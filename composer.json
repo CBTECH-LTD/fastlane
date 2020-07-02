@@ -1,0 +1,61 @@
+{
+    "name": "cbtech-ltd/fastlane",
+    "description": "Fastlane is a toolkit to build custom CMS.",
+    "keywords": [
+        "cbtech-ltd",
+        "fastlane"
+    ],
+    "homepage": "https://github.com/cbtech-ltd/fastlane",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Vanderlei Sbaraini Amancio",
+            "email": "vanderlei@cbtech.co.uk",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "illuminate/support": "^7.0",
+        "webmozart/assert": "^1.8.0",
+        "altek/accountant": "^2.0",
+        "altek/eventually": "^1.0",
+        "cbtech-ltd/laravel-json-api-transformer": "dev-master",
+        "spatie/laravel-medialibrary": "^8.2",
+        "spatie/laravel-permission": "^3.13",
+        "hashids/hashids": "^4.0",
+        "inertiajs/inertia-laravel": "^0.2.5"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^5.0",
+        "../../vendor/phpunit/phpunit": "^8.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "CbtechLtd\\Fastlane\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CbtechLtd\\Fastlane\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CbtechLtd\\Fastlane\\FastlaneServiceProvider"
+            ],
+            "aliases": {
+                "Fastlane": "CbtechLtd\\Fastlane\\FastlaneFacade"
+            }
+        }
+    }
+}

@@ -1,0 +1,77 @@
+<template>
+    <f-the-app-layout>
+        <template v-slot:title>{{ entryType.plural_name }}</template>
+        <template v-slot:actions>
+            <f-button v-if="links.create" :href="links.create" left-icon="plus" size="lg">Add {{ entryType.singular_name }}</f-button>
+        </template>
+
+        <f-table-card :items="items.data" :schema="entryType.schema">
+            <template v-slot:columns>
+                <th v-for="(colConfig, colId) in entryType.schema" :key="colId" class="table__column">
+                    {{ colConfig.label }}
+                </th>
+                <th></th>
+            </template>
+            <template v-slot:item="{ item }">
+                <td v-for="(colConfig, colId) in entryType.schema" :key="colId" class="table__cell">
+                    <slot :name="`item-content-${colId}`" :column="colConfig" :item="item" :value="item.attributes[colId]">
+                        {{ item.attributes[colId] }}
+                    </slot>
+                </td>
+                <td class="table__cell flex items-center justify-end">
+                    <!-- Activate / Deactivate -->
+                    <template v-if="item.attributes.hasOwnProperty('is_active')">
+                        <f-list-item-action v-if="item.attributes.is_active" @click="toggleItemActivation(item, false)" icon="toggle-on" color="green" title="Click to deactivate" :loading="isUpdatingActivationStateFor[item.id]"/>
+                        <f-list-item-action v-else @click="toggleItemActivation(item, true)" icon="toggle-off" color="black" title="Click to activate" :loading="isUpdatingActivationStateFor[item.id]"/>
+                    </template>
+                    <!-- Edit -->
+                    <f-list-item-action v-if="item.links.self" :href="item.links.self" icon="pencil-alt" title="Edit"/>
+                </td>
+            </template>
+        </f-table-card>
+    </f-the-app-layout>
+</template>
+
+<script>
+
+    export default {
+        name: 'Entries.Index',
+
+        props: {
+            links: {
+                required: true,
+                type: Object,
+            },
+            items: {
+                required: true,
+                type: Object,
+            },
+            entryType: {
+                required: true,
+                type: Object,
+            }
+        },
+
+        data () {
+            return {
+                isUpdatingActivationStateFor: {},
+            }
+        },
+
+        methods: {
+            async toggleItemActivation (item, state) {
+                if (!this.isUpdatingActivationStateFor[item.id]) {
+                    this.$set(this.isUpdatingActivationStateFor, item.id, true)
+
+                    try {
+                        await this.$inertia.patch(item.links.self, {
+                            is_active: state,
+                        })
+                    } catch {}
+
+                    this.$set(this.isUpdatingActivationStateFor, item.id, false)
+                }
+            }
+        }
+    }
+</script>
