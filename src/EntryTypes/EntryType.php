@@ -102,7 +102,7 @@ abstract class EntryType implements EntryTypeContract
         // Create permissions for all constants starting with PERM_.
         $constants
             ->filter(function ($value, $key) {
-                return Str::startsWith('PERM_', $key);
+                return Str::startsWith($key, 'PERM_');
             })
             ->each(function ($value, $key) {
                 FastlaneFacade::createPermission($value);
@@ -111,7 +111,7 @@ abstract class EntryType implements EntryTypeContract
         // Create roles for all constants starting with ROLE_.
         $constants
             ->filter(function ($value, $key) {
-                return Str::startsWith('ROLE_', $key);
+                return Str::startsWith($key, 'ROLE_');
             })
             ->each(function ($value) {
                 FastlaneFacade::createRole($value);

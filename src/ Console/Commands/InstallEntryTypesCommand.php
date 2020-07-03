@@ -6,21 +6,21 @@ use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use Illuminate\Console\Command;
 
-class InstallContentTypesCommand extends Command
+class InstallEntryTypesCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'fastlane:content-types:install';
+    protected $signature = 'fastlane:entry-types:install';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Install the Content Types as configured in Fastlane config file';
+    protected $description = 'Install the Entry Types as configured in Fastlane config file';
 
     /**
      * Create a new command instance.

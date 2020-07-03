@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane;
 
-use CbtechLtd\Fastlane\Console\Commands\InstallContentTypesCommand;
+use CbtechLtd\Fastlane\Console\Commands\InstallEntryTypesCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserResource;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Commands\CreateSystemAdminCommand;
@@ -58,7 +58,7 @@ class FastlaneServiceProvider extends ServiceProvider
 
             // Registering package commands.
             $this->commands([
-                InstallContentTypesCommand::class,
+                InstallEntryTypesCommand::class,
                 CreateSystemAdminCommand::class,
             ]);
         }
