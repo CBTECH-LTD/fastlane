@@ -96,26 +96,7 @@ abstract class EntryType implements EntryTypeContract
 
     public function install(): void
     {
-        $reflector = new ReflectionClass($this);
-        $constants = Collection::make($reflector->getConstants());
-
-        // Create permissions for all constants starting with PERM_.
-        $constants
-            ->filter(function ($value, $key) {
-                return Str::startsWith($key, 'PERM_');
-            })
-            ->each(function ($value, $key) {
-                FastlaneFacade::createPermission($value);
-            });
-
-        // Create roles for all constants starting with ROLE_.
-        $constants
-            ->filter(function ($value, $key) {
-                return Str::startsWith($key, 'ROLE_');
-            })
-            ->each(function ($value) {
-                FastlaneFacade::createRole($value);
-            });
+        $this->installRolesAndPermissions();
     }
 
     public function isVisibleOnMenu(): bool
@@ -173,5 +154,39 @@ abstract class EntryType implements EntryTypeContract
     protected function newModelInstance(): Model
     {
         return app()->make($this->model());
+    }
+
+    protected function installRolesAndPermissions(): void
+    {
+        $reflector = new ReflectionClass($this);
+        $constants = Collection::make($reflector->getConstants());
+
+        // Create permissions for all constants starting with PERM_.
+        $this->installPermissions(
+            $constants->filter(function ($value, $key) {
+                return Str::startsWith($key, 'PERM_');
+            })
+        );
+
+        // Create roles for all constants starting with ROLE_.
+        $this->installRoles(
+            $constants->filter(function ($value, $key) {
+                return Str::startsWith($key, 'ROLE_');
+            })
+        );
+    }
+
+    protected function installPermissions(Collection $permissions): void
+    {
+        $permissions->each(function ($value) {
+            FastlaneFacade::createPermission($value);
+        });
+    }
+
+    protected function installRoles(Collection $roles): void
+    {
+        $roles->each(function ($value) {
+            FastlaneFacade::createRole($value);
+        });
     }
 }

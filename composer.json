@@ -25,11 +25,12 @@
         "spatie/laravel-medialibrary": "^8.2",
         "spatie/laravel-permission": "^3.13",
         "hashids/hashids": "^4.0",
-        "inertiajs/inertia-laravel": "^0.2.5"
+        "inertiajs/inertia-laravel": "^0.2.5",
+        "nette/php-generator": "^3.4"
     },
     "require-dev": {
         "orchestra/testbench": "^5.0",
-        "../../vendor/phpunit/phpunit": "^8.5"
+        "phpunit/phpunit": "^8.5"
     },
     "autoload": {
         "psr-4": {
