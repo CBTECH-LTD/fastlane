@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
 use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
+use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Constraints\Unique;
 
 abstract class BaseType implements SchemaFieldType
 {
@@ -11,6 +12,7 @@ abstract class BaseType implements SchemaFieldType
     protected string $createRules = '';
     protected string $updateRules = '';
     protected bool $required = false;
+    protected ?Unique $unique = null;
     protected bool $showOnIndex = false;
     protected bool $showOnCreate = true;
     protected bool $showOnUpdate = true;
@@ -48,6 +50,22 @@ abstract class BaseType implements SchemaFieldType
         return $this;
     }
 
+    public function hasUniqueRule(): bool
+    {
+        return $this->unique instanceof Unique;
+    }
+
+    public function getUniqueRule(): ?Unique
+    {
+        return $this->unique;
+    }
+
+    public function unique(Unique $unique): self
+    {
+        $this->unique = $unique;
+        return $this;
+    }
+
     public function setRules(string $rules): self
     {
         $this->createRules = $rules;
@@ -57,11 +75,9 @@ abstract class BaseType implements SchemaFieldType
 
     public function getCreateRules(): string
     {
-        $requiredRule = $this->isRequired()
-            ? 'required'
-            : 'nullable';
+        $baseRules = $this->getBaseRules();
 
-        return "{$requiredRule}|{$this->getTypeRules()}|{$this->createRules}";
+        return "{baseRules}{$this->getTypeRules()}|{$this->createRules}";
     }
 
     public function setCreateRules(string $rules): self
@@ -72,11 +88,9 @@ abstract class BaseType implements SchemaFieldType
 
     public function getUpdateRules(): string
     {
-        $requiredRule = $this->isRequired()
-            ? 'required'
-            : 'nullable';
+        $baseRules = $this->getBaseRules();
 
-        return "sometimes|{$requiredRule}|{$this->getTypeRules()}|{$this->updateRules}";
+        return "sometimes|{$baseRules}{$this->getTypeRules()}|{$this->updateRules}";
     }
 
     public function setUpdateRules(string $rules): self
@@ -145,6 +159,19 @@ abstract class BaseType implements SchemaFieldType
             'required' => $this->isRequired(),
             'config'   => $this->getConfig(),
         ];
+    }
+
+    protected function getBaseRules(): string
+    {
+        $requiredRule = $this->isRequired()
+            ? 'required'
+            : 'nullable';
+
+        $uniqueRule = $this->hasUniqueRule()
+            ? (string)$this->getUniqueRule() . '|'
+            : '';
+
+        return $requiredRule . '|' . $uniqueRule;
     }
 
     protected function getTypeRules(): string

@@ -2,13 +2,14 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes\BackendUser;
 
+use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
 use CbtechLtd\Fastlane\Support\Schema\EntrySchemaDefinition;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config\SingleChoiceOption;
+use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Constraints\Unique;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\SingleChoiceType;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\StringType;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\ToggleType;
-use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 
 class BackendUserSchema extends EntrySchema
@@ -23,8 +24,8 @@ class BackendUserSchema extends EntrySchema
 
             StringType::make('email', 'Email')
                 ->required()
-                ->setCreateRules('max:255|unique:users,email')
-                ->setUpdateRules('max:255|unique:users,email,' . Auth::user()->getKey())
+                ->unique(new Unique(User::class, 'email'))
+                ->setRules('max:255')
                 ->showOnIndex(),
 
             SingleChoiceType::make('role', 'Role')
