@@ -2,6 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
+use Illuminate\Database\Schema\Blueprint;
+
 class TextType extends BaseType
 {
     public function getType(): string
@@ -14,18 +16,12 @@ class TextType extends BaseType
         return 'string';
     }
 
-    public function toMigration(): string
+    public function runOnMigration(Blueprint $table): void
     {
-        $base = "text('{$this->getName()}')";
+        $col = $table->text($this->getName())->nullable(! $this->isRequired());
 
-        if (! $this->isRequired()) {
-            $base = "{$base}->nullable()";
+        if (! $this->hasUniqueRule()) {
+            $col->unique();
         }
-
-        if ($this->hasUniqueRule()) {
-            $base = "{$base}->unique()";
-        }
-
-        return $base;
     }
 }

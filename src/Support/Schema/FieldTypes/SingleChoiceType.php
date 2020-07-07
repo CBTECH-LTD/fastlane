@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config\SingleChoiceOption;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 
@@ -55,18 +56,12 @@ class SingleChoiceType extends BaseType
         ];
     }
 
-    public function toMigration(): string
+    public function runOnMigration(Blueprint $table): void
     {
-        $base = "string('{$this->getName()}')";
+        $col = $table->string($this->getName())->nullable(! $this->isRequired());
 
-        if (! $this->isRequired()) {
-            $base = "{$base}->nullable()";
+        if (! $this->hasUniqueRule()) {
+            $col->unique();
         }
-
-        if ($this->hasUniqueRule()) {
-            $base = "{$base}->unique()";
-        }
-
-        return $base;
     }
 }

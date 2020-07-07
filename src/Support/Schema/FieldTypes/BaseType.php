@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
 use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Constraints\Unique;
+use Illuminate\Database\Schema\Blueprint;
 
 abstract class BaseType implements SchemaFieldType
 {
@@ -77,7 +78,7 @@ abstract class BaseType implements SchemaFieldType
     {
         $baseRules = $this->getBaseRules();
 
-        return "{baseRules}{$this->getTypeRules()}|{$this->createRules}";
+        return "{$baseRules}{$this->getTypeRules()}|{$this->createRules}";
     }
 
     public function setCreateRules(string $rules): self
@@ -149,11 +150,6 @@ abstract class BaseType implements SchemaFieldType
         return $this->showOnUpdate;
     }
 
-    public function toMigration(): string
-    {
-        return '';
-    }
-
     public function toArray()
     {
         return [
@@ -164,6 +160,11 @@ abstract class BaseType implements SchemaFieldType
             'required' => $this->isRequired(),
             'config'   => $this->getConfig(),
         ];
+    }
+
+    public function runOnMigration(Blueprint $table): void
+    {
+        //
     }
 
     protected function getBaseRules(): string

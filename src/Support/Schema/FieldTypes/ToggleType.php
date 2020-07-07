@@ -2,6 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
+use Illuminate\Database\Schema\Blueprint;
+
 class ToggleType extends BaseType
 {
     public function getType(): string
@@ -9,15 +11,13 @@ class ToggleType extends BaseType
         return 'boolean';
     }
 
-    public function toMigration(): string
+    public function runOnMigration(Blueprint $table): void
     {
-        $base = "boolean('{$this->getName()}')";
+        $col = $table->boolean($this->getName())->nullable(! $this->isRequired());
 
-        if (! $this->isRequired()) {
-            $base = "{$base}->nullable()";
+        if (! $this->hasUniqueRule()) {
+            $col->unique();
         }
-
-        return $base;
     }
 
     protected function getTypeRules(): string

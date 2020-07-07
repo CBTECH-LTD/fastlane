@@ -4,24 +4,21 @@ namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
 use Illuminate\Database\Schema\Blueprint;
 
-class StringType extends BaseType
+class DateType extends BaseType
 {
     public function getType(): string
     {
-        return 'string';
+        return 'date';
     }
 
     public function runOnMigration(Blueprint $table): void
     {
-        $col = $table->string($this->getName())->nullable(! $this->isRequired());
+        $col = $table
+            ->date($this->getName())
+            ->nullable(! $this->isRequired());
 
-        if (! $this->hasUniqueRule()) {
+        if ($this->hasUniqueRule()) {
             $col->unique();
         }
-    }
-
-    protected function getTypeRules(): string
-    {
-        return 'string';
     }
 }

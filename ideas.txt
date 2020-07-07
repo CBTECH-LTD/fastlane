@@ -1,0 +1,25 @@
+fastlane:entry-types:generate
+
+- Type the namespace:
+    default: App\EntryTypes
+- Type the entry type name. It will generate a class named "App\EntryTypes\{NAME}\{NAME}EntryType":
+    text input
+- Type the singular name of the entry type:
+    default: {NAME}
+- Type the plural name of the entry type:
+    default: {NAME}
+- Choose the name of the field #N:
+- Choose the type of the field #N:
+    - show list of options
+    - according to each type, other questions may be presented.
+- Is the field {NAME} required?
+    - yes / no
+- What is the default field value?
+    - type it or blank
+- Select the views where the field must be displayed:
+    - index
+    - create
+    - update
+- Is the field sortable?
+- Is the field filterable?
+    

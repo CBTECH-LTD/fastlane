@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\Support\Contracts;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Schema\Blueprint;
 
 interface SchemaFieldType extends Arrayable
 {
@@ -44,5 +45,5 @@ interface SchemaFieldType extends Arrayable
 
     public function isShownOnUpdate(): bool;
 
-    public function toMigration(): string;
+    public function runOnMigration(Blueprint $table): void;
 }

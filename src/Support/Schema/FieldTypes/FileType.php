@@ -2,6 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
+use Illuminate\Database\Schema\Blueprint;
+
 class FileType extends BaseType
 {
     protected array $accept = [];
@@ -27,18 +29,12 @@ class FileType extends BaseType
         return 'file';
     }
 
-    public function toMigration(): string
+    public function runOnMigration(Blueprint $table): void
     {
-        $base = "string('{$this->getName()}')";
-
-        if (! $this->isRequired()) {
-            $base = "{$base}->nullable()";
-        }
+        $col = $table->string($this->getName())->nullable(! $this->isRequired());
 
         if ($this->hasUniqueRule()) {
-            $base = "{$base}->unique()";
+            $col->unique();
         }
-
-        return $base;
     }
 }

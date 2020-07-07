@@ -66,10 +66,6 @@ class GenerateMigrationFromEntrySchemaCommand extends Command
     {
         $entryType = $this->argument('entryType');
 
-        if (class_exists($entryType)) {
-            return $entryType;
-        }
-
         $entryTypeDirectory = Str::endsWith($entryType, 'EntryType')
             ? Str::replaceLast('EntryType', '', $entryType)
             : $entryType;
@@ -82,6 +78,10 @@ class GenerateMigrationFromEntrySchemaCommand extends Command
             return $entryTypeFull;
         }
 
+        if (class_exists($entryType)) {
+            return $entryType;
+        }
+
         throw new \Exception('Entry Type ' . $entryType . ' does not exist.');
     }
 
@@ -90,15 +90,12 @@ class GenerateMigrationFromEntrySchemaCommand extends Command
         $className = 'Create' . $entryType->pluralName() . 'Table';
         $table = Str::plural(Str::snake($entryType->identifier(), '_'));
 
-        $fields = Collection::make($entryType->schema()->build()->getFields())->map(function (SchemaFieldType $field) {
-            if ($field->getName() === 'is_active') {
-                return null;
-            }
+        $fields = Collection::make($entryType->schema()->build()->getFields())
+            ->filter(function (SchemaFieldType $field) {
+                return $field->getName() !== 'is_active';
+            });
 
-            return '$table->' . $field->toMigration();
-        })->filter();
-
-        $this->createClassFile($className, $table, $fields->all(), 'EntryMigration');
+        $this->createClassFile($className, $table, get_class($entryType), $fields->all(), 'EntryMigration');
     }
 
     protected function makeFilePath(string $relativeClass): string
@@ -114,11 +111,12 @@ class GenerateMigrationFromEntrySchemaCommand extends Command
     /**
      * @param string $className
      * @param string $table
+     * @param string $entryTypeClass
      * @param array  $columns
      * @param string $stub
      * @throws \Exception
      */
-    protected function createClassFile(string $className, string $table, array $columns, string $stub): void
+    protected function createClassFile(string $className, string $table, string $entryTypeClass, array $columns, string $stub): void
     {
         $now = Carbon::now()->format('Y_m_d_Hmi');
         $filePath = database_path('migrations/' . $now . '_' . Str::snake($className) . '.php');
@@ -127,14 +125,13 @@ class GenerateMigrationFromEntrySchemaCommand extends Command
             throw new \Exception('File ' . $filePath . ' already exists');
         }
 
-        $columns = Collection::make($columns)->implode(';' . PHP_EOL . '             ');
-
         $view = View::file(
             __DIR__ . '/../../../stubs/' . $stub . '.blade.php',
             [
-                'class'   => $className,
-                'table'   => $table,
-                'columns' => $columns,
+                'class'          => $className,
+                'table'          => $table,
+                'entryTypeClass' => $entryTypeClass,
+                'columns'        => $columns,
             ]
         );
 

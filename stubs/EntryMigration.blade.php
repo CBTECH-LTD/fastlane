@@ -23,7 +23,16 @@ class {{ $class }} extends Migration
             $table->activable();
 
             // Specific table columns...
-            @isset($columns) {!! $columns !!}; @endisset
+            @isset($columns)
+
+            collect(app()->make('{{ $entryTypeClass }}')->schema()->build()->getFields())
+                ->each(function ($field) use ($table) {
+                    if ($field->getName() !== 'is_active') {
+                        $field->runOnMigration($table);
+                    }
+                });
+
+            @endisset
 
         });
     }
