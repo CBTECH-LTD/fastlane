@@ -8,7 +8,7 @@ class {{ $class }} extends ResourceType
 {
         public function type(): string
         {
-            return {{ $type }};
+            return '{{ $type }}';
         }
 
         public function attributes(Request $request): array
