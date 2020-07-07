@@ -26,4 +26,19 @@ class FileType extends BaseType
     {
         return 'file';
     }
+
+    public function toMigration(): string
+    {
+        $base = "string('{$this->getName()}')";
+
+        if (! $this->isRequired()) {
+            $base = "{$base}->nullable()";
+        }
+
+        if ($this->hasUniqueRule()) {
+            $base = "{$base}->unique()";
+        }
+
+        return $base;
+    }
 }

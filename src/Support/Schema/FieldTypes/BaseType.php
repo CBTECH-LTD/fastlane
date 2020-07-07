@@ -149,6 +149,11 @@ abstract class BaseType implements SchemaFieldType
         return $this->showOnUpdate;
     }
 
+    public function toMigration(): string
+    {
+        return '';
+    }
+
     public function toArray()
     {
         return [

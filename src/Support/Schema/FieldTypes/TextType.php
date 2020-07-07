@@ -13,4 +13,19 @@ class TextType extends BaseType
     {
         return 'string';
     }
+
+    public function toMigration(): string
+    {
+        $base = "text('{$this->getName()}')";
+
+        if (! $this->isRequired()) {
+            $base = "{$base}->nullable()";
+        }
+
+        if ($this->hasUniqueRule()) {
+            $base = "{$base}->unique()";
+        }
+
+        return $base;
+    }
 }

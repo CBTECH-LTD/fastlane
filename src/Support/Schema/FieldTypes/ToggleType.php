@@ -9,6 +9,17 @@ class ToggleType extends BaseType
         return 'boolean';
     }
 
+    public function toMigration(): string
+    {
+        $base = "boolean('{$this->getName()}')";
+
+        if (! $this->isRequired()) {
+            $base = "{$base}->nullable()";
+        }
+
+        return $base;
+    }
+
     protected function getTypeRules(): string
     {
         return 'boolean';

@@ -23,7 +23,8 @@ class {{ $class }} extends Migration
             $table->activable();
 
             // Specific table columns...
-            $table->string('name');
+            @isset($columns) {!! $columns !!}; @endisset
+
         });
     }
 

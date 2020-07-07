@@ -1,0 +1,150 @@
+<?php
+
+namespace CbtechLtd\Fastlane\Console\Commands;
+
+use Carbon\Carbon;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
+use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
+use Webmozart\Assert\Assert;
+
+class GenerateMigrationFromEntrySchemaCommand extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'fastlane:entry-types:schema-to-migration {entryType}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Generate a migration from the given schema';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle()
+    {
+        $entryTypeClass = $this->getEntryTypeClass();
+
+        Assert::implementsInterface(
+            $entryTypeClass,
+            EntryType::class,
+            'First argument must implement ' . EntryType::class
+        );
+
+        $entryTypeInstance = app()->make($entryTypeClass);
+
+        if (is_null($entryTypeInstance)) {
+            throw new \Exception($entryTypeClass . ' is not registered.');
+        }
+
+        $this->makeMigrationClass($entryTypeInstance);
+    }
+
+    protected function getEntryTypeClass(): string
+    {
+        $entryType = $this->argument('entryType');
+
+        if (class_exists($entryType)) {
+            return $entryType;
+        }
+
+        $entryTypeDirectory = Str::endsWith($entryType, 'EntryType')
+            ? Str::replaceLast('EntryType', '', $entryType)
+            : $entryType;
+
+        $entryTypeClass = Str::endsWith($entryType, 'EntryType')
+            ? $entryType
+            : "{$entryType}EntryType";
+
+        if (class_exists($entryTypeFull = app()->getNamespace() . 'EntryTypes\\' . $entryTypeDirectory . '\\' . $entryTypeClass)) {
+            return $entryTypeFull;
+        }
+
+        throw new \Exception('Entry Type ' . $entryType . ' does not exist.');
+    }
+
+    protected function makeMigrationClass(EntryType $entryType): void
+    {
+        $className = 'Create' . $entryType->pluralName() . 'Table';
+        $table = Str::plural(Str::snake($entryType->identifier(), '_'));
+
+        $fields = Collection::make($entryType->schema()->build()->getFields())->map(function (SchemaFieldType $field) {
+            if ($field->getName() === 'is_active') {
+                return null;
+            }
+
+            return '$table->' . $field->toMigration();
+        })->filter();
+
+        $this->createClassFile($className, $table, $fields->all(), 'EntryMigration');
+    }
+
+    protected function makeFilePath(string $relativeClass): string
+    {
+        return app_path('EntryTypes/' . $this->getEntryTypeClass() . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $relativeClass));
+    }
+
+    protected function fileExists(string $file): bool
+    {
+        return File::exists($file);
+    }
+
+    /**
+     * @param string $className
+     * @param string $table
+     * @param array  $columns
+     * @param string $stub
+     * @throws \Exception
+     */
+    protected function createClassFile(string $className, string $table, array $columns, string $stub): void
+    {
+        $now = Carbon::now()->format('Y_m_d_Hmi');
+        $filePath = database_path('migrations/' . $now . '_' . Str::snake($className) . '.php');
+
+        if ($this->fileExists($filePath)) {
+            throw new \Exception('File ' . $filePath . ' already exists');
+        }
+
+        $columns = Collection::make($columns)->implode(';' . PHP_EOL . '             ');
+
+        $view = View::file(
+            __DIR__ . '/../../../stubs/' . $stub . '.blade.php',
+            [
+                'class'   => $className,
+                'table'   => $table,
+                'columns' => $columns,
+            ]
+        );
+
+        $this->savePHPFile($filePath, $view);
+    }
+
+    protected function savePHPFile(string $filePath, string $content): void
+    {
+        File::put($filePath, '<?php' . PHP_EOL . PHP_EOL . $content);
+
+        $this->comment('File ' . $filePath . ' created.');
+    }
+}

@@ -43,4 +43,6 @@ interface SchemaFieldType extends Arrayable
     public function isShownOnCreate(): bool;
 
     public function isShownOnUpdate(): bool;
+
+    public function toMigration(): string;
 }

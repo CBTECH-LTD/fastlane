@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane;
 
+use CbtechLtd\Fastlane\Console\Commands\GenerateMigrationFromEntrySchemaCommand;
 use CbtechLtd\Fastlane\Console\Commands\InstallEntryTypesCommand;
 use CbtechLtd\Fastlane\Console\Commands\MakeEntryTypeCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
@@ -61,6 +62,7 @@ class FastlaneServiceProvider extends ServiceProvider
             $this->commands([
                 MakeEntryTypeCommand::class,
                 InstallEntryTypesCommand::class,
+                GenerateMigrationFromEntrySchemaCommand::class,
                 CreateSystemAdminCommand::class,
             ]);
         }

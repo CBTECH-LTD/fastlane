@@ -7,7 +7,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
-use Nette\PhpGenerator\Printer;
 
 class MakeEntryTypeCommand extends Command
 {
@@ -26,11 +25,6 @@ class MakeEntryTypeCommand extends Command
     protected $description = 'Make a new Entry Type';
 
     /**
-     * @var Printer
-     */
-    protected Printer $printer;
-
-    /**
      * Create a new command instance.
      *
      * @return void
@@ -38,8 +32,6 @@ class MakeEntryTypeCommand extends Command
     public function __construct()
     {
         parent::__construct();
-
-        $this->printer = new Printer;
     }
 
     /**
@@ -64,11 +56,6 @@ class MakeEntryTypeCommand extends Command
         $this->makeResourceClass($ns);
         $this->makeSchemaClass($ns);
         $this->makeMigrationClass($ns);
-    }
-
-    protected function getBasePath(): string
-    {
-        return app_path('EntryTypes/' . $this->getNameArgument());
     }
 
     protected function getNameArgument(): string
@@ -135,7 +122,7 @@ class MakeEntryTypeCommand extends Command
         }
 
         $className = 'Create' . Str::plural($this->getNameArgument()) . 'Table';
-        $table = Str::plural(Str::snake($this->getNameArgument(), '-'));
+        $table = Str::plural(Str::snake($this->getNameArgument(), '_'));
 
         $now = Carbon::now()->format('Y_m_d_Hmi');
         $migrationPath = database_path('migrations/' . $now . '_' . Str::snake($className) . '.php');
