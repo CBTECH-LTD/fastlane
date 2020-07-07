@@ -72,7 +72,7 @@ class MakeEntryTypeCommand extends Command
 
     protected function makeModelClass(string $namespace): void
     {
-        if (! $this->option('model')) {
+        if (! $this->option('model') && ! $this->option('all')) {
             return;
         }
 
@@ -82,7 +82,7 @@ class MakeEntryTypeCommand extends Command
 
     protected function makePolicyClass(string $namespace): void
     {
-        if (! $this->option('policy')) {
+        if (! $this->option('policy') && ! $this->option('all')) {
             return;
         }
 
@@ -92,7 +92,7 @@ class MakeEntryTypeCommand extends Command
 
     protected function makeSchemaClass(string $namespace): void
     {
-        if (! $this->option('schema')) {
+        if (! $this->option('schema') && ! $this->option('all')) {
             return;
         }
 
@@ -102,7 +102,7 @@ class MakeEntryTypeCommand extends Command
 
     protected function makeResourceClass(string $namespace): void
     {
-        if (! $this->option('resource')) {
+        if (! $this->option('resource') && ! $this->option('all')) {
             return;
         }
 
@@ -117,7 +117,7 @@ class MakeEntryTypeCommand extends Command
 
     protected function makeMigrationClass(string $namespace): void
     {
-        if (! $this->option('migration')) {
+        if (! $this->option('migration') && ! $this->option('all')) {
             return;
         }
 
