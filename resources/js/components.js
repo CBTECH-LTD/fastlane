@@ -3,6 +3,7 @@ import FButton from './Components/Button'
 import FFormField from './Components/FormField'
 import FFormDateTimeInput from './Components/FormDateTimeInput'
 import FFormRadioInput from './Components/FormRadioInput'
+import FFormRichEditorInput from './Components/FormRichEditorInput'
 import FFormSingleChoiceInput from './Components/FormSingleChoiceInput'
 import FFormStringInput from './Components/FormStringInput'
 import FFormSwitchInput from './Components/FormSwitchInput'
@@ -18,9 +19,12 @@ import FSidebar from './Components/Sidebar'
 import FSpinner from './Components/Spinner'
 import FTableCard from './Components/TableCard'
 import FTheAppLayout from './Components/TheAppLayout'
+import FTrix from './Components/Trix'
 
 export default {
     install (Vue) {
+        Vue.config.ignoredElements = ['trix-editor']
+
         Vue.component('f-boxed-card', FBoxedCard)
         Vue.component('f-button', FButton)
         Vue.component('f-icon', FIcon)
@@ -32,6 +36,7 @@ export default {
         Vue.component('f-sidebar', FSidebar)
         Vue.component('f-spinner', FSpinner)
         Vue.component('f-the-app-layout', FTheAppLayout)
+        Vue.component('f-trix', FTrix)
 
         // Menu specific..)
         Vue.component('f-menu-group', FMenuGroup)
@@ -41,6 +46,7 @@ export default {
         Vue.component('f-form-field', FFormField)
         Vue.component('f-form-date-time-input', FFormDateTimeInput)
         Vue.component('f-form-radio-input', FFormRadioInput)
+        Vue.component('f-form-rich-editor-input', FFormRichEditorInput)
         Vue.component('f-form-single-choice-input', FFormSingleChoiceInput)
         Vue.component('f-form-string-input', FFormStringInput)
         Vue.component('f-form-text-input', FFormTextInput)

@@ -119,6 +119,11 @@ const types = {
         component: 'f-form-date-time-input',
         default: null,
         make: null,
+    },
+    richEditor: {
+        component: 'f-form-rich-editor-input',
+        default: null,
+        make: null,
     }
 }
 
