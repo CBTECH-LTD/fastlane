@@ -1,6 +1,6 @@
 <template>
     <div class="w-full">
-        <textarea rows="4" class="w-full form-input" :class="{'border-purple-500': dirty}" v-bind="$attrs" :value="value" @input="onInput"></textarea>
+        <textarea rows="4" class="w-full form-input" v-bind="$attrs" :value="value" @input="onInput"></textarea>
     </div>
 </template>
 
@@ -16,10 +16,6 @@
                 type: String | null,
                 required: true,
             },
-            dirty: {
-                type: Boolean,
-                default: false,
-            }
         },
 
         methods: {

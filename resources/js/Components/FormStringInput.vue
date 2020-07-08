@@ -1,6 +1,6 @@
 <template>
     <div class="w-full">
-        <input type="text" class="w-full form-input" :class="{'border-purple-500': dirty}" v-bind="$attrs" :value="value" @input="onInput">
+        <input type="text" class="w-full form-input" v-bind="$attrs" :value="value" @input="onInput">
     </div>
 </template>
 
@@ -15,10 +15,6 @@
             value: {
                 type: String | null,
                 required: true,
-            },
-            dirty: {
-                type: Boolean,
-                default: false,
             }
         },
 

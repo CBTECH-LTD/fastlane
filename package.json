@@ -24,7 +24,9 @@
         "@tailwindcss/custom-forms": "^0.2.1",
         "ajv": "^6.12.2",
         "axios": "^0.19",
+        "flatpickr": "^4.6.3",
         "lodash": "^4.17.13",
+        "moment": "^2.27.0",
         "popper.js": "^1.12",
         "tailwindcss": "^1.4.6",
         "vue-select": "^3.10.5"

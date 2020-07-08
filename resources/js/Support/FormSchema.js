@@ -115,6 +115,11 @@ const types = {
         default: null,
         make: null,
     },
+    date: {
+        component: 'f-form-date-time-input',
+        default: null,
+        make: null,
+    }
 }
 
 export default function FormSchema (data, schema) {

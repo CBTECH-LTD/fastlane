@@ -1,6 +1,7 @@
 import FBoxedCard from './Components/BoxedCard'
 import FButton from './Components/Button'
 import FFormField from './Components/FormField'
+import FFormDateTimeInput from './Components/FormDateTimeInput'
 import FFormRadioInput from './Components/FormRadioInput'
 import FFormSingleChoiceInput from './Components/FormSingleChoiceInput'
 import FFormStringInput from './Components/FormStringInput'
@@ -38,6 +39,7 @@ export default {
 
         // Form specific..)
         Vue.component('f-form-field', FFormField)
+        Vue.component('f-form-date-time-input', FFormDateTimeInput)
         Vue.component('f-form-radio-input', FFormRadioInput)
         Vue.component('f-form-single-choice-input', FFormSingleChoiceInput)
         Vue.component('f-form-string-input', FFormStringInput)
