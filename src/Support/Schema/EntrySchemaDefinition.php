@@ -71,6 +71,13 @@ class EntrySchemaDefinition implements Contracts\EntrySchemaDefinition
         );
     }
 
+    public function findField(string $name): ?SchemaFieldType
+    {
+        return Collection::make($this->fields)->first(
+            fn(SchemaFieldType $field) => $field->getName() === $name
+        );
+    }
+
     protected function transformToArray(Collection $items): array
     {
         return Collection::make($items)->mapWithKeys(

@@ -14,7 +14,7 @@ use Spatie\Permission\Models\Role;
 
 class BackendUserSchema extends EntrySchema
 {
-    public function build(): EntrySchemaDefinition
+    protected function fields(): EntrySchemaDefinition
     {
         return EntrySchemaDefinition::make([
             StringType::make('name', 'Name')

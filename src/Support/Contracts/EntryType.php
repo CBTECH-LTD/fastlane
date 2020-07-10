@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Contracts;
 
+use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResourceCollection;
@@ -31,9 +32,9 @@ interface EntryType
 
     public function findItem(string $hashid): ApiResource;
 
-    public function store(array $data): Model;
+    public function store(EntryRequest $request, array $data): Model;
 
-    public function update(string $hashid, array $data): Model;
+    public function update(EntryRequest $request, string $hashid, array $data): Model;
 
     public function delete(string $hashid): Model;
 

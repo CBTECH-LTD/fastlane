@@ -15,10 +15,8 @@
                         {{ field.label }}
                     </template>
                     <component :is="field.component"
-                               v-model="field.value"
+                               :field="field"
                                :required="field.isRequired"
-                               :dirty="field.isDirty"
-                               :config="field.config || {}"
                     ></component>
                 </f-form-field>
             </template>
@@ -82,11 +80,13 @@
 
         methods: {
             async submitForm () {
-                if (!this.isUpdating) {
+                const formObject = this.form.toFormObject()
+
+                if (formObject && !this.isUpdating) {
                     this.isUpdating = true
 
                     try {
-                        await this.$inertia.patch(this.item.links.self, this.form.getDirty())
+                        await this.$inertia.patch(this.item.links.self, formObject.all())
                     } catch {}
 
                     this.isUpdating = false

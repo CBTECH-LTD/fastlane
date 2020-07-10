@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\ControlPanel\Controllers;
+use CbtechLtd\Fastlane\FastlaneFacade;
+use CbtechLtd\Fastlane\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,16 +39,8 @@ Route::post('email/resend', [\CbtechLtd\Fastlane\Http\Controllers\Auth\Verificat
 */
 
 Route::middleware(['auth:cp', 'verified'])->group(function ($router) {
-    $router->get('dashboard', [\CbtechLtd\Fastlane\Http\Controllers\DashboardController::class, 'show'])->name('dashboard');
-
-    // Backend users
-//    $router->get('backend-users', [Controllers\BackendUsersController::class, 'index'])->name('backend-users.index');
-//    $router->get('backend-users/new', [Controllers\BackendUsersController::class, 'create'])->name('backend-users.create');
-//    $router->post('backend-users', [Controllers\BackendUsersController::class, 'store'])->name('backend-users.store');
-//    $router->get('backend-users/{user}', [Controllers\BackendUsersController::class, 'edit'])->name('backend-users.edit');
-//    $router->patch('backend-users/{user}', [Controllers\BackendUsersController::class, 'update']);
-//    $router->delete('backend-users/{user}', [Controllers\BackendUsersController::class, 'delete']);
+    $router->get('dashboard', [DashboardController::class, 'show'])->name('dashboard');
 
     // Register Content Types routes
-    \CbtechLtd\Fastlane\FastlaneFacade::registerRoutes($router);
+    FastlaneFacade::registerRoutes($router);
 });

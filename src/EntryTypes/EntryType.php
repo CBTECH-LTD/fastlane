@@ -4,12 +4,15 @@ namespace CbtechLtd\Fastlane\EntryTypes;
 
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\FastlaneFacade;
+use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
+use CbtechLtd\Fastlane\Support\Schema\EntrySchemaDefinition;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResourceCollection;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -91,7 +94,7 @@ abstract class EntryType implements EntryTypeContract
             ClassDoesNotExistException::model($name);
         }
 
-        return new $name;
+        return new $name($this);
     }
 
     public function install(): void
@@ -122,22 +125,34 @@ abstract class EntryType implements EntryTypeContract
         return $this->apiResource()::single($entry);
     }
 
-    public function store(array $data): Model
+    public function store(EntryRequest $request, array $data): Model
     {
         $this->gate->authorize('create', $this->model());
 
-        return tap($this->newModelInstance(), function (Model $entry) use ($data) {
-            $entry->fill($data)->save();
-        });
+        $entry = $this->newModelInstance();
+
+        $this->hydrateFields(
+            $request,
+            $entry,
+            $this->schema()->getDefinition()->toCreate(),
+        );
+
+        $entry->save();
+        return $entry;
     }
 
-    public function update(string $hashid, array $data): Model
+    public function update(EntryRequest $request, string $hashid, array $data): Model
     {
         $entry = $this->model()::findHashid($hashid);
         $this->gate->authorize('update', $entry);
 
-        $entry->fill($data)->save();
+        $this->hydrateFields(
+            $request,
+            $entry,
+            $this->schema()->getDefinition()->toUpdate(),
+        );
 
+        $entry->save();
         return $entry;
     }
 
@@ -188,5 +203,16 @@ abstract class EntryType implements EntryTypeContract
         $roles->each(function ($value) {
             FastlaneFacade::createRole($value);
         });
+    }
+
+    protected function hydrateFields(EntryRequest $request, Model $model, EntrySchemaDefinition $fieldsDefinition): void
+    {
+        $data = $request->validated();
+
+        foreach ($fieldsDefinition->getFields() as $field) {
+            if (Arr::has($data, $field->getName())) {
+                $field->hydrateValue($request, Arr::get($data, $field->getName()), $model);
+            }
+        }
     }
 }

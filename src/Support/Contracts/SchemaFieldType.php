@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Contracts;
 
+use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -12,6 +13,10 @@ interface SchemaFieldType extends Arrayable
     public function getName(): string;
 
     public function getLabel(): string;
+
+    public function getEntryType(): EntryType;
+
+    public function setEntryType(EntryType $entryType): self;
 
     public function isRequired(): bool;
 
@@ -44,6 +49,10 @@ interface SchemaFieldType extends Arrayable
     public function isShownOnCreate(): bool;
 
     public function isShownOnUpdate(): bool;
+
+    public function hydrateValue(EntryRequest $request, $value, $model): void;
+
+    public function hydrateUsing($callback): self;
 
     public function runOnMigration(Blueprint $table): void;
 }

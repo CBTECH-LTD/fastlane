@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\EntryTypes\BackendUser;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
+use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResourceCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -37,21 +38,24 @@ class BackendUserEntryType extends EntryType
         return BackendUserResource::collection($items);
     }
 
-    public function store(array $data): Model
+    public function store(EntryRequest $request, array $data): Model
     {
         $this->gate->authorize('create', $this->model());
 
-        return tap($this->newModelInstance(), function ($user) use ($data) {
-            $data['password'] = Str::random(16);
+        return tap($this->newModelInstance(), function ($user) use ($request, $data) {
+            foreach ($this->schema()->getDefinition()->toCreate() as $field) {
+                $field->hydrateValue($request, $data[$field->getName()], $user);
+            }
+
+            $user->password = Str::random(16);
 
             $user
-                ->fill($data)
                 ->assignRole($data['role'])
                 ->save();
         });
     }
 
-    public function update(string $hashid, array $data): Model
+    public function update(EntryRequest $request, string $hashid, array $data): Model
     {
         $entry = User::findHashid($hashid);
         $this->gate->authorize('update', $entry);
@@ -60,8 +64,11 @@ class BackendUserEntryType extends EntryType
             $entry->assignRole($data['role']);
         }
 
-        $entry->fill($data)->save();
+        foreach ($this->schema()->getDefinition()->toCreate() as $field) {
+            $field->hydrateValue($request, $data[$field->getName()], $entry);
+        }
 
+        $entry->save();
         return $entry;
     }
 }

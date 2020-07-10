@@ -1,17 +1,17 @@
 <template>
     <div class="mt-2 mb-4">
-        <label class="relative block flex flex-wrap" :class="containerClasses">
+        <div class="relative block flex flex-wrap" :class="containerClasses">
             <span v-if="required" class="absolute left-0 top-0 -ml-4 text-red-600">*</span>
-            <span class="block relative font-medium text-base text-gray-600 my-2" :class="labelClasses">
+            <label class="block relative font-medium text-base text-gray-600 my-2" :class="labelClasses">
                 <slot name="label"/>
-            </span>
+            </label>
             <span :class="fieldClasses">
                 <slot/>
             </span>
             <span v-if="errors && errors.length" class="block my-1 text-sm text-red-600">
                 <span class="block" v-for="e in errors">{{ e }}</span>
             </span>
-        </label>
+        </div>
     </div>
 </template>
 
