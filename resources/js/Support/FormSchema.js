@@ -2,11 +2,34 @@
 
 import each from 'lodash/each'
 import some from 'lodash/some'
-import find from 'lodash/find'
+import filter from 'lodash/filter'
+import map from 'lodash/map'
+import tap from 'lodash/tap'
 import camelCase from 'lodash/camelCase'
+import FormRichEditorInput from '../Components/FormRichEditorInput'
+import FormDateTimeInput from '../Components/FormDateTimeInput'
+import FormStringInput from '../Components/FormStringInput'
+import FormSingleChoiceInput from '../Components/FormSingleChoiceInput'
+import FormSwitchInput from '../Components/FormSwitchInput'
+import FormTextInput from '../Components/FormTextInput'
+import FormObject from './FormObject'
+
+const types = {
+    string: FormStringInput,
+    text: FormTextInput,
+    boolean: FormSwitchInput,
+    singleChoice: FormSingleChoiceInput,
+    file: FormStringInput,
+    date: FormDateTimeInput,
+    richEditor: FormRichEditorInput,
+}
 
 export function defaultProperties ({ key, value, type, field }) {
     return {
+        component: {
+            enumerable: true,
+            value: type,
+        },
         name: {
             enumerable: true,
             value: key,
@@ -14,10 +37,6 @@ export function defaultProperties ({ key, value, type, field }) {
         originalValue: {
             enumerable: true,
             value: value,
-        },
-        component: {
-            enumerable: true,
-            value: type.component,
         },
         label: {
             enumerable: true,
@@ -34,97 +53,26 @@ export function defaultProperties ({ key, value, type, field }) {
         isDirty: {
             enumerable: true,
             get () {
-                return this.transformValue() !== this.originalValue
+                return this.value !== this.originalValue
             }
         },
-        transformValue: {
-            enumerable: false,
-            value: function () {
-                return this.value
-            }
-        }
     }
 }
 
-export function defaultMakeFn ({ key, value, field, type }) {
+export function buildForSchema (obj, { key, value, field, type }) {
     // First we add the schema field to the form data object.
-    this[key] = {
+    obj[key] = {
         value,
     }
 
-    const props = defaultProperties.call(this, {
+    const props = defaultProperties.call(obj, {
         key,
         field,
         type,
         value,
     })
 
-    Object.defineProperties(this[key], props)
-}
-
-const types = {
-    string: {
-        component: 'f-form-string-input',
-        default: '',
-        make: null,
-    },
-    text: {
-        component: 'f-form-text-input',
-        default: '',
-        make: null,
-    },
-    boolean: {
-        component: 'f-form-switch-input',
-        default: true,
-        make: null,
-    },
-    singleChoice: {
-        component: 'f-form-single-choice-input',
-        default: null,
-        make ({ key, field, type, value }) {
-            const filteredValue = find(field.config.options, o => o.value === value)
-
-            // First we add the schema field to the form data object.
-            this[key] = {
-                value: filteredValue || type.default,
-            }
-
-            const defProps = defaultProperties.call(this, {
-                key,
-                field,
-                type,
-                value,
-            })
-
-            const props = {
-                ...defProps,
-                transformValue: {
-                    value: function () {
-                        return (this.value && this.value.hasOwnProperty('value'))
-                            ? this.value.value
-                            : null
-                    }
-                }
-            }
-
-            Object.defineProperties(this[key], props)
-        },
-    },
-    file: {
-        component: 'f-form-string-input',
-        default: null,
-        make: null,
-    },
-    date: {
-        component: 'f-form-date-time-input',
-        default: null,
-        make: null,
-    },
-    richEditor: {
-        component: 'f-form-rich-editor-input',
-        default: null,
-        make: null,
-    }
+    Object.defineProperties(obj[key], props)
 }
 
 export default function FormSchema (data, schema) {
@@ -132,11 +80,11 @@ export default function FormSchema (data, schema) {
         const camelCaseType = camelCase(field.type)
         const type = types[camelCaseType]
 
-        const makeFn = type.make === null
-            ? defaultMakeFn.bind(this)
-            : type.make.bind(this)
+        const makeFn = type.buildForSchema
+            ? type.buildForSchema
+            : buildForSchema
 
-        makeFn({
+        makeFn(this, {
             key,
             field,
             type,
@@ -158,31 +106,28 @@ export default function FormSchema (data, schema) {
         },
         getDirty: {
             value: () => {
-                let data = {}
-
-                each(this, (v, k) => {
-                    if (v.isDirty) {
-                        data[k] = v.hasOwnProperty('transformValue')
-                            ? v.transformValue()
-                            : v.value
-                    }
-                })
-
-                return data
+                return filter(this, f => f.isDirty)
             },
         },
         getAll: {
             value: () => {
-                let data = {}
-
-                each(this, (v, k) => {
-                    data[k] = v.hasOwnProperty('transformValue')
-                        ? v.transformValue()
-                        : v.value
-                })
-
-                return data
+                return map(this, f => f)
             }
-        }
+        },
+        toFormObject: {
+            value: (onlyDirty = true) => {
+                const items = onlyDirty ? this.getDirty() : this.getAll()
+
+                if (items.length === 0) {
+                    return null
+                }
+
+                return tap(new FormObject(), formObject => {
+                    each(items, (field) => {
+                        field.commit(formObject)
+                    })
+                })
+            }
+        },
     })
 }

@@ -8,6 +8,7 @@ use CbtechLtd\Fastlane\Console\Commands\MakeEntryTypeCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserResource;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Commands\CreateSystemAdminCommand;
+use CbtechLtd\Fastlane\Http\Controllers\EntryAttachmentsController;
 use CbtechLtd\Fastlane\Http\Middleware\SetInertiaRootTemplate;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuManager as MenuManagerContract;
 use CbtechLtd\Fastlane\Support\Menu\MenuManager;
@@ -75,6 +76,9 @@ class FastlaneServiceProvider extends ServiceProvider
     {
         // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'fastlane');
+
+        // Register migrations
+        $this->loadMigrationsFrom(__DIR__ . '/../migrations');
 
         // Register views and menu
         $this->registerViews();
@@ -179,6 +183,10 @@ class FastlaneServiceProvider extends ServiceProvider
                 $this->get('/{id}', [$controller, 'edit'])->name("{$prefix}.edit");
                 $this->patch('/{id}', [$controller, 'update'])->name("{$prefix}.update");
                 $this->delete('/{id}', [$controller, 'delete'])->name("{$prefix}.delete");
+
+                // Attachment management routes
+                $this->post('/attachments/{fieldName}', [EntryAttachmentsController::class, 'store'])->name("{$prefix}.attachments");
+                $this->delete('/attachments/{fieldName}', [EntryAttachmentsController::class, 'delete']);
             });
         });
 

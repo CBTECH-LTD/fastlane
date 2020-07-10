@@ -27,4 +27,9 @@ return [
      * Determine whether the Super Admin role is enabled in the system.
      */
     'super_admin'              => true,
+
+    /*
+     * Determine the storage disk to be used fot file attachments.
+     */
+    'attachment_disk'          => 'public',
 ];

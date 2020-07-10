@@ -1,27 +1,14 @@
 <template>
     <div class="w-full">
-        <textarea rows="4" class="w-full form-input" v-bind="$attrs" :value="value" @input="onInput"></textarea>
+        <textarea rows="4" class="w-full form-input" v-bind="$attrs" v-model="field.value"></textarea>
     </div>
 </template>
 
 <script>
+    import FormInput from './Mixins/FormInput'
+
     export default {
         name: 'FormTextInput',
-        inheritAttrs: false,
-
-        inject: ['errors', 'isRequired'],
-
-        props: {
-            value: {
-                type: String | null,
-                required: true,
-            },
-        },
-
-        methods: {
-            onInput (ev) {
-                this.$emit('input', ev.target.value)
-            }
-        }
+        mixins: [FormInput],
     }
 </script>

@@ -18,7 +18,7 @@ class EntriesController extends Controller
         return $this->render('Entries/Index', [
             'items'     => $items,
             'entryType' => [
-                'schema'        => $request->entryType()->schema()->build()->toIndex()->toArray(),
+                'schema'        => $request->entryType()->schema()->getDefinition()->toIndex()->toArray(),
                 'singular_name' => $request->entryType()->name(),
                 'plural_name'   => Str::plural($request->entryType()->name()),
             ],
@@ -34,7 +34,7 @@ class EntriesController extends Controller
 
         return $this->render('Entries/Create', [
             'entryType' => [
-                'schema'        => $request->entryType()->schema()->build()->toCreate()->toArray(),
+                'schema'        => $request->entryType()->schema()->getDefinition()->toCreate()->toArray(),
                 'singular_name' => $request->entryType()->name(),
                 'plural_name'   => Str::plural($request->entryType()->name()),
             ],
@@ -49,7 +49,7 @@ class EntriesController extends Controller
     {
         $entry = $request
             ->entryType()
-            ->store($request->validated());
+            ->store($request, $request->validated());
 
         return Redirect::route("cp.{$request->entryType()->identifier()}.edit", [$entry]);
     }
@@ -61,7 +61,7 @@ class EntriesController extends Controller
         return $this->render('Entries/Edit', [
             'item'      => $entry,
             'entryType' => [
-                'schema'        => $request->entryType()->schema()->build()->toUpdate()->toArray(),
+                'schema'        => $request->entryType()->schema()->getDefinition()->toUpdate()->toArray(),
                 'singular_name' => $request->entryType()->name(),
                 'plural_name'   => Str::plural($request->entryType()->name()),
             ],
@@ -70,7 +70,7 @@ class EntriesController extends Controller
 
     public function update(EntryUpdateRequest $request, string $id)
     {
-        $request->entryType()->update($id, $request->validated());
+        $request->entryType()->update($request, $id, $request->validated());
 
         session()->flash('message', [
             'type' => 'success',

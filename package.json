@@ -30,6 +30,7 @@
         "popper.js": "^1.12",
         "tailwindcss": "^1.4.6",
         "trix": "^1.2.3",
+        "uuid": "^8.2.0",
         "vue-select": "^3.10.5"
     }
 }

@@ -2,6 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
+use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Constraints\Unique;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,6 +20,8 @@ abstract class BaseType implements SchemaFieldType
     protected bool $showOnCreate = true;
     protected bool $showOnUpdate = true;
     protected $default = null;
+    protected $hydrateCallback;
+    protected EntryType $entryType;
 
     protected function __construct(string $name, string $label)
     {
@@ -38,6 +42,17 @@ abstract class BaseType implements SchemaFieldType
     public function getLabel(): string
     {
         return $this->label;
+    }
+
+    public function getEntryType(): EntryType
+    {
+        return $this->entryType;
+    }
+
+    public function setEntryType(EntryType $entryType): self
+    {
+        $this->entryType = $entryType;
+        return $this;
     }
 
     public function isRequired(): bool
@@ -148,6 +163,22 @@ abstract class BaseType implements SchemaFieldType
     public function isShownOnUpdate(): bool
     {
         return $this->showOnUpdate;
+    }
+
+    public function hydrateValue(EntryRequest $request, $value, $model): void
+    {
+        if (is_callable($this->hydrateCallback)) {
+            call_user_func($this->hydrateCallback, $request, $value, $model);
+            return;
+        }
+
+        $model->{$this->getName()} = $value;
+    }
+
+    public function hydrateUsing($callback): self
+    {
+        $this->hydrateCallback = $callback;
+        return $this;
     }
 
     public function toArray()

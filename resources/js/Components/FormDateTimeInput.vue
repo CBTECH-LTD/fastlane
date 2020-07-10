@@ -5,7 +5,7 @@
                class="w-full form-input"
                :placeholder="defaultPlaceholder"
                v-bind="$attrs"
-               :value="value"
+               :value="field.value"
         >
     </div>
 </template>
@@ -14,22 +14,11 @@
     import flatpickr from 'flatpickr'
     import 'flatpickr/dist/themes/airbnb.css'
     import moment from 'moment'
+    import FormInput from './Mixins/FormInput'
 
     export default {
         name: 'FormDateTimeInput',
-        inheritAttrs: false,
-        inject: ['errors', 'isRequired'],
-
-        props: {
-            value: {
-                type: String | null,
-                required: true,
-            },
-            config: {
-                type: Object,
-                required: true,
-            },
-        },
+        mixins: [FormInput],
 
         data: () => ({
             flatpickr: null,
@@ -41,7 +30,7 @@
             },
 
             saveFormat () {
-                return this.config.enableTime
+                return this.field.config.enableTime
                     ? 'Y-m-d H:i:S'
                     : 'Y-m-d'
             }
@@ -49,17 +38,17 @@
 
         methods: {
             onInput () {
-                this.$emit('input', this.$refs.datePicker.value)
+                this.field.value = this.$refs.datePicker.value
             }
         },
 
         mounted () {
             this.$nextTick(() => {
                 this.flatpickr = flatpickr(this.$refs.datePicker, {
-                    enableTime: this.config.enableTime,
-                    enableSeconds: this.config.enableSeconds,
+                    enableTime: this.field.config.enableTime,
+                    enableSeconds: this.field.config.enableSeconds,
                     altInput: true,
-                    altFormat: this.config.displayFormat,
+                    altFormat: this.field.config.displayFormat,
                     dateFormat: this.saveFormat,
                     onClose: this.onInput,
                     onChange: this.onInput,

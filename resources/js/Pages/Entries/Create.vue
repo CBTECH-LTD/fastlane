@@ -14,10 +14,9 @@
                         {{ field.label }}
                     </template>
                     <component :is="field.component"
+                               :field="field"
                                v-model="field.value"
                                :required="field.isRequired"
-                               :dirty="field.isDirty"
-                               :config="field.config || {}"
                     ></component>
                 </f-form-field>
             </template>
@@ -59,11 +58,11 @@
 
         methods: {
             async submitForm () {
-                if (!this.isCreating) {
+                if (this.form.isDirty() && !this.isCreating) {
                     this.isCreating = true
 
                     try {
-                        await this.$inertia.post(this.links.form, this.form.getAll())
+                        await this.$inertia.post(this.links.form, this.form.toFormObject(true).all())
                     } catch {}
 
                     this.isCreating = false
