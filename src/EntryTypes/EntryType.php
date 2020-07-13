@@ -211,7 +211,7 @@ abstract class EntryType implements EntryTypeContract
 
         foreach ($fieldsDefinition->getFields() as $field) {
             if (Arr::has($data, $field->getName())) {
-                $field->hydrateValue($request, Arr::get($data, $field->getName()), $model);
+                $field->hydrateValue($model, Arr::get($data, $field->getName()), $request);
             }
         }
     }

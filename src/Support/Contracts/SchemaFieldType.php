@@ -50,7 +50,7 @@ interface SchemaFieldType extends Arrayable
 
     public function isShownOnUpdate(): bool;
 
-    public function hydrateValue(EntryRequest $request, $value, $model): void;
+    public function hydrateValue($model, $value, EntryRequest $request): void;
 
     public function hydrateUsing($callback): self;
 

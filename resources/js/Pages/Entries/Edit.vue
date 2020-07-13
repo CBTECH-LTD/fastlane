@@ -8,27 +8,38 @@
             </f-button>
         </template>
 
-        <f-boxed-card>
-            <template v-for="field in form">
-                <f-form-field :errors="$page.errors.get(field.name)">
-                    <template v-if="field.label" v-slot:label>
-                        {{ field.label }}
-                    </template>
-                    <component :is="field.component"
-                               :field="field"
-                               :required="field.isRequired"
-                    ></component>
-                </f-form-field>
-            </template>
+        <form @submit.prevent="submitForm">
+            <f-boxed-card>
+                <template v-for="field in form">
+                    <f-form-field :errors="$page.errors.get(field.name)">
+                        <template v-if="field.label" v-slot:label>
+                            {{ field.label }}
+                        </template>
+                        <component :is="field.component"
+                                   :field="field"
+                                   :required="field.isRequired"
+                                   :aria-required="field.isRequired"
+                                   :placeholder="field.placeholder"
+                                   :aria-placeholder="field.placeholder"
+                        ></component>
+                    </f-form-field>
+                </template>
 
-            <template v-slot:footer>
-                <div class="text-right">
-                    <f-button @click="submitForm" size="lg" left-icon="save" color="success">
-                        Save
-                    </f-button>
-                </div>
-            </template>
-        </f-boxed-card>
+                <template v-slot:footer>
+                    <div class="text-right">
+                        <f-button submit
+                                  color="success"
+                                  size="lg"
+                                  left-icon="save"
+                                  :disabled="isFormDisabled"
+                                  :aria-disabled="isFormDisabled"
+                                  :loading="isUpdating">
+                            Save
+                        </f-button>
+                    </div>
+                </template>
+            </f-boxed-card>
+        </form>
 
         <f-boxed-card class="mt-8">
             <template v-slot:title>
@@ -78,11 +89,17 @@
             }
         },
 
+        computed: {
+            isFormDisabled () {
+                return this.isUpdating || !this.form.isDirty()
+            }
+        },
+
         methods: {
             async submitForm () {
                 const formObject = this.form.toFormObject()
 
-                if (formObject && !this.isUpdating) {
+                if (formObject && this.form.isDirty() && !this.isUpdating) {
                     this.isUpdating = true
 
                     try {

@@ -19,6 +19,7 @@ abstract class BaseType implements SchemaFieldType
     protected bool $showOnIndex = false;
     protected bool $showOnCreate = true;
     protected bool $showOnUpdate = true;
+    protected ?string $placeholder;
     protected $default = null;
     protected $hydrateCallback;
     protected EntryType $entryType;
@@ -52,6 +53,17 @@ abstract class BaseType implements SchemaFieldType
     public function setEntryType(EntryType $entryType): self
     {
         $this->entryType = $entryType;
+        return $this;
+    }
+
+    public function getPlaceholder(): string
+    {
+        return $this->placeholder ?? $this->label;
+    }
+
+    public function setPlaceholder(string $placeholder): self
+    {
+        $this->placeholder = $placeholder;
         return $this;
     }
 
@@ -165,10 +177,10 @@ abstract class BaseType implements SchemaFieldType
         return $this->showOnUpdate;
     }
 
-    public function hydrateValue(EntryRequest $request, $value, $model): void
+    public function hydrateValue($model, $value, EntryRequest $request): void
     {
         if (is_callable($this->hydrateCallback)) {
-            call_user_func($this->hydrateCallback, $request, $value, $model);
+            call_user_func($this->hydrateCallback, $model, $value, $request);
             return;
         }
 
@@ -184,12 +196,13 @@ abstract class BaseType implements SchemaFieldType
     public function toArray()
     {
         return [
-            'name'     => $this->getName(),
-            'type'     => $this->getType(),
-            'label'    => $this->getLabel(),
-            'default'  => $this->getDefault(),
-            'required' => $this->isRequired(),
-            'config'   => $this->getConfig(),
+            'name'        => $this->getName(),
+            'type'        => $this->getType(),
+            'label'       => $this->getLabel(),
+            'placeholder' => $this->getPlaceholder(),
+            'default'     => $this->getDefault(),
+            'required'    => $this->isRequired(),
+            'config'      => $this->getConfig(),
         ];
     }
 

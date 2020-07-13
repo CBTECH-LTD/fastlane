@@ -5,10 +5,10 @@
 </template>
 
 <script>
-    import FormInput from './Mixins/FormInput'
+    import FormInput from '../Mixins/FormInput'
 
     export default {
-        name: 'FormTextInput',
+        name: 'TextInput',
         mixins: [FormInput],
     }
 </script>

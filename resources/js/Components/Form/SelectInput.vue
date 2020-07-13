@@ -12,24 +12,24 @@
 <script>
     import VSelect from 'vue-select'
     import 'vue-select/dist/vue-select.css'
-    import FormInput from './Mixins/FormInput'
+    import FormInput from '../Mixins/FormInput'
     import find from 'lodash/find'
-    import { buildForSchema } from '../Support/FormSchema'
 
     export default {
-        name: 'FormSingleChoiceInput',
+        name: 'SelectInput',
         mixins: [FormInput],
         components: { VSelect },
 
-        buildForSchema (obj, { key, field, type, value }) {
+        methods: {
+            commit (formObject) {
+                formObject.put(this.field.name, this.field.value ? this.field.value.value : null)
+            },
+        },
+
+        buildForSchema (obj, { field, type, value }) {
             const filteredValue = find(field.config.options, o => o.value === value)
 
-            buildForSchema(obj, {
-                key,
-                field,
-                type,
-                value: filteredValue || type.default,
-            })
+            obj.value = filteredValue || field.default
         }
     }
 </script>

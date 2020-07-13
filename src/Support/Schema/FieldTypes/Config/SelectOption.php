@@ -4,7 +4,7 @@ namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config;
 
 use Illuminate\Contracts\Support\Arrayable;
 
-class SingleChoiceOption implements Arrayable
+class SelectOption implements Arrayable
 {
     private string $value;
     private string $label;
@@ -15,7 +15,7 @@ class SingleChoiceOption implements Arrayable
         $this->label = $label;
     }
 
-    public static function make(string $value, string $label): SingleChoiceOption
+    public static function make(string $value, string $label): SelectOption
     {
         return new static($value, $label);
     }

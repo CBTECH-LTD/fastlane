@@ -6,25 +6,25 @@ import filter from 'lodash/filter'
 import map from 'lodash/map'
 import tap from 'lodash/tap'
 import camelCase from 'lodash/camelCase'
-import FormRichEditorInput from '../Components/FormRichEditorInput'
-import FormDateTimeInput from '../Components/FormDateTimeInput'
-import FormStringInput from '../Components/FormStringInput'
-import FormSingleChoiceInput from '../Components/FormSingleChoiceInput'
-import FormSwitchInput from '../Components/FormSwitchInput'
-import FormTextInput from '../Components/FormTextInput'
+import RichEditorInput from '../Components/Form/RichEditorInput'
+import DateTimeInput from '../Components/Form/DateTimeInput'
+import StringInput from '../Components/Form/StringInput'
+import SelectInput from '../Components/Form/SelectInput'
+import ToggleInput from '../Components/Form/ToggleInput'
+import TextInput from '../Components/Form/TextInput'
 import FormObject from './FormObject'
 
 const types = {
-    string: FormStringInput,
-    text: FormTextInput,
-    boolean: FormSwitchInput,
-    singleChoice: FormSingleChoiceInput,
-    file: FormStringInput,
-    date: FormDateTimeInput,
-    richEditor: FormRichEditorInput,
+    string: StringInput,
+    text: TextInput,
+    toggle: ToggleInput,
+    select: SelectInput,
+    file: StringInput,
+    date: DateTimeInput,
+    richEditor: RichEditorInput,
 }
 
-export function defaultProperties ({ key, value, type, field }) {
+export function defaultProperties ({ value, type, field }) {
     return {
         component: {
             enumerable: true,
@@ -32,7 +32,7 @@ export function defaultProperties ({ key, value, type, field }) {
         },
         name: {
             enumerable: true,
-            value: key,
+            value: field.name,
         },
         originalValue: {
             enumerable: true,
@@ -41,6 +41,10 @@ export function defaultProperties ({ key, value, type, field }) {
         label: {
             enumerable: true,
             value: field.label,
+        },
+        placeholder: {
+            enumerable: true,
+            value: field.placeholder,
         },
         config: {
             enumerable: true,
@@ -59,37 +63,42 @@ export function defaultProperties ({ key, value, type, field }) {
     }
 }
 
-export function buildForSchema (obj, { key, value, field, type }) {
+function makeSchemaField ({ value, field, type }) {
     // First we add the schema field to the form data object.
-    obj[key] = {
+    const obj = {
         value,
     }
 
     const props = defaultProperties.call(obj, {
-        key,
         field,
         type,
         value,
     })
 
-    Object.defineProperties(obj[key], props)
+    Object.defineProperties(obj, props)
+
+    return obj
 }
 
 export default function FormSchema (data, schema) {
-    each(schema, (field, key) => {
-        const camelCaseType = camelCase(field.type)
-        const type = types[camelCaseType]
+    each(schema, field => {
+        const type = types[camelCase(field.type)]
 
-        const makeFn = type.buildForSchema
-            ? type.buildForSchema
-            : buildForSchema
-
-        makeFn(this, {
-            key,
+        const params = {
             field,
             type,
-            value: data.hasOwnProperty(key) ? data[key] : type.default
-        })
+            value: data.hasOwnProperty(field.name)
+                ? data[field.name]
+                : field.default
+        }
+
+        const obj = makeSchemaField(params)
+
+        if (type.buildForSchema) {
+            type.buildForSchema(obj, params)
+        }
+
+        this[field.name] = obj
     })
 
     // Now we define some useful methods...

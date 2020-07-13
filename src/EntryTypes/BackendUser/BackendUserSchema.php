@@ -3,11 +3,12 @@
 namespace CbtechLtd\Fastlane\EntryTypes\BackendUser;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
+use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
 use CbtechLtd\Fastlane\Support\Schema\EntrySchemaDefinition;
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config\SingleChoiceOption;
+use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config\SelectOption;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Constraints\Unique;
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\SingleChoiceType;
+use CbtechLtd\Fastlane\Support\Schema\FieldTypes\SelectType;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\StringType;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\ToggleType;
 use Spatie\Permission\Models\Role;
@@ -28,17 +29,23 @@ class BackendUserSchema extends EntrySchema
                 ->setRules('max:255')
                 ->showOnIndex(),
 
-            SingleChoiceType::make('role', 'Role')
+            SelectType::make('role', 'Role')
                 ->setOptions(
                     Role::all()->map(
-                        fn(Role $role) => SingleChoiceOption::make($role->name, $role->name)
+                        fn(Role $role) => SelectOption::make($role->name, $role->name)
                     )->all()
                 )
                 ->required()
-                ->showOnIndex(),
+                ->showOnIndex()
+                ->hydrateUsing(function ($model, $value) {
+                    if ($value) {
+                        $model->assignRole($value);
+                    }
+                }),
 
             ToggleType::make('is_active', 'Active')
-                ->required(),
+                ->required()
+                ->setDefault(true),
         ]);
     }
 }

@@ -15,10 +15,10 @@
 <script>
     import axios from 'axios'
     import { v4 as uuidv4 } from 'uuid'
-    import FormInput from './Mixins/FormInput'
+    import FormInput from '../Mixins/FormInput'
 
     export default {
-        name: 'FormRichEditorInput',
+        name: 'RichEditorInput',
         mixins: [FormInput],
         inheritAttrs: false,
 

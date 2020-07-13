@@ -1,13 +1,13 @@
 import FBoxedCard from './Components/BoxedCard'
 import FButton from './Components/Button'
-import FFormField from './Components/FormField'
-import FFormDateTimeInput from './Components/FormDateTimeInput'
-import FFormRadioInput from './Components/FormRadioInput'
-import FFormRichEditorInput from './Components/FormRichEditorInput'
-import FFormSingleChoiceInput from './Components/FormSingleChoiceInput'
-import FFormStringInput from './Components/FormStringInput'
-import FFormSwitchInput from './Components/FormSwitchInput'
-import FFormTextInput from './Components/FormTextInput'
+import FFormField from './Components/Form/Field'
+import FFormDateTimeInput from './Components/Form/DateTimeInput'
+import FFormRadioInput from './Components/Form/RadioInput'
+import FFormRichEditorInput from './Components/Form/RichEditorInput'
+import FFormSelectInput from './Components/Form/SelectInput'
+import FFormStringInput from './Components/Form/StringInput'
+import FFormToggleInput from './Components/Form/ToggleInput'
+import FFormTextInput from './Components/Form/TextInput'
 import FIcon from './Components/Icon'
 import FLink from './Components/Link'
 import FListCard from './Components/ListCard'
@@ -47,9 +47,9 @@ export default {
         Vue.component('f-form-date-time-input', FFormDateTimeInput)
         Vue.component('f-form-radio-input', FFormRadioInput)
         Vue.component('f-form-rich-editor-input', FFormRichEditorInput)
-        Vue.component('f-form-single-choice-input', FFormSingleChoiceInput)
+        Vue.component('f-form-single-choice-input', FFormSelectInput)
         Vue.component('f-form-string-input', FFormStringInput)
         Vue.component('f-form-text-input', FFormTextInput)
-        Vue.component('f-form-switch-input', FFormSwitchInput)
+        Vue.component('f-form-toggle-input', FFormToggleInput)
     }
 }

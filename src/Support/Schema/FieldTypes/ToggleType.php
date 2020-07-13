@@ -6,9 +6,11 @@ use Illuminate\Database\Schema\Blueprint;
 
 class ToggleType extends BaseType
 {
+    protected $default = true;
+
     public function getType(): string
     {
-        return 'boolean';
+        return 'toggle';
     }
 
     public function runOnMigration(Blueprint $table): void

@@ -115,6 +115,7 @@
                 if (this.isDisabled) {
                     classes.push('btn-disabled')
                 }
+
                 return classes
             },
 

@@ -2,21 +2,22 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config\SingleChoiceOption;
+use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config\SelectOption;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 
-class SingleChoiceType extends BaseType
+class SelectType extends BaseType
 {
+    protected $default = null;
     protected array $options;
 
     static public function make(string $name, string $label, array $options = []): self
     {
         Assert::allIsInstanceOf(
             $options,
-            SingleChoiceOption::class,
-            'All options must be instances of ' . SingleChoiceOption::class
+            SelectOption::class,
+            'All options must be instances of ' . SelectOption::class
         );
 
         $instance = new static($name, $label);
@@ -26,7 +27,7 @@ class SingleChoiceType extends BaseType
 
     public function getType(): string
     {
-        return 'singleChoice';
+        return 'select';
     }
 
     public function getOptions(): array
@@ -43,7 +44,7 @@ class SingleChoiceType extends BaseType
     protected function getTypeRules(): string
     {
         $values = Collection::make($this->options)->map(
-            fn(SingleChoiceOption $option) => $option->getValue()
+            fn(SelectOption $option) => $option->getValue()
         );
 
         return 'in:' . $values->implode(',');

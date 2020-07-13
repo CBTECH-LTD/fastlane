@@ -14,10 +14,10 @@
     import flatpickr from 'flatpickr'
     import 'flatpickr/dist/themes/airbnb.css'
     import moment from 'moment'
-    import FormInput from './Mixins/FormInput'
+    import FormInput from '../Mixins/FormInput'
 
     export default {
-        name: 'FormDateTimeInput',
+        name: 'DateTimeInput',
         mixins: [FormInput],
 
         data: () => ({

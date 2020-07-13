@@ -43,15 +43,15 @@ class BackendUserEntryType extends EntryType
         $this->gate->authorize('create', $this->model());
 
         return tap($this->newModelInstance(), function ($user) use ($request, $data) {
-            foreach ($this->schema()->getDefinition()->toCreate() as $field) {
-                $field->hydrateValue($request, $data[$field->getName()], $user);
+            foreach ($this->schema()->getDefinition()->toCreate()->getFields() as $field) {
+                if (isset($data[$field->getName()])) {
+                    $field->hydrateValue($user, $data[$field->getName()], $request);
+                }
             }
 
             $user->password = Str::random(16);
 
-            $user
-                ->assignRole($data['role'])
-                ->save();
+            $user->save();
         });
     }
 
@@ -64,8 +64,10 @@ class BackendUserEntryType extends EntryType
             $entry->assignRole($data['role']);
         }
 
-        foreach ($this->schema()->getDefinition()->toCreate() as $field) {
-            $field->hydrateValue($request, $data[$field->getName()], $entry);
+        foreach ($this->schema()->getDefinition()->toUpdate()->getFields() as $field) {
+            if (isset($data[$field->getName()])) {
+                $field->hydrateValue($entry, $data[$field->getName()], $request);
+            }
         }
 
         $entry->save();

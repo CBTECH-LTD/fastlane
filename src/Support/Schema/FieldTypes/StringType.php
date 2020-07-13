@@ -6,6 +6,8 @@ use Illuminate\Database\Schema\Blueprint;
 
 class StringType extends BaseType
 {
+    protected $default = '';
+
     public function getType(): string
     {
         return 'string';
