@@ -33,7 +33,7 @@ class RichEditorType extends BaseType
         return $this;
     }
 
-    public function hydrateValue(EntryRequest $request, $value, $model): void
+    public function hydrateValue($model, $value, EntryRequest $request): void
     {
         if (is_callable($this->hydrateCallback)) {
             call_user_func($this->hydrateCallback, $request, $value, $model);

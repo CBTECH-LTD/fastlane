@@ -311,16 +311,6 @@ __webpack_require__.r(__webpack_exports__);
       "default": false
     }
   },
-  provide: function provide() {
-    return {
-      errors: function errors() {
-        return this.errors;
-      },
-      isRequired: function isRequired() {
-        return this.required;
-      }
-    };
-  },
   computed: {
     containerClasses: function containerClasses() {
       if (this.stacked) {
@@ -531,6 +521,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Mixins_FormInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Mixins/FormInput */ "./resources/js/Components/Mixins/FormInput.js");
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/find */ "./node_modules/lodash/find.js");
 /* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _Support_FormField__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../Support/FormField */ "./resources/js/Support/FormField.js");
 //
 //
 //
@@ -542,6 +533,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+
 
 
 
@@ -557,14 +549,14 @@ __webpack_require__.r(__webpack_exports__);
       formObject.put(this.field.name, this.field.value ? this.field.value.value : null);
     }
   },
-  buildForSchema: function buildForSchema(obj, _ref) {
+  buildForSchema: function buildForSchema(_ref) {
     var field = _ref.field,
-        type = _ref.type,
+        component = _ref.component,
         value = _ref.value;
     var filteredValue = lodash_find__WEBPACK_IMPORTED_MODULE_3___default()(field.config.options, function (o) {
       return o.value === value;
     });
-    obj.value = filteredValue || field["default"];
+    return new _Support_FormField__WEBPACK_IMPORTED_MODULE_4__["FormField"](field, component, filteredValue || field["default"]);
   }
 });
 
@@ -1630,6 +1622,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+//
 //
 //
 //
@@ -30674,8 +30667,8 @@ var render = function() {
                         tag: "component",
                         attrs: {
                           field: field,
-                          required: field.isRequired,
-                          "aria-required": field.isRequired,
+                          required: field.isRequired(),
+                          "aria-required": field.isRequired(),
                           placeholder: field.placeholder,
                           "aria-placeholder": field.placeholder
                         },
@@ -30823,7 +30816,10 @@ var render = function() {
                   _c(
                     "f-form-field",
                     {
-                      attrs: { errors: _vm.$page.errors.get(field.name) },
+                      attrs: {
+                        errors: _vm.$page.errors.get(field.name),
+                        required: field.isRequired()
+                      },
                       scopedSlots: _vm._u(
                         [
                           field.label
@@ -30852,8 +30848,8 @@ var render = function() {
                         tag: "component",
                         attrs: {
                           field: field,
-                          required: field.isRequired,
-                          "aria-required": field.isRequired,
+                          required: field.isRequired(),
+                          "aria-required": field.isRequired(),
                           placeholder: field.placeholder,
                           "aria-placeholder": field.placeholder
                         }
@@ -32474,7 +32470,6 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   inheritAttrs: false,
-  inject: ['errors', 'isRequired'],
   props: {
     field: {
       type: Object,
@@ -32501,7 +32496,7 @@ __webpack_require__.r(__webpack_exports__);
     // Make a copy of the `commit` method from this component
     // to the form field instance, because we need to be able
     // to run it from FormSchema instances.
-    this.field.commit = this.commit;
+    this.field.setCommitCallback(this.commit);
   }
 });
 
@@ -33449,6 +33444,134 @@ function ErrorBagsFactory(errors) {
 
 /***/ }),
 
+/***/ "./resources/js/Support/FormField.js":
+/*!*******************************************!*\
+  !*** ./resources/js/Support/FormField.js ***!
+  \*******************************************/
+/*! exports provided: FormField */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FormField", function() { return FormField; });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classPrivateFieldGet(receiver, privateMap) { var descriptor = privateMap.get(receiver); if (!descriptor) { throw new TypeError("attempted to get private field on non-instance"); } if (descriptor.get) { return descriptor.get.call(receiver); } return descriptor.value; }
+
+function _classPrivateFieldSet(receiver, privateMap, value) { var descriptor = privateMap.get(receiver); if (!descriptor) { throw new TypeError("attempted to set private field on non-instance"); } if (descriptor.set) { descriptor.set.call(receiver, value); } else { if (!descriptor.writable) { throw new TypeError("attempted to set read only private field"); } descriptor.value = value; } return value; }
+
+var _originalValue = new WeakMap();
+
+var _field = new WeakMap();
+
+var _component = new WeakMap();
+
+var _commitCallback = new WeakMap();
+
+var FormField = /*#__PURE__*/function () {
+  function FormField(field, component) {
+    var value = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+    _classCallCheck(this, FormField);
+
+    _defineProperty(this, "value", null);
+
+    _originalValue.set(this, {
+      writable: true,
+      value: null
+    });
+
+    _field.set(this, {
+      writable: true,
+      value: null
+    });
+
+    _component.set(this, {
+      writable: true,
+      value: null
+    });
+
+    _commitCallback.set(this, {
+      writable: true,
+      value: null
+    });
+
+    this.value = value;
+
+    _classPrivateFieldSet(this, _originalValue, value);
+
+    _classPrivateFieldSet(this, _field, field);
+
+    _classPrivateFieldSet(this, _component, component);
+  }
+
+  _createClass(FormField, [{
+    key: "isRequired",
+    value: function isRequired() {
+      return _classPrivateFieldGet(this, _field).required;
+    }
+  }, {
+    key: "isDirty",
+    value: function isDirty() {
+      return this.value !== _classPrivateFieldGet(this, _originalValue);
+    }
+  }, {
+    key: "setCommitCallback",
+    value: function setCommitCallback(callbackFn) {
+      _classPrivateFieldSet(this, _commitCallback, callbackFn);
+    }
+  }, {
+    key: "commit",
+    value: function commit(formObject) {
+      if (!_classPrivateFieldGet(this, _commitCallback)) {
+        throw new Error('No Commit Callback set on the field');
+      }
+
+      _classPrivateFieldGet(this, _commitCallback).call(this, formObject);
+    }
+  }, {
+    key: "name",
+    get: function get() {
+      return _classPrivateFieldGet(this, _field).name;
+    }
+  }, {
+    key: "component",
+    get: function get() {
+      return _classPrivateFieldGet(this, _component);
+    }
+  }, {
+    key: "originalValue",
+    get: function get() {
+      return _classPrivateFieldGet(this, _originalValue);
+    }
+  }, {
+    key: "label",
+    get: function get() {
+      return _classPrivateFieldGet(this, _field).label;
+    }
+  }, {
+    key: "placeholder",
+    get: function get() {
+      return _classPrivateFieldGet(this, _field).placeholder;
+    }
+  }, {
+    key: "config",
+    get: function get() {
+      return _classPrivateFieldGet(this, _field).config;
+    }
+  }]);
+
+  return FormField;
+}();
+
+/***/ }),
+
 /***/ "./resources/js/Support/FormObject.js":
 /*!********************************************!*\
   !*** ./resources/js/Support/FormObject.js ***!
@@ -33503,12 +33626,11 @@ var FormObject = /*#__PURE__*/function () {
 /*!********************************************!*\
   !*** ./resources/js/Support/FormSchema.js ***!
   \********************************************/
-/*! exports provided: defaultProperties, default */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "defaultProperties", function() { return defaultProperties; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormSchema; });
 /* harmony import */ var lodash_each__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/each */ "./node_modules/lodash/each.js");
 /* harmony import */ var lodash_each__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_each__WEBPACK_IMPORTED_MODULE_0__);
@@ -33529,6 +33651,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Components_Form_ToggleInput__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../Components/Form/ToggleInput */ "./resources/js/Components/Form/ToggleInput.vue");
 /* harmony import */ var _Components_Form_TextInput__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../Components/Form/TextInput */ "./resources/js/Components/Form/TextInput.vue");
 /* harmony import */ var _FormObject__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./FormObject */ "./resources/js/Support/FormObject.js");
+/* harmony import */ var _FormField__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./FormField */ "./resources/js/Support/FormField.js");
 
 
 
@@ -33544,7 +33667,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var types = {
+
+var components = {
   string: _Components_Form_StringInput__WEBPACK_IMPORTED_MODULE_8__["default"],
   text: _Components_Form_TextInput__WEBPACK_IMPORTED_MODULE_11__["default"],
   toggle: _Components_Form_ToggleInput__WEBPACK_IMPORTED_MODULE_10__["default"],
@@ -33553,82 +33677,17 @@ var types = {
   date: _Components_Form_DateTimeInput__WEBPACK_IMPORTED_MODULE_7__["default"],
   richEditor: _Components_Form_RichEditorInput__WEBPACK_IMPORTED_MODULE_6__["default"]
 };
-function defaultProperties(_ref) {
-  var value = _ref.value,
-      type = _ref.type,
-      field = _ref.field;
-  return {
-    component: {
-      enumerable: true,
-      value: type
-    },
-    name: {
-      enumerable: true,
-      value: field.name
-    },
-    originalValue: {
-      enumerable: true,
-      value: value
-    },
-    label: {
-      enumerable: true,
-      value: field.label
-    },
-    placeholder: {
-      enumerable: true,
-      value: field.placeholder
-    },
-    config: {
-      enumerable: true,
-      value: field.config || {}
-    },
-    isRequired: {
-      enumerable: true,
-      value: field.required
-    },
-    isDirty: {
-      enumerable: true,
-      get: function get() {
-        return this.value !== this.originalValue;
-      }
-    }
-  };
-}
-
-function makeSchemaField(_ref2) {
-  var value = _ref2.value,
-      field = _ref2.field,
-      type = _ref2.type;
-  // First we add the schema field to the form data object.
-  var obj = {
-    value: value
-  };
-  var props = defaultProperties.call(obj, {
-    field: field,
-    type: type,
-    value: value
-  });
-  Object.defineProperties(obj, props);
-  return obj;
-}
-
 function FormSchema(data, schema) {
   var _this = this;
 
   lodash_each__WEBPACK_IMPORTED_MODULE_0___default()(schema, function (field) {
-    var type = types[lodash_camelCase__WEBPACK_IMPORTED_MODULE_5___default()(field.type)];
-    var params = {
+    var component = components[lodash_camelCase__WEBPACK_IMPORTED_MODULE_5___default()(field.type)];
+    var value = data.hasOwnProperty(field.name) ? data[field.name] : field["default"];
+    _this[field.name] = !!component.buildForSchema ? component.buildForSchema({
       field: field,
-      type: type,
-      value: data.hasOwnProperty(field.name) ? data[field.name] : field["default"]
-    };
-    var obj = makeSchemaField(params);
-
-    if (type.buildForSchema) {
-      type.buildForSchema(obj, params);
-    }
-
-    _this[field.name] = obj;
+      component: component,
+      value: value
+    }) : new _FormField__WEBPACK_IMPORTED_MODULE_13__["FormField"](field, component, value);
   }); // Now we define some useful methods...
 
   Object.defineProperties(this, {
@@ -33640,14 +33699,14 @@ function FormSchema(data, schema) {
     isDirty: {
       value: function value() {
         return lodash_some__WEBPACK_IMPORTED_MODULE_1___default()(_this, function (v) {
-          return v.isDirty;
+          return v.isDirty();
         });
       }
     },
     getDirty: {
       value: function value() {
         return lodash_filter__WEBPACK_IMPORTED_MODULE_2___default()(_this, function (f) {
-          return f.isDirty;
+          return f.isDirty();
         });
       }
     },

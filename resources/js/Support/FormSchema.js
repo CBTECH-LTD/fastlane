@@ -13,8 +13,9 @@ import SelectInput from '../Components/Form/SelectInput'
 import ToggleInput from '../Components/Form/ToggleInput'
 import TextInput from '../Components/Form/TextInput'
 import FormObject from './FormObject'
+import { FormField } from './FormField'
 
-const types = {
+const components = {
     string: StringInput,
     text: TextInput,
     toggle: ToggleInput,
@@ -24,81 +25,17 @@ const types = {
     richEditor: RichEditorInput,
 }
 
-export function defaultProperties ({ value, type, field }) {
-    return {
-        component: {
-            enumerable: true,
-            value: type,
-        },
-        name: {
-            enumerable: true,
-            value: field.name,
-        },
-        originalValue: {
-            enumerable: true,
-            value: value,
-        },
-        label: {
-            enumerable: true,
-            value: field.label,
-        },
-        placeholder: {
-            enumerable: true,
-            value: field.placeholder,
-        },
-        config: {
-            enumerable: true,
-            value: field.config || {},
-        },
-        isRequired: {
-            enumerable: true,
-            value: field.required
-        },
-        isDirty: {
-            enumerable: true,
-            get () {
-                return this.value !== this.originalValue
-            }
-        },
-    }
-}
-
-function makeSchemaField ({ value, field, type }) {
-    // First we add the schema field to the form data object.
-    const obj = {
-        value,
-    }
-
-    const props = defaultProperties.call(obj, {
-        field,
-        type,
-        value,
-    })
-
-    Object.defineProperties(obj, props)
-
-    return obj
-}
-
 export default function FormSchema (data, schema) {
     each(schema, field => {
-        const type = types[camelCase(field.type)]
+        const component = components[camelCase(field.type)]
 
-        const params = {
-            field,
-            type,
-            value: data.hasOwnProperty(field.name)
-                ? data[field.name]
-                : field.default
-        }
+        const value = data.hasOwnProperty(field.name)
+            ? data[field.name]
+            : field.default
 
-        const obj = makeSchemaField(params)
-
-        if (type.buildForSchema) {
-            type.buildForSchema(obj, params)
-        }
-
-        this[field.name] = obj
+        this[field.name] = !!component.buildForSchema
+            ? component.buildForSchema({ field, component, value })
+            : new FormField(field, component, value)
     })
 
     // Now we define some useful methods...
@@ -110,12 +47,12 @@ export default function FormSchema (data, schema) {
         },
         isDirty: {
             value: () => {
-                return some(this, v => v.isDirty)
+                return some(this, v => v.isDirty())
             }
         },
         getDirty: {
             value: () => {
-                return filter(this, f => f.isDirty)
+                return filter(this, f => f.isDirty())
             },
         },
         getAll: {

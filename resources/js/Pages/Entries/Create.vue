@@ -17,8 +17,8 @@
                         <component :is="field.component"
                                    :field="field"
                                    v-model="field.value"
-                                   :required="field.isRequired"
-                                   :aria-required="field.isRequired"
+                                   :required="field.isRequired()"
+                                   :aria-required="field.isRequired()"
                                    :placeholder="field.placeholder"
                                    :aria-placeholder="field.placeholder"
                         ></component>

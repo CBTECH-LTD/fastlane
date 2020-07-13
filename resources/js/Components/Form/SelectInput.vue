@@ -14,6 +14,7 @@
     import 'vue-select/dist/vue-select.css'
     import FormInput from '../Mixins/FormInput'
     import find from 'lodash/find'
+    import { FormField } from '../../Support/FormField'
 
     export default {
         name: 'SelectInput',
@@ -26,10 +27,14 @@
             },
         },
 
-        buildForSchema (obj, { field, type, value }) {
+        buildForSchema ({ field, component, value }) {
             const filteredValue = find(field.config.options, o => o.value === value)
 
-            obj.value = filteredValue || field.default
+            return new FormField(
+                field,
+                component,
+                filteredValue || field.default
+            )
         }
     }
 </script>

@@ -11,17 +11,18 @@
         <form @submit.prevent="submitForm">
             <f-boxed-card>
                 <template v-for="field in form">
-                    <f-form-field :errors="$page.errors.get(field.name)">
+                    <f-form-field :errors="$page.errors.get(field.name)" :required="field.isRequired()">
                         <template v-if="field.label" v-slot:label>
                             {{ field.label }}
                         </template>
                         <component :is="field.component"
                                    :field="field"
-                                   :required="field.isRequired"
-                                   :aria-required="field.isRequired"
+                                   :required="field.isRequired()"
+                                   :aria-required="field.isRequired()"
                                    :placeholder="field.placeholder"
                                    :aria-placeholder="field.placeholder"
                         ></component>
+
                     </f-form-field>
                 </template>
 

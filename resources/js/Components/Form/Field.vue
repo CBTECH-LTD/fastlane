@@ -34,17 +34,6 @@
             }
         },
 
-        provide () {
-            return {
-                errors () {
-                    return this.errors
-                },
-                isRequired () {
-                    return this.required
-                }
-            }
-        },
-
         computed: {
             containerClasses () {
                 if (this.stacked) {
