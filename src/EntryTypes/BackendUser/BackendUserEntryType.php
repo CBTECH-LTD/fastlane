@@ -3,18 +3,25 @@
 namespace CbtechLtd\Fastlane\EntryTypes\BackendUser;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
+use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\RandomPasswordPipe;
+use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\UpdateRolePipe;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
-use CbtechLtd\JsonApiTransformer\ApiResources\ApiResourceCollection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class BackendUserEntryType extends EntryType
 {
     const PERM_MANAGE_SYSTEM_ADMINS = 'manage admins';
     const ROLE_SYSTEM_ADMIN = 'system admin';
+
+    public function __construct(Gate $gate)
+    {
+        parent::__construct($gate);
+
+        $this->addHook(static::HOOK_BEFORE_CREATING, RandomPasswordPipe::class);
+        $this->addHook(static::HOOK_BEFORE_UPDATING, UpdateRolePipe::class);
+    }
 
     public function icon(): string
     {
@@ -26,51 +33,13 @@ class BackendUserEntryType extends EntryType
         return User::class;
     }
 
-    public function getItems(): ApiResourceCollection
+    protected function queryItems(Builder $query): void
     {
-        $this->gate->authorize('list', $this->model());
-
-        $items = $this->newModelInstance()
-            ->newModelQuery()
-            ->except(Auth::user())
-            ->get();
-
-        return BackendUserResource::collection($items);
+        $query->except(Auth::user());
     }
 
-    public function store(EntryRequest $request, array $data): Model
+    protected function querySingleItem(Builder $query, string $hashid): void
     {
-        $this->gate->authorize('create', $this->model());
-
-        return tap($this->newModelInstance(), function ($user) use ($request, $data) {
-            foreach ($this->schema()->getDefinition()->toCreate()->getFields() as $field) {
-                if (isset($data[$field->getName()])) {
-                    $field->hydrateValue($user, $data[$field->getName()], $request);
-                }
-            }
-
-            $user->password = Str::random(16);
-
-            $user->save();
-        });
-    }
-
-    public function update(EntryRequest $request, string $hashid, array $data): Model
-    {
-        $entry = User::findHashid($hashid);
-        $this->gate->authorize('update', $entry);
-
-        if ($role = Arr::get($data, 'role')) {
-            $entry->assignRole($data['role']);
-        }
-
-        foreach ($this->schema()->getDefinition()->toUpdate()->getFields() as $field) {
-            if (isset($data[$field->getName()])) {
-                $field->hydrateValue($entry, $data[$field->getName()], $request);
-            }
-        }
-
-        $entry->save();
-        return $entry;
+        $query->except(Auth::user());
     }
 }

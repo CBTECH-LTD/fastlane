@@ -5,11 +5,24 @@ namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
+use CbtechLtd\Fastlane\Support\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Constraints\Unique;
 use Illuminate\Database\Schema\Blueprint;
 
 abstract class BaseType implements SchemaFieldType
 {
+    use HandlesHooks;
+
+    /** Parameters: EntryRequest $request, Model $entry, array $fields, array $data */
+    const HOOK_BEFORE_HYDRATING = 'beforeHydrating';
+    /** Parameters: EntryRequest $request, Model $entry, array $fields, array $data */
+    const HOOK_AFTER_HYDRATING = 'afterHydrating';
+
+    protected array $hooks = [
+        self::HOOK_BEFORE_HYDRATING => [],
+        self::HOOK_AFTER_HYDRATING  => [],
+    ];
+
     protected string $name;
     protected string $label;
     protected string $createRules = '';

@@ -2,15 +2,19 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes;
 
+use CbtechLtd\Fastlane\EntryTypes\Hooks\BeforeHydratingHook;
+use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
+use CbtechLtd\Fastlane\Support\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
-use CbtechLtd\Fastlane\Support\Schema\EntrySchemaDefinition;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResourceCollection;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -19,6 +23,27 @@ use ReflectionClass;
 
 abstract class EntryType implements EntryTypeContract
 {
+    use HandlesHooks;
+
+    /** Parameters: EntryRequest $request, Model $entry, array $fields, array $data */
+    const HOOK_BEFORE_HYDRATING = 'beforeHydrating';
+    /** Parameters: Model $entry */
+    const HOOK_BEFORE_CREATING = 'beforeCreating';
+    /** Parameters: Model $entry */
+    const HOOK_BEFORE_UPDATING = 'beforeUpdating';
+    /** Parameters: Model $entry */
+    const HOOK_AFTER_CREATING = 'afterCreating';
+    /** Parameters: Model $entry */
+    const HOOK_AFTER_UPDATING = 'afterUpdating';
+
+    protected array $hooks = [
+        self::HOOK_BEFORE_HYDRATING => [],
+        self::HOOK_BEFORE_CREATING  => [],
+        self::HOOK_BEFORE_UPDATING  => [],
+        self::HOOK_AFTER_CREATING   => [],
+        self::HOOK_AFTER_UPDATING   => [],
+    ];
+
     protected Gate $gate;
 
     public function __construct(Gate $gate)
@@ -111,54 +136,73 @@ abstract class EntryType implements EntryTypeContract
     {
         $this->gate->authorize('list', $this->model());
 
-        $items = $this->model()::all();
+        $query = $this->newModelInstance()->newModelQuery();
+        $this->queryItems($query);
+        $items = $query->get();
 
         return $this->apiResource()::collection($items);
     }
 
     public function findItem(string $hashid): ApiResource
     {
-        $entry = $this->model()::findHashid($hashid);
+        $query = $this->newModelInstance()->newModelQuery();
+        $this->querySingleItem($query, $hashid);
+        $entry = $query->whereHashid($hashid)->firstOrFail();
 
         $this->gate->authorize('show', $entry);
 
         return $this->apiResource()::single($entry);
     }
 
-    public function store(EntryRequest $request, array $data): Model
+    public function store(EntryRequest $request): Model
     {
         $this->gate->authorize('create', $this->model());
-
         $entry = $this->newModelInstance();
 
         $this->hydrateFields(
             $request,
             $entry,
-            $this->schema()->getDefinition()->toCreate(),
+            $this->schema()->getDefinition()->toCreate()->getFields(),
         );
 
-        $entry->save();
-        return $entry;
+        $beforeHook = new OnSavingHook($this, $entry, $request->validated());
+        $this->executeHooks(static::HOOK_BEFORE_CREATING, $beforeHook);
+
+        $beforeHook->model()->save();
+
+        $afterHook = new OnSavingHook($this, $beforeHook->model(), $request->validated());
+        $this->executeHooks(static::HOOK_AFTER_CREATING, $afterHook);
+
+        return $afterHook->model();
     }
 
-    public function update(EntryRequest $request, string $hashid, array $data): Model
+    public function update(EntryRequest $request, string $hashid): Model
     {
-        $entry = $this->model()::findHashid($hashid);
+        $query = $this->newModelInstance()->newModelQuery();
+        $this->querySingleItem($query, $hashid);
+        $entry = $query->whereHashid($hashid)->firstOrFail();
+
         $this->gate->authorize('update', $entry);
 
         $this->hydrateFields(
             $request,
             $entry,
-            $this->schema()->getDefinition()->toUpdate(),
+            $this->schema()->getDefinition()->toUpdate()->getFields(),
         );
 
-        $entry->save();
-        return $entry;
+        $beforeHook = $this->executeHooks(static::HOOK_BEFORE_UPDATING, new OnSavingHook($this, $entry, $request->validated()));
+        $beforeHook->model()->save();
+
+        $afterHook = $this->executeHooks(static::HOOK_AFTER_UPDATING, new OnSavingHook($this, $beforeHook->model(), $request->validated()));
+        return $afterHook->model();
     }
 
     public function delete(string $hashid): Model
     {
-        $entry = $this->model()::findHashid($hashid);
+        $query = $this->newModelInstance()->newModelQuery();
+        $this->querySingleItem($query, $hashid);
+        $entry = $query->whereHashid($hashid)->firstOrFail();
+
         $this->gate->authorize('delete', $entry);
 
         $entry->delete();
@@ -205,13 +249,33 @@ abstract class EntryType implements EntryTypeContract
         });
     }
 
-    protected function hydrateFields(EntryRequest $request, Model $model, EntrySchemaDefinition $fieldsDefinition): void
+    protected function queryItems(Builder $query): void
     {
-        $data = $request->validated();
+        //
+    }
 
-        foreach ($fieldsDefinition->getFields() as $field) {
-            if (Arr::has($data, $field->getName())) {
-                $field->hydrateValue($model, Arr::get($data, $field->getName()), $request);
+    protected function querySingleItem(Builder $query, string $hashid): void
+    {
+        //
+    }
+
+    /**
+     * @param EntryRequest      $request
+     * @param Model             $model
+     * @param SchemaFieldType[] $fields
+     */
+    protected function hydrateFields(EntryRequest $request, Model $model, array $fields): void
+    {
+        $hookClass = new BeforeHydratingHook($this, $request, $model, $fields, $request->validated());
+
+        $this->executeHooks(
+            static::HOOK_BEFORE_HYDRATING,
+            $hookClass
+        );
+
+        foreach ($fields as $field) {
+            if (Arr::has($hookClass->data, $field->getName())) {
+                $field->hydrateValue($model, Arr::get($hookClass->data, $field->getName()), $request);
             }
         }
     }

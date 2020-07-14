@@ -32,9 +32,9 @@ interface EntryType
 
     public function findItem(string $hashid): ApiResource;
 
-    public function store(EntryRequest $request, array $data): Model;
+    public function store(EntryRequest $request): Model;
 
-    public function update(EntryRequest $request, string $hashid, array $data): Model;
+    public function update(EntryRequest $request, string $hashid): Model;
 
     public function delete(string $hashid): Model;
 

@@ -49,7 +49,7 @@ class EntriesController extends Controller
     {
         $entry = $request
             ->entryType()
-            ->store($request, $request->validated());
+            ->store($request);
 
         return Redirect::route("cp.{$request->entryType()->identifier()}.edit", [$entry]);
     }
@@ -70,7 +70,7 @@ class EntriesController extends Controller
 
     public function update(EntryUpdateRequest $request, string $id)
     {
-        $request->entryType()->update($request, $id, $request->validated());
+        $request->entryType()->update($request, $id);
 
         session()->flash('message', [
             'type' => 'success',
