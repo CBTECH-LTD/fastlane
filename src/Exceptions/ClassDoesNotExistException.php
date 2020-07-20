@@ -25,6 +25,11 @@ class ClassDoesNotExistException extends Exception
 
     public static function schema(string $class)
     {
-        return new static("Policy schema '{$class}' does not exist");
+        return new static("Schema class '{$class}' does not exist");
+    }
+
+    public static function entryType(string $class)
+    {
+        return new static("EntryType class '{$class}' does not exist");
     }
 }

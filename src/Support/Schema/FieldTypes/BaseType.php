@@ -7,7 +7,7 @@ use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
 use CbtechLtd\Fastlane\Support\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Constraints\Unique;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 
 abstract class BaseType implements SchemaFieldType
 {
@@ -34,8 +34,8 @@ abstract class BaseType implements SchemaFieldType
     protected bool $showOnUpdate = true;
     protected ?string $placeholder;
     protected $default = null;
-    protected $hydrateCallback;
     protected EntryType $entryType;
+    protected $hydrateCallback;
 
     protected function __construct(string $name, string $label)
     {
@@ -219,9 +219,24 @@ abstract class BaseType implements SchemaFieldType
         ];
     }
 
-    public function runOnMigration(Blueprint $table): void
+    public function toMigration(): string
     {
-        //
+        $str = [$this->buildMigrationMethodString()];
+
+        if (! $this->isRequired()) {
+            $str[] = 'nullable()';
+        }
+
+        if ($this->hasUniqueRule()) {
+            $str[] = 'unique()';
+        }
+
+        return implode('->', $str);
+    }
+
+    public function toModelAttribute()
+    {
+        return [$this->getName() => null];
     }
 
     protected function getBaseRules(): string
@@ -245,5 +260,38 @@ abstract class BaseType implements SchemaFieldType
     protected function getConfig(): array
     {
         return [];
+    }
+
+    protected function getMigrationMethod(): array
+    {
+        return ['string'];
+    }
+
+    private function buildMigrationMethodString(): string
+    {
+        $method = $this->getMigrationMethod();
+        $methodName = array_shift($method);
+
+        $methodParams = empty($method)
+            ? ''
+            : ', ' . Collection::make($method)->map(function ($str) {
+                if (is_null($str)) {
+                    return 'null';
+                }
+
+                if ($str === true) {
+                    return 'true';
+                }
+
+                if ($str === false) {
+                    return 'false';
+                }
+
+                return is_string($str)
+                    ? "'{$str}'"
+                    : $str;
+            })->implode(', ');
+
+        return "{$methodName}('{$this->getName()}'{$methodParams})";
     }
 }

@@ -125,13 +125,17 @@ class GenerateMigrationFromEntrySchemaCommand extends Command
             throw new \Exception('File ' . $filePath . ' already exists');
         }
 
+        $colDef = Collection::make($columns)->map(function (SchemaFieldType $f) {
+            return $f->toMigration();
+        });
+
         $view = View::file(
             __DIR__ . '/../../../stubs/' . $stub . '.blade.php',
             [
                 'class'          => $className,
                 'table'          => $table,
                 'entryTypeClass' => $entryTypeClass,
-                'columns'        => $columns,
+                'columns'        => $colDef,
             ]
         );
 

@@ -4,7 +4,6 @@ namespace CbtechLtd\Fastlane\Support\Contracts;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Schema\Blueprint;
 
 interface SchemaFieldType extends Arrayable
 {
@@ -54,5 +53,7 @@ interface SchemaFieldType extends Arrayable
 
     public function hydrateUsing($callback): self;
 
-    public function runOnMigration(Blueprint $table): void;
+    public function toMigration(): string;
+
+    public function toModelAttribute();
 }

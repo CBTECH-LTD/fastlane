@@ -3,7 +3,6 @@
 namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config\SelectOption;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 
@@ -55,14 +54,5 @@ class SelectType extends BaseType
         return [
             'options' => $this->getOptions(),
         ];
-    }
-
-    public function runOnMigration(Blueprint $table): void
-    {
-        $col = $table->string($this->getName())->nullable(! $this->isRequired());
-
-        if (! $this->hasUniqueRule()) {
-            $col->unique();
-        }
     }
 }

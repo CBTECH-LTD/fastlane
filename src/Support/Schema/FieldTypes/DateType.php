@@ -2,8 +2,6 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
-use Illuminate\Database\Schema\Blueprint;
-
 class DateType extends BaseType
 {
     protected ?string $displayFormat = null;
@@ -50,6 +48,16 @@ class DateType extends BaseType
         return 'd/m/Y - H:i:S';
     }
 
+    public function toModelAttribute()
+    {
+        [$type, $format] = $this->enableTime
+            ? ['datetime', $this->getSaveFormat()]
+            : ['date', $this->getSaveFormat()];
+
+        return [
+            $this->getName() => "{$type}:{$format}",
+        ];
+    }
 
     protected function getConfig(): array
     {
@@ -58,19 +66,6 @@ class DateType extends BaseType
             'enableTime'    => $this->enableTime,
             'enableSeconds' => $this->enableSeconds,
         ];
-    }
-
-    public function runOnMigration(Blueprint $table): void
-    {
-        $col = $this->enableTime
-            ? $table->dateTime($this->getName())
-            : $table->date($this->getName());
-
-        $col->nullable(! $this->isRequired());
-
-        if ($this->hasUniqueRule()) {
-            $col->unique();
-        }
     }
 
     protected function getTypeRules(): string
@@ -83,5 +78,12 @@ class DateType extends BaseType
         return $this->enableTime
             ? 'Y-m-d H:i:s'
             : 'Y-m-d';
+    }
+
+    protected function getMigrationMethod(): array
+    {
+        return $this->enableTime
+            ? ['dateTime']
+            : ['date'];
     }
 }

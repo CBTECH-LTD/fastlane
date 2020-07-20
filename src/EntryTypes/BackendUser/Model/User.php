@@ -3,7 +3,6 @@
 namespace CbtechLtd\Fastlane\EntryTypes\BackendUser\Model;
 
 use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
-use CbtechLtd\Fastlane\Support\Eloquent\Concerns\Activable;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -20,6 +19,8 @@ class User extends BaseModel implements
     AuthorizableContract,
     CanResetPasswordContract
 {
+    protected bool $fillableFromSchema = false;
+
     use Notifiable, Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasRoles;
 
     protected $fillable = [

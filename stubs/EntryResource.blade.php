@@ -13,10 +13,7 @@ class {{ $class }} extends ResourceType
 
         public function attributes(Request $request): array
         {
-            return [
-                'name'                => $this->model->name,
-                'is_active'           => $this->model->is_active,
-            ];
+            return $this->getAttributesFromFillable();
         }
 
         protected function links(): array

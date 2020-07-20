@@ -6,6 +6,7 @@ use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
 use CbtechLtd\Fastlane\FileAttachment\StoreDraftAttachment;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Concerns\HandlesAttachments;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\URL;
 
 class RichEditorType extends BaseType
@@ -61,5 +62,20 @@ class RichEditorType extends BaseType
                 'self' => URL::relative("cp.{$this->getEntryType()->identifier()}.attachments", $this->getName()),
             ],
         ];
+    }
+
+    protected function getMigrationMethod(): array
+    {
+        return ['longText'];
+    }
+
+
+    public function runOnMigration(Blueprint $table): void
+    {
+        $col = $table->longText($this->getName())->nullable(! $this->isRequired());
+
+        if ($this->hasUniqueRule()) {
+            $col->unique();
+        }
     }
 }

@@ -7,7 +7,7 @@ use CbtechLtd\Fastlane\Support\Schema\FieldTypes\ToggleType;
 
 class {{ $class }} extends EntrySchema
 {
-    public function build(): EntrySchemaDefinition
+    protected function fields(): EntrySchemaDefinition
     {
         return EntrySchemaDefinition::make([
             StringType::make('name', 'Name')

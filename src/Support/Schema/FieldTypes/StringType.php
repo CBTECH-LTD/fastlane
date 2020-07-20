@@ -2,8 +2,6 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
 
-use Illuminate\Database\Schema\Blueprint;
-
 class StringType extends BaseType
 {
     protected $default = '';
@@ -11,15 +9,6 @@ class StringType extends BaseType
     public function getType(): string
     {
         return 'string';
-    }
-
-    public function runOnMigration(Blueprint $table): void
-    {
-        $col = $table->string($this->getName())->nullable(! $this->isRequired());
-
-        if (! $this->hasUniqueRule()) {
-            $col->unique();
-        }
     }
 
     protected function getTypeRules(): string
