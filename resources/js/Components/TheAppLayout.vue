@@ -27,22 +27,37 @@
 
             <!-- Main area -->
             <div class="flex-1 flex flex-col">
-                <div class="flex-1 p-12">
-                    <div class="flex items-center justify-between pt-4 pb-8">
-                        <div class="div">
-                            <h1 class="text-3xl text-gray-700 font-extrabold">
-                                <slot name="title"/>
-                            </h1>
-                            <div class="text-lg text-gray-500 font-semibold">
-                                <slot name="subtitle"/>
+                <div class="flex-1">
+                    <div ref="sticky" class="title-bar-wrapper" :class="stickyBarClass">
+                        <div class="title-bar">
+                            <div class="div">
+                                <h1 class="title-bar__title">
+                                    <slot name="title"/>
+                                </h1>
+                                <div class="title-bar__subtitle">
+                                    <slot name="subtitle"/>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex items-center">
-                            <slot name="actions"/>
+                            <div class="flex items-center">
+                                <slot name="actions"/>
+                            </div>
                         </div>
                     </div>
 
-                    <slot/>
+                    <div v-if="$page.flashMessages && $page.flashMessages.length" class="mt-8 mb-4 px-12">
+                        <div v-for="msg in $page.flashMessages" class="flash-message" :class="`flash-message--type-${msg.type}`">
+                            <div v-if="msg.icon" class="mr-8 text-4xl">
+                                <f-icon :name="msg.icon"></f-icon>
+                            </div>
+                            <div class="mt-4 text-sm font-normal tracking-wide leading-relaxed">
+                                {{ msg.message }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 px-12">
+                        <slot/>
+                    </div>
                 </div>
             </div>
         </div>
@@ -57,6 +72,7 @@
         data () {
             return {
                 isSigningOut: false,
+                stickyBarClass: '',
                 sidebar: {
                     show: false,
                     title: '',
@@ -65,28 +81,6 @@
                     items: [],
                 }
             }
-        },
-
-        computed: {
-            flashMessageClasses () {
-                if (!this.$page.flashMessage) {
-                    return ''
-                }
-
-                if (this.$page.flashMessage.type === 'success') {
-                    return 'text-green-700 bg-green-200 border-green-300'
-                }
-
-                if (this.$page.flashMessage.type === 'alert') {
-                    return 'text-yellow-700 bg-yellow-200 border-yellow-300'
-                }
-
-                if (this.$page.flashMessage.type === 'info') {
-                    return 'text-purple-700 bg-purple-200 border-purple-300'
-                }
-
-                return ''
-            },
         },
 
         methods: {
@@ -109,7 +103,82 @@
                 this.isSigningOut = true
                 await this.$inertia.post('/cp/logout')
                 this.isSigningOut = false
+            },
+
+            observeStickyTitleBar ($observable) {
+                let observer = new IntersectionObserver(entries => {
+                    this.stickyBarClass = (! entries[0].isIntersecting)
+                        ? 'is-floating'
+                        : ''
+                }, {
+                    rootMargin: '-20px 0px',
+                    threshold: 1
+                })
+
+                observer.observe($observable)
             }
-        }
+        },
+
+        mounted () {
+            this.observeStickyTitleBar(this.$refs.sticky)
+        },
     }
 </script>
+
+<style scoped>
+    .title-bar-wrapper {
+        @apply sticky top-0 pt-12 mx-4 z-30 bg-transparent transition-all duration-300;
+    }
+
+    .title-bar {
+        @apply flex items-center justify-between px-12 py-8 z-30 transition-all duration-300;
+        height: 72px;
+        transform: translateY(0);
+        top: 80px;
+    }
+
+    .title-bar__title {
+        @apply text-3xl text-gray-700 font-extrabold;
+    }
+
+    .title-bar__subtitle {
+        @apply text-lg text-gray-500 font-semibold;
+    }
+
+    .title-bar-wrapper.is-floating {
+        @apply bg-indigo-200 rounded-t-none rounded-b-lg border border-indigo-300 shadow-lg;
+    }
+
+    .title-bar-wrapper.is-floating .title-bar {
+        @apply py-4 mb-12;
+        transform: translateY(40px);
+    }
+
+    .title-bar-wrapper.is-floating .title-bar__title {
+        @apply text-xl;
+    }
+
+    .title-bar-wrapper.is-floating .title-bar__subtitle {
+        @apply text-sm;
+    }
+
+    .flash-message {
+        @apply mb-2 p-2 border-l-4 flex items-start;
+    }
+
+    .flash-message--type-success {
+        @apply text-green-700 bg-green-200 border-green-700;
+    }
+
+    .flash-message--type-alert {
+        @apply text-yellow-700 bg-yellow-200 border-yellow-700;
+    }
+
+    .flash-message--type-danger {
+        @apply text-red-700 bg-red-200 border-red-700;
+    }
+
+    .flash-message--type-info {
+        @apply text-purple-700 bg-purple-200 border-purple-300;
+    }
+</style>

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static void createRole(string $name, array $permissions = ['*'])
  * @method static void createPermission(string $name)
  * @method static Collection entryTypes()
+ * @method static array getFlashMessages()
  */
 class FastlaneFacade extends Facade
 {

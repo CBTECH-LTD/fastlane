@@ -6,9 +6,19 @@
             <f-button :href="item.links.parent" variant="outline" left-icon="arrow-left">
                 Back to list
             </f-button>
+            <f-button submit form="editForm"
+                      class="ml-4"
+                      color="success"
+                      size="lg"
+                      left-icon="save"
+                      :disabled="isFormDisabled"
+                      :aria-disabled="isFormDisabled"
+                      :loading="isUpdating">
+                Save
+            </f-button>
         </template>
 
-        <form @submit.prevent="submitForm">
+        <form id="editForm" @submit.prevent="submitForm">
             <f-boxed-card>
                 <template v-for="field in form">
                     <f-form-field :errors="$page.errors.get(field.name)" :required="field.isRequired()">
@@ -24,20 +34,6 @@
                         ></component>
 
                     </f-form-field>
-                </template>
-
-                <template v-slot:footer>
-                    <div class="text-right">
-                        <f-button submit
-                                  color="success"
-                                  size="lg"
-                                  left-icon="save"
-                                  :disabled="isFormDisabled"
-                                  :aria-disabled="isFormDisabled"
-                                  :loading="isUpdating">
-                            Save
-                        </f-button>
-                    </div>
                 </template>
             </f-boxed-card>
         </form>
@@ -81,6 +77,8 @@
             },
         },
 
+        remember: ['form'],
+
         data () {
             return {
                 isUpdating: false,
@@ -104,7 +102,9 @@
                     this.isUpdating = true
 
                     try {
-                        await this.$inertia.patch(this.item.links.self, formObject.all())
+                        await this.$inertia.patch(this.item.links.self, formObject.all(), {
+                            preserveState: false,
+                        })
                     } catch {}
 
                     this.isUpdating = false

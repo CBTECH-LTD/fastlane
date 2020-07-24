@@ -36,7 +36,8 @@
 }
 
 .table__cell {
-    @apply p-4 text-base text-gray-700;
+    @apply table-fixed p-4 text-base text-gray-700 overflow-hidden;
+    word-break: break-word;
 }
 
 .table__row {

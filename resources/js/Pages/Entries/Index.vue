@@ -15,17 +15,20 @@
             <template v-slot:item="{ item }">
                 <td v-for="(colConfig, colId) in entryType.schema" :key="colId" class="table__cell">
                     <slot :name="`item-content-${colId}`" :column="colConfig" :item="item" :value="item.attributes[colId]">
+
                         {{ item.attributes[colId] }}
                     </slot>
                 </td>
-                <td class="table__cell flex items-center justify-end">
-                    <!-- Activate / Deactivate -->
-                    <template v-if="item.attributes.hasOwnProperty('is_active')">
-                        <f-list-item-action v-if="item.attributes.is_active" @click="toggleItemActivation(item, false)" icon="toggle-on" color="green" title="Click to deactivate" :loading="isUpdatingActivationStateFor[item.id]"/>
-                        <f-list-item-action v-else @click="toggleItemActivation(item, true)" icon="toggle-off" color="black" title="Click to activate" :loading="isUpdatingActivationStateFor[item.id]"/>
-                    </template>
-                    <!-- Edit -->
-                    <f-list-item-action v-if="item.links.self" :href="item.links.self" icon="pencil-alt" title="Edit"/>
+                <td class="table__cell">
+                    <div class="w-full h-full flex items-center justify-end">
+                        <!-- Activate / Deactivate -->
+                        <template v-if="item.attributes.hasOwnProperty('is_active')">
+                            <f-list-item-action v-if="item.attributes.is_active" @click="toggleItemActivation(item, false)" icon="toggle-on" color="green" title="Click to deactivate" :loading="isUpdatingActivationStateFor[item.id]"/>
+                            <f-list-item-action v-else @click="toggleItemActivation(item, true)" icon="toggle-off" color="black" title="Click to activate" :loading="isUpdatingActivationStateFor[item.id]"/>
+                        </template>
+                        <!-- Edit -->
+                        <f-list-item-action v-if="item.links.self" :href="item.links.self" icon="pencil-alt" title="Edit"/>
+                    </div>
                 </td>
             </template>
         </f-table-card>

@@ -22,8 +22,6 @@
         mixins: [FormInput],
         inheritAttrs: false,
 
-        inject: ['errors', 'isRequired'],
-
         props: {
             field: {
                 type: Object,

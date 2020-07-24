@@ -151,8 +151,9 @@ class FastlaneServiceProvider extends ServiceProvider
             return (object)[];
         });
 
-        Inertia::share('flashMessage', function () {
-            return Session::get('message');
+        Inertia::share('flashMessages', function () {
+//            dd(session()->get('fastlane-messages'));
+            return Session::get('fastlane-messages');
         });
 
         Inertia::share('menu', function () {

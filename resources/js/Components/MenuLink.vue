@@ -23,8 +23,8 @@
         },
         computed: {
             classes () {
-                if (`${this.$page.app.baseUrl}/${this.$page.app.requestUrl}` === this.item.href) {
-                    return 'text-gray-800'
+                if (`${this.$page.app.baseUrl}/${this.$page.app.requestUrl}`.startsWith(this.item.href)) {
+                    return 'text-gray-800 border-r-8 border-brand-500'
                 }
 
                 return ''

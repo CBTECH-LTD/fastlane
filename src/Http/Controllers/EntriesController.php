@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers;
 
+use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Http\Requests\EntryStoreRequest;
 use CbtechLtd\Fastlane\Http\Requests\EntryUpdateRequest;
@@ -51,6 +52,8 @@ class EntriesController extends Controller
             ->entryType()
             ->store($request);
 
+        FastlaneFacade::flashSuccess($request->entryType()->name() . ' created successfully.', 'thumbs-up');
+
         return Redirect::route("cp.{$request->entryType()->identifier()}.edit", [$entry]);
     }
 
@@ -72,10 +75,7 @@ class EntriesController extends Controller
     {
         $request->entryType()->update($request, $id);
 
-        session()->flash('message', [
-            'type' => 'success',
-            'text' => 'User updated successfully',
-        ]);
+        FastlaneFacade::flashSuccess($request->entryType()->name() . ' updated successfully.', 'thumbs-up');
 
         return Redirect::back();
     }
@@ -84,6 +84,8 @@ class EntriesController extends Controller
     {
         $request->entryType()->delete($id);
 
-        return Redirect::route('cp.backend-users.index');
+        FastlaneFacade::flashSuccess($request->entryType()->name() . ' deleted successfully.', 'trash');
+
+        return Redirect::route("cp.{$request->entryType()->identifier()}.index");
     }
 }

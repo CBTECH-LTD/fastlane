@@ -15,10 +15,49 @@ class Fastlane
 {
     protected Collection $entryTypes;
     protected Collection $routes;
+    protected array $flashMessages = [];
 
     public function __construct()
     {
         $this->registerEntryTypes();
+    }
+
+    public function flashSuccess(string $message, ?string $icon = null): void
+    {
+        $this->flashMessages[] = [
+            'type'    => 'success',
+            'message' => $message,
+            'icon'    => $icon,
+        ];
+
+        session()->flash('fastlane-messages', $this->flashMessages);
+    }
+
+    public function flashAlert(string $message, ?string $icon = null): void
+    {
+        $this->flashMessages[] = [
+            'type'    => 'alert',
+            'message' => $message,
+            'icon'    => $icon,
+        ];
+
+        session()->flash('fastlane-messages', $this->flashMessages);
+    }
+
+    public function flashDanger(string $message, ?string $icon = null): void
+    {
+        $this->flashMessages[] = [
+            'type'    => 'danger',
+            'message' => $message,
+            'icon'    => $icon,
+        ];
+
+        session()->flash('fastlane-messages', $this->flashMessages);
+    }
+
+    public function getFlashMessages(): array
+    {
+        return $this->flashMessages;
     }
 
     public function createPermission(string $name): void

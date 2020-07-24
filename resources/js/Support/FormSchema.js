@@ -14,12 +14,14 @@ import ToggleInput from '../Components/Form/ToggleInput'
 import TextInput from '../Components/Form/TextInput'
 import FormObject from './FormObject'
 import { FormField } from './FormField'
+import ImageInput from '../Components/Form/ImageInput'
 
 const components = {
     string: StringInput,
     text: TextInput,
     toggle: ToggleInput,
     select: SelectInput,
+    image: ImageInput,
     file: StringInput,
     date: DateTimeInput,
     richEditor: RichEditorInput,
@@ -60,6 +62,13 @@ export default function FormSchema (data, schema) {
                 return map(this, f => f)
             }
         },
+
+        restart: {
+            value: (attributes) => {
+                return new FormSchema(attributes, this.getSchema())
+            }
+        },
+
         toFormObject: {
             value: (onlyDirty = true) => {
                 const items = onlyDirty ? this.getDirty() : this.getAll()
