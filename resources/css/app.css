@@ -37,7 +37,8 @@
 
 .table__cell {
     @apply table-fixed p-4 text-base text-gray-700 overflow-hidden;
-    word-break: break-word;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .table__row {

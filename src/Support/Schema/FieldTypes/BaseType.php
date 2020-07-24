@@ -215,7 +215,9 @@ abstract class BaseType implements SchemaFieldType
             'placeholder' => $this->getPlaceholder(),
             'default'     => $this->getDefault(),
             'required'    => $this->isRequired(),
-            'config'      => $this->getConfig(),
+            'config'      => array_merge([
+                'listWidth' => $this->getListWidth(),
+            ], $this->getConfig()),
         ];
     }
 
@@ -255,6 +257,11 @@ abstract class BaseType implements SchemaFieldType
     protected function getTypeRules(): string
     {
         return '';
+    }
+
+    protected function getListWidth(): int
+    {
+        return 0;
     }
 
     protected function getConfig(): array

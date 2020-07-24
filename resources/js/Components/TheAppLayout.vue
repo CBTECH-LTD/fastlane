@@ -131,7 +131,7 @@
     }
 
     .title-bar {
-        @apply flex items-center justify-between px-12 py-8 z-30 transition-all duration-300;
+        @apply flex items-center justify-between px-8 py-8 z-30 transition-all duration-300;
         height: 72px;
         transform: translateY(0);
         top: 80px;

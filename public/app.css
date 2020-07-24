@@ -25158,7 +25158,8 @@ video {
   color: #4a5568;
   color: rgba(74, 85, 104, var(--text-opacity));
   overflow: hidden;
-  word-break: break-word;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .table__row {

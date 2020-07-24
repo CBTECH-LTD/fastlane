@@ -6,30 +6,13 @@ import filter from 'lodash/filter'
 import map from 'lodash/map'
 import tap from 'lodash/tap'
 import camelCase from 'lodash/camelCase'
-import RichEditorInput from '../Components/Form/RichEditorInput'
-import DateTimeInput from '../Components/Form/DateTimeInput'
-import StringInput from '../Components/Form/StringInput'
-import SelectInput from '../Components/Form/SelectInput'
-import ToggleInput from '../Components/Form/ToggleInput'
-import TextInput from '../Components/Form/TextInput'
 import FormObject from './FormObject'
 import { FormField } from './FormField'
-import ImageInput from '../Components/Form/ImageInput'
-
-const components = {
-    string: StringInput,
-    text: TextInput,
-    toggle: ToggleInput,
-    select: SelectInput,
-    image: ImageInput,
-    file: StringInput,
-    date: DateTimeInput,
-    richEditor: RichEditorInput,
-}
+import components from './utils/schemaComponents'
 
 export default function FormSchema (data, schema) {
     each(schema, field => {
-        const component = components[camelCase(field.type)]
+        const component = components[camelCase(field.type)].form
 
         const value = data.hasOwnProperty(field.name)
             ? data[field.name]

@@ -59,4 +59,9 @@ class ImageType extends FileType
     {
         return config('fastlane.thumbor_url');
     }
+
+    protected function getListWidth(): int
+    {
+        return 150;
+    }
 }

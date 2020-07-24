@@ -5,18 +5,23 @@
             <f-button v-if="links.create" :href="links.create" left-icon="plus" size="lg">Add {{ entryType.singular_name }}</f-button>
         </template>
 
-        <f-table-card :items="items.data" :schema="entryType.schema">
+        <f-table-card :items="items.data">
             <template v-slot:columns>
-                <th v-for="(colConfig, colId) in entryType.schema" :key="colId" class="table__column">
-                    {{ colConfig.label }}
+                <th v-for="field in listSchema" :key="field.name" class="table__column" :width="field.config.listWidth > 0 ? field.config.listWidth : 'auto'">
+                    {{ field.label }}
                 </th>
-                <th></th>
+                <th width="160"></th>
             </template>
             <template v-slot:item="{ item }">
-                <td v-for="(colConfig, colId) in entryType.schema" :key="colId" class="table__cell">
-                    <slot :name="`item-content-${colId}`" :column="colConfig" :item="item" :value="item.attributes[colId]">
-
-                        {{ item.attributes[colId] }}
+                <td v-for="field in listSchema" :key="field.name" class="table__cell">
+                    <slot :name="`item-content-${field.name}`" :field="field" :item="item" :value="item.attributes[field.name]">
+                        <component :is="field.component"
+                                   :type="field.type"
+                                   :name="field.name"
+                                   :label="field.label"
+                                   :config="field.config"
+                                   :value="item.attributes[field.name]">
+                        </component>
                     </slot>
                 </td>
                 <td class="table__cell">
@@ -36,6 +41,8 @@
 </template>
 
 <script>
+
+    import ListSchema from '../../Support/ListSchema'
 
     export default {
         name: 'Entries.Index',
@@ -58,6 +65,7 @@
         data () {
             return {
                 isUpdatingActivationStateFor: {},
+                listSchema: new ListSchema(this.entryType.schema),
             }
         },
 
@@ -75,6 +83,6 @@
                     this.$set(this.isUpdatingActivationStateFor, item.id, false)
                 }
             }
-        }
+        },
     }
 </script>
