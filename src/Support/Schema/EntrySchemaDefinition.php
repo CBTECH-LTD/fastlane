@@ -12,7 +12,6 @@ class EntrySchemaDefinition implements Contracts\EntrySchemaDefinition
 
     /**
      * @param SchemaFieldType[] $fields
-     * @return EntrySchemaDefinition
      */
     public function __construct(array $fields)
     {

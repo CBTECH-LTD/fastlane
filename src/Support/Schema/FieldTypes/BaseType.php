@@ -63,9 +63,9 @@ abstract class BaseType implements SchemaFieldType
         return $this->entryType;
     }
 
-    public function setEntryType(EntryType $entryType): self
+    public function setEntryType(EntryType $relatedEntryType): self
     {
-        $this->entryType = $entryType;
+        $this->entryType = $relatedEntryType;
         return $this;
     }
 

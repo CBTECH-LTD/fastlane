@@ -11,6 +11,8 @@ abstract class EntrySchema implements Contracts\EntrySchema
     private EntryType $entryType;
     private EntrySchemaDefinition $definition;
 
+    abstract protected function fields(): EntrySchemaDefinition;
+
     public function __construct(EntryType $entryType)
     {
         $this->entryType = $entryType;

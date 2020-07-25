@@ -9,6 +9,7 @@ use Webmozart\Assert\Assert;
 class SelectType extends BaseType
 {
     protected $default = null;
+    protected bool $multiple = false;
     protected array $options;
 
     static public function make(string $name, string $label, array $options = []): self
@@ -29,6 +30,17 @@ class SelectType extends BaseType
         return 'select';
     }
 
+    public function multiple(bool $state = true): self
+    {
+        $this->multiple = $state;
+        return $this;
+    }
+
+    public function isMultiple(): bool
+    {
+        return $this->multiple;
+    }
+
     public function getOptions(): array
     {
         return Collection::make($this->options)->toArray();
@@ -46,6 +58,10 @@ class SelectType extends BaseType
             fn(SelectOption $option) => $option->getValue()
         );
 
+        if ($this->isMultiple()) {
+            return 'array';
+        }
+
         return 'in:' . $values->implode(',');
     }
 
@@ -53,6 +69,7 @@ class SelectType extends BaseType
     {
         return [
             'options' => $this->getOptions(),
+            'multiple' => $this->isMultiple(),
         ];
     }
 }

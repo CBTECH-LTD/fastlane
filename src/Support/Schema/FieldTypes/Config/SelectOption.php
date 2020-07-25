@@ -32,9 +32,11 @@ class SelectOption implements Arrayable
 
     public function toArray()
     {
+        $val = $this->getValue();
+
         return [
             'label' => $this->getLabel(),
-            'value' => $this->getValue(),
+            'value' => (int)$val,
         ];
     }
 }

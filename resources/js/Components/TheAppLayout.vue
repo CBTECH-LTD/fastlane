@@ -55,7 +55,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 px-12">
+                    <div class="mt-4 mb-12 px-12">
                         <slot/>
                     </div>
                 </div>

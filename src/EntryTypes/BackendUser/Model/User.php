@@ -19,7 +19,8 @@ class User extends BaseModel implements
     AuthorizableContract,
     CanResetPasswordContract
 {
-    protected bool $fillableFromSchema = false;
+    protected bool $attributesFromSchema = false;
+    protected bool $relationsFromSchema = false;
 
     use Notifiable, Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasRoles;
 

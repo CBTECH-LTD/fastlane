@@ -621,9 +621,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_select_dist_vue_select_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-select/dist/vue-select.css */ "./node_modules/vue-select/dist/vue-select.css");
 /* harmony import */ var vue_select_dist_vue_select_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue_select_dist_vue_select_css__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _Mixins_FormInput__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Mixins/FormInput */ "./resources/js/Components/Mixins/FormInput.js");
-/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/find */ "./node_modules/lodash/find.js");
-/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _Support_FormField__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../Support/FormField */ "./resources/js/Support/FormField.js");
+/* harmony import */ var _Support_FormField__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../Support/FormField */ "./resources/js/Support/FormField.js");
+/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash/find */ "./node_modules/lodash/find.js");
+/* harmony import */ var lodash_find__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash_find__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var lodash_map__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! lodash/map */ "./node_modules/lodash/map.js");
+/* harmony import */ var lodash_map__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(lodash_map__WEBPACK_IMPORTED_MODULE_5__);
 //
 //
 //
@@ -635,6 +637,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+
 
 
 
@@ -648,17 +652,30 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     commit: function commit(formObject) {
-      formObject.put(this.field.name, this.field.value ? this.field.value.value : null);
+      formObject.put(this.field.name, this.prepareValueForCommit());
+    },
+    prepareValueForCommit: function prepareValueForCommit() {
+      if (!this.field.value) {
+        return null;
+      }
+
+      if (this.field.config.multiple === true) {
+        return lodash_map__WEBPACK_IMPORTED_MODULE_5___default()(this.field.value, function (v) {
+          return v.value;
+        });
+      }
+
+      return this.field.value.value;
     }
   },
   buildForSchema: function buildForSchema(_ref) {
     var field = _ref.field,
         component = _ref.component,
         value = _ref.value;
-    var filteredValue = lodash_find__WEBPACK_IMPORTED_MODULE_3___default()(field.config.options, function (o) {
+    var filteredValue = lodash_find__WEBPACK_IMPORTED_MODULE_4___default()(field.config.options, function (o) {
       return o.value === value;
     });
-    return new _Support_FormField__WEBPACK_IMPORTED_MODULE_4__["FormField"](field, component, filteredValue || field["default"]);
+    return new _Support_FormField__WEBPACK_IMPORTED_MODULE_3__["FormField"](field, component, filteredValue || field["default"]);
   }
 });
 
@@ -29601,7 +29618,11 @@ var render = function() {
     [
       _c("v-select", {
         staticClass: "form-input",
-        attrs: { clearable: false, options: _vm.field.config.options },
+        attrs: {
+          clearable: false,
+          options: _vm.field.config.options,
+          multiple: _vm.field.config.multiple
+        },
         model: {
           value: _vm.field.value,
           callback: function($$v) {
@@ -30583,7 +30604,7 @@ var render = function() {
               )
             : _vm._e(),
           _vm._v(" "),
-          _c("div", { staticClass: "mt-4 px-12" }, [_vm._t("default")], 2)
+          _c("div", { staticClass: "mt-4 mb-12 px-12" }, [_vm._t("default")], 2)
         ])
       ])
     ])
