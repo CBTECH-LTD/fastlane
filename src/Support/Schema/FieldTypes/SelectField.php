@@ -1,12 +1,14 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config\SelectOption;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 
-class SelectType extends BaseType
+class SelectField extends BaseSchemaField
 {
     protected $default = null;
     protected bool $multiple = false;
@@ -71,5 +73,18 @@ class SelectType extends BaseType
             'options' => $this->getOptions(),
             'multiple' => $this->isMultiple(),
         ];
+    }
+
+    public function readValue(Model $model)
+    {
+        $value = Arr::wrap($model->{$this->getName()});
+
+        if (count($value) === 0) {
+            return [];
+        }
+
+        return Collection::make($this->options)->filter(
+            fn(SelectOption $opt) => in_array($opt->getValue(), $value)
+        )->toArray();
     }
 }

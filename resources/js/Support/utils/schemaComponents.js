@@ -7,6 +7,7 @@ import DateTimeInput from '../../Components/Form/DateTimeInput'
 import RichEditorInput from '../../Components/Form/RichEditorInput'
 import Simple from '../../Components/List/Simple'
 import Image from '../../Components/List/Image'
+import Select from '../../Components/List/Select'
 
 export default {
     string: {
@@ -22,7 +23,7 @@ export default {
         form: ToggleInput,
     },
     select: {
-        list: Simple,
+        list: Select,
         form: SelectInput,
     },
     image: {

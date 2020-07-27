@@ -1,6 +1,6 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields\Config;
 
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -36,7 +36,7 @@ class SelectOption implements Arrayable
 
         return [
             'label' => $this->getLabel(),
-            'value' => (int)$val,
+            'value' => is_int($val) ? $val : $val,
         ];
     }
 }

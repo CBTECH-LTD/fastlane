@@ -1,15 +1,15 @@
 <?php declare(strict_types = 1);
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
 use CbtechLtd\Fastlane\FileAttachment\StoreDraftAttachment;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Concerns\HandlesAttachments;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\URL;
 
-class RichEditorType extends BaseType
+class RichEditorField extends BaseSchemaField
 {
     use HandlesAttachments;
 

@@ -4,14 +4,21 @@ namespace CbtechLtd\Fastlane\Support\Contracts;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Model;
 
-interface SchemaFieldType extends Arrayable
+interface SchemaField extends Arrayable
 {
     public function getType(): string;
 
     public function getName(): string;
 
     public function getLabel(): string;
+
+    public function readValue(Model $model);
+
+    public function hydrateValue($model, $value, EntryRequest $request): void;
+
+    public function hydrateUsing($callback): self;
 
     public function getEntryType(): EntryType;
 
@@ -48,10 +55,6 @@ interface SchemaFieldType extends Arrayable
     public function isShownOnCreate(): bool;
 
     public function isShownOnUpdate(): bool;
-
-    public function hydrateValue($model, $value, EntryRequest $request): void;
-
-    public function hydrateUsing($callback): self;
 
     public function toMigration(): string;
 

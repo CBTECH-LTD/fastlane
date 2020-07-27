@@ -15,7 +15,7 @@
     import 'vue-select/dist/vue-select.css'
     import FormInput from '../Mixins/FormInput'
     import { FormField } from '../../Support/FormField'
-    import find from 'lodash/find'
+    import filter from 'lodash/filter'
     import map from 'lodash/map'
 
     export default {
@@ -44,7 +44,21 @@
         },
 
         buildForSchema ({ field, component, value }) {
-            const filteredValue = find(field.config.options, o => o.value === value)
+            const getValue = () => {
+                if (! value) {
+                    return null;
+                }
+
+                if (field.config.multiple === true) {
+                    return map(value, v => v.value)
+                }
+
+                return value[0].value || null;
+            }
+
+            const filteredValue = filter(field.config.options, o => {
+                return getValue().includes(o.value)
+            })
 
             return new FormField(
                 field,

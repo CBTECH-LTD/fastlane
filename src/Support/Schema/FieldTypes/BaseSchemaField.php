@@ -1,15 +1,16 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
+use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\HandlesHooks;
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Constraints\Unique;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-abstract class BaseType implements SchemaFieldType
+abstract class BaseSchemaField implements SchemaField
 {
     use HandlesHooks;
 
@@ -56,6 +57,11 @@ abstract class BaseType implements SchemaFieldType
     public function getLabel(): string
     {
         return $this->label;
+    }
+
+    public function readValue(Model $model)
+    {
+        return $model->{$this->getName()};
     }
 
     public function getEntryType(): EntryType

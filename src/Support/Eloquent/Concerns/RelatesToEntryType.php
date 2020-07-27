@@ -6,8 +6,8 @@ namespace CbtechLtd\Fastlane\Support\Eloquent\Concerns;
 
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\RelationType;
+use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\RelationField;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 
@@ -36,24 +36,24 @@ trait RelatesToEntryType
     {
         if ($this->attributesFromSchema) {
             $this->loadAttributesFromEntrySchema(
-                $this->getEntryType()->schema()->getDefinition()->getFields()
+                $this->getEntryType()->schema()->all()
             );
         }
 
         if ($this->relationsFromSchema) {
             $this->loadRelationsFromEntrySchema(
-                $this->getEntryType()->schema()->getDefinition()->getFields()
+                $this->getEntryType()->schema()->all()
             );
         }
     }
 
     /**
-     * @param SchemaFieldType[] $fields
+     * @param SchemaField[] $fields
      */
     private function loadAttributesFromEntrySchema(array $fields): void
     {
         $fields = Collection::make($fields)
-            ->mapWithKeys(function (SchemaFieldType $ft) {
+            ->mapWithKeys(function (SchemaField $ft) {
                 if ($ft->isShownOnCreate() || $ft->isShownOnUpdate()) {
                     return $ft->toModelAttribute();
                 }
@@ -66,13 +66,13 @@ trait RelatesToEntryType
     }
 
     /**
-     * @param SchemaFieldType[] $fields
+     * @param SchemaField[] $fields
      */
     private function loadRelationsFromEntrySchema(array $fields): void
     {
         Collection::make($fields)
-            ->filter(fn(SchemaFieldType $ft) => $ft instanceof RelationType)
-            ->each(function (RelationType $ft) {
+            ->filter(fn(SchemaField $ft) => $ft instanceof RelationField)
+            ->each(function (RelationField $ft) {
                 static::resolveRelationUsing(
                     $ft->getRelationshipName(),
                     $ft->getRelationshipMethod()

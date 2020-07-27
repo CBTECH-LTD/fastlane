@@ -1,15 +1,14 @@
 namespace {{ $namespace }};
 
 use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
-use CbtechLtd\Fastlane\Support\Schema\EntrySchemaDefinition;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\StringType;
 use CbtechLtd\Fastlane\Support\Schema\FieldTypes\ToggleType;
 
 class {{ $class }} extends EntrySchema
 {
-    protected function fields(): EntrySchemaDefinition
+    protected function fields(): array
     {
-        return EntrySchemaDefinition::make([
+        return [
             StringType::make('name', 'Name')
                 ->required()
                 ->setRules('max:255')
@@ -17,6 +16,6 @@ class {{ $class }} extends EntrySchema
 
             ToggleType::make('is_active', 'Active')
             ->required(),
-        ]);
+        ];
     }
 }

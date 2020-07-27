@@ -2,13 +2,13 @@
 
 namespace CbtechLtd\Fastlane\Http\Requests;
 
-use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Concerns\HandlesAttachments;
+use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 
 class EntryAttachmentStoreRequest extends EntryRequest
 {
     protected bool $hasLoadedField = false;
-    protected ?SchemaFieldType $field = null;
+    protected ?SchemaField $field = null;
 
     public function authorizeRequest()
     {
@@ -16,18 +16,18 @@ class EntryAttachmentStoreRequest extends EntryRequest
             return false;
         }
 
-        return $this->field() instanceof SchemaFieldType
+        return $this->field() instanceof SchemaField
             && in_array(HandlesAttachments::class, class_uses($this->field()))
             && $this->field()->isAcceptingFiles();
     }
 
-    public function field(): ?SchemaFieldType
+    public function field(): ?SchemaField
     {
         if ($this->hasLoadedField) {
             return $this->field;
         }
 
-        $this->field = $this->entryType()->schema()->getDefinition()->findField($this->fieldName);
+        $this->field = $this->entryType()->schema()->findField($this->fieldName);
         $this->hasLoadedField = true;
 
         return $this->field;

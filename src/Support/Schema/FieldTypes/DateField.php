@@ -1,8 +1,8 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-class DateType extends BaseType
+class DateField extends BaseSchemaField
 {
     protected ?string $displayFormat = null;
     protected bool $enableTime = false;

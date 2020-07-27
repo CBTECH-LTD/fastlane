@@ -13,7 +13,7 @@ trait HasEntryType
     public function entryType()
     {
         if (! $this->entryType) {
-            $this->entryType = FastlaneFacade::entryTypes()->get(
+            $this->entryType = FastlaneFacade::getEntryTypeByIdentifier(
                 explode('/', Str::replaceFirst('cp/', '', $this->path()))[0]
             );
         }

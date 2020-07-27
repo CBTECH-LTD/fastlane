@@ -1,8 +1,8 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-class FileType extends BaseType
+class FileField extends BaseSchemaField
 {
     protected array $accept = [];
 

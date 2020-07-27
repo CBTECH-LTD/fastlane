@@ -1,20 +1,21 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config\SelectOption;
-use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-abstract class RelationType extends BaseType
+abstract class RelationField extends BaseSchemaField
 {
     protected $default = null;
     protected bool $multiple = false;
+    protected bool $withTimestamps = true;
+    protected ?Collection $options = null;
     protected EntryType $relatedEntryType;
-    protected array $options = [];
 
     abstract public function isMultiple(): bool;
 
@@ -42,10 +43,6 @@ abstract class RelationType extends BaseType
 
         $this->label = $this->relatedEntryType->pluralName();
         $this->name = "relations__{$this->relatedEntryType->identifier()}";
-
-        $this->options = $this->relatedEntryType->getItems()->getCollection()->map(
-            fn(ApiResource $res) => SelectOption::make((int)$res->getModel()->getKey(), $res->getModel()->toString())
-        )->all();
     }
 
     static public function make(string $relatedEntryType, ?string $label = null): self
@@ -53,9 +50,35 @@ abstract class RelationType extends BaseType
         return new static($relatedEntryType, $label);
     }
 
+    public function withTimestamps(bool $state = true): self
+    {
+        $this->withTimestamps = $state;
+        return $this;
+    }
+
+    public function withoutTimestamps(): self
+    {
+        return $this->withTimestamps(false);
+    }
+
+    public function readValue(Model $model)
+    {
+        throw new \Exception('readValue not implemented.');
+    }
+
     public function getType(): string
     {
         return 'select';
+    }
+
+    public function hydrateValue($model, $value, EntryRequest $request): void
+    {
+        if (is_callable($this->hydrateCallback)) {
+            call_user_func($this->hydrateCallback, $model, $value, $request);
+            return;
+        }
+
+        $this->hydrateRelation($model, $value, $request);
     }
 
     public function getRelatedEntryType(): EntryType
@@ -71,7 +94,16 @@ abstract class RelationType extends BaseType
 
     public function getOptions(): array
     {
-        return $this->options;
+        if (! $this->options) {
+            $this->options = $this->relatedEntryType->getItems()->map(function (Model $model) {
+                return SelectOption::make(
+                    $model->getKey(),
+                    $this->entryType->transformModelToString($model)
+                );
+            });
+        }
+
+        return $this->options->toArray();
     }
 
     protected function getTypeRules(): string
@@ -93,15 +125,5 @@ abstract class RelationType extends BaseType
             'options'  => $this->getOptions(),
             'multiple' => $this->isMultiple(),
         ];
-    }
-
-    public function hydrateValue($model, $value, EntryRequest $request): void
-    {
-        if (is_callable($this->hydrateCallback)) {
-            call_user_func($this->hydrateCallback, $model, $value, $request);
-            return;
-        }
-
-        $this->hydrateRelation($model, $value, $request);
     }
 }

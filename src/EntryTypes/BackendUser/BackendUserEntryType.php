@@ -6,9 +6,15 @@ use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\RandomPasswordPipe;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\UpdateRolePipe;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
+use CbtechLtd\Fastlane\Support\Schema\Fields\SelectField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 class BackendUserEntryType extends EntryType
 {
@@ -31,6 +37,40 @@ class BackendUserEntryType extends EntryType
     public function model(): string
     {
         return User::class;
+    }
+
+    public function fields(): array
+    {
+        return [
+            StringField::make('name', 'Name')
+                ->required()
+                ->setRules('max:255')
+                ->showOnIndex(),
+
+            StringField::make('email', 'Email')
+                ->required()
+                ->unique(new Unique(User::class, 'email'))
+                ->setRules('max:255')
+                ->showOnIndex(),
+
+            SelectField::make('role', 'Role')
+                ->setOptions(
+                    Role::all()->map(
+                        fn(Role $role) => SelectOption::make($role->name, $role->name)
+                    )->all()
+                )
+                ->required()
+                ->showOnIndex()
+                ->hydrateUsing(function ($model, $value) {
+                    if ($value) {
+                        $model->assignRole($value);
+                    }
+                }),
+
+            ToggleField::make('is_active', 'Active')
+                ->required()
+                ->setDefault(true),
+        ];
     }
 
     protected function queryItems(Builder $query): void

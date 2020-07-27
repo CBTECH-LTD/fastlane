@@ -1,8 +1,8 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-class StringType extends BaseType
+class StringField extends BaseSchemaField
 {
     protected $default = '';
 

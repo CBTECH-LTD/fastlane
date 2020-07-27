@@ -4,7 +4,7 @@ namespace CbtechLtd\Fastlane\Console\Commands;
 
 use Carbon\Carbon;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
+use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -90,8 +90,8 @@ class GenerateMigrationFromEntrySchemaCommand extends Command
         $className = 'Create' . $entryType->pluralName() . 'Table';
         $table = Str::plural(Str::snake($entryType->identifier(), '_'));
 
-        $fields = Collection::make($entryType->schema()->getDefinition()->getFields())
-            ->filter(function (SchemaFieldType $field) {
+        $fields = Collection::make($entryType->fields())
+            ->filter(function (SchemaField $field) {
                 return $field->getName() !== 'is_active';
             });
 
@@ -125,7 +125,7 @@ class GenerateMigrationFromEntrySchemaCommand extends Command
             throw new \Exception('File ' . $filePath . ' already exists');
         }
 
-        $colDef = Collection::make($columns)->map(function (SchemaFieldType $f) {
+        $colDef = Collection::make($columns)->map(function (SchemaField $f) {
             return $f->toMigration();
         });
 

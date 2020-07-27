@@ -1,8 +1,8 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-class TextType extends BaseType
+class TextField extends BaseSchemaField
 {
     public function getType(): string
     {
