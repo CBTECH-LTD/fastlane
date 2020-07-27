@@ -9,9 +9,11 @@ class TextField extends BaseSchemaField
         return 'text';
     }
 
-    protected function getTypeRules(): string
+    protected function getTypeRules(): array
     {
-        return 'string';
+        return [
+            $this->getName() => 'string',
+        ];
     }
 
     protected function getMigrationMethod(): array

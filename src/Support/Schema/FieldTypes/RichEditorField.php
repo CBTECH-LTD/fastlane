@@ -7,6 +7,7 @@ use CbtechLtd\Fastlane\FileAttachment\StoreDraftAttachment;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 
 class RichEditorField extends BaseSchemaField
@@ -67,15 +68,5 @@ class RichEditorField extends BaseSchemaField
     protected function getMigrationMethod(): array
     {
         return ['longText'];
-    }
-
-
-    public function runOnMigration(Blueprint $table): void
-    {
-        $col = $table->longText($this->getName())->nullable(! $this->isRequired());
-
-        if ($this->hasUniqueRule()) {
-            $col->unique();
-        }
     }
 }

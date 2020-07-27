@@ -12,7 +12,8 @@ class SelectField extends BaseSchemaField
 {
     protected $default = null;
     protected bool $multiple = false;
-    protected array $options;
+    protected $options;
+    protected $loadedOptions;
 
     static public function make(string $name, string $label, array $options = []): self
     {
@@ -45,26 +46,35 @@ class SelectField extends BaseSchemaField
 
     public function getOptions(): array
     {
-        return Collection::make($this->options)->toArray();
+        if (! $this->loadedOptions) {
+            $this->loadOptions();
+        }
+
+        return Collection::make($this->loadedOptions)->toArray();
     }
 
-    public function setOptions(array $options): self
+    public function setOptions($options): self
     {
         $this->options = $options;
         return $this;
     }
 
-    protected function getTypeRules(): string
+    protected function getTypeRules(): array
     {
         $values = Collection::make($this->options)->map(
             fn(SelectOption $option) => $option->getValue()
         );
 
+        $inRule = 'in:' . $values->implode(',');
+
         if ($this->isMultiple()) {
-            return 'array';
+            return [
+                $this->getName() => 'array',
+                "{$this->getName()}.*" => $inRule,
+            ];
         }
 
-        return 'in:' . $values->implode(',');
+        return [ $this->getName() => 'in:' . $values->implode(',') ];
     }
 
     public function getConfig(): array
@@ -86,5 +96,12 @@ class SelectField extends BaseSchemaField
         return Collection::make($this->options)->filter(
             fn(SelectOption $opt) => in_array($opt->getValue(), $value)
         )->toArray();
+    }
+
+    protected function loadOptions(): void
+    {
+        $this->loadedOptions = is_callable($this->options)
+            ? call_user_func($this->options)
+            : $this->loadedOptions;
     }
 }

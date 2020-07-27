@@ -22,8 +22,10 @@ class FileField extends BaseSchemaField
         return $this;
     }
 
-    protected function getTypeRules(): string
+    protected function getTypeRules(): array
     {
-        return 'file';
+        return [
+            $this->getName() => 'file'
+        ];
     }
 }

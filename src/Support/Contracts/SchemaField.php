@@ -58,5 +58,16 @@ interface SchemaField extends Arrayable
 
     public function toMigration(): string;
 
-    public function toModelAttribute();
+    /**
+     * Exports an array to be used by the model to define
+     * a fillable column and its casting type.
+     *
+     * The returned array must be in the following format:
+     *  [
+     *      "field_name" => string | null
+     * ]
+     *
+     * @return array
+     */
+    public function toModelAttribute(): array;
 }

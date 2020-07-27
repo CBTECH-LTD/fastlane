@@ -48,7 +48,7 @@ class DateField extends BaseSchemaField
         return 'd/m/Y - H:i:S';
     }
 
-    public function toModelAttribute()
+    public function toModelAttribute(): array
     {
         [$type, $format] = $this->enableTime
             ? ['datetime', $this->getSaveFormat()]
@@ -68,9 +68,11 @@ class DateField extends BaseSchemaField
         ];
     }
 
-    protected function getTypeRules(): string
+    protected function getTypeRules(): array
     {
-        return 'date_format:' . $this->getSaveFormat();
+        return [
+            $this->getName() => 'date_format:' . $this->getSaveFormat()
+        ];
     }
 
     protected function getSaveFormat(): string

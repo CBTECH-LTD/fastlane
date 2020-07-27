@@ -73,10 +73,14 @@ trait RelatesToEntryType
         Collection::make($fields)
             ->filter(fn(SchemaField $ft) => $ft instanceof RelationField)
             ->each(function (RelationField $ft) {
-                static::resolveRelationUsing(
-                    $ft->getRelationshipName(),
-                    $ft->getRelationshipMethod()
-                );
+                // We dynamically add a relation to the model if there's no
+                // method declared with the same name.
+                if (! method_exists($this, $ft->getRelationshipName())) {
+                    static::resolveRelationUsing(
+                        $ft->getRelationshipName(),
+                        $ft->getRelationshipMethod()
+                    );
+                }
             });
     }
 }

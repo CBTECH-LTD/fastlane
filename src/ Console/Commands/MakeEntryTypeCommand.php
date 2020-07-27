@@ -15,7 +15,7 @@ class MakeEntryTypeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'fastlane:entry-types:make {name} {--all} {--m|model} {--i|migration} {--p|policy} {--r|resource} {--s|schema}';
+    protected $signature = 'fastlane:entry-types:make {name} {--all} {--m|model} {--i|migration} {--p|policy} {--r|resource}';
 
     /**
      * The console command description.
@@ -54,7 +54,6 @@ class MakeEntryTypeCommand extends Command
         $this->makeModelClass($ns);
         $this->makePolicyClass($ns);
         $this->makeResourceClass($ns);
-        $this->makeSchemaClass($ns);
         $this->makeMigrationClass($ns);
     }
 
@@ -88,16 +87,6 @@ class MakeEntryTypeCommand extends Command
 
         $className = $this->getNameArgument() . 'Policy';
         $this->createClassFile($className, $namespace, 'EntryPolicy');
-    }
-
-    protected function makeSchemaClass(string $namespace): void
-    {
-        if (! $this->option('schema') && ! $this->option('all')) {
-            return;
-        }
-
-        $className = $this->getNameArgument() . 'Schema';
-        $this->createClassFile($className, $namespace, 'EntrySchema');
     }
 
     protected function makeResourceClass(string $namespace): void

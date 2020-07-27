@@ -29,10 +29,11 @@ class ImageField extends FileField
         return $this;
     }
 
-    protected function getTypeRules(): string
+    protected function getTypeRules(): array
     {
-        return 'url|starts_with:' .
-            $this->getBaseImageUrl();
+        return [
+            $this->getName()=> 'url|starts_with:' . $this->getBaseImageUrl(),
+        ];
     }
 
     protected function getConfig(): array

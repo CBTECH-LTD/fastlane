@@ -94,6 +94,42 @@ abstract class RelationField extends BaseSchemaField
 
     public function getOptions(): array
     {
+        return $this->getSelectOptions()->toArray();
+    }
+
+    protected function getTypeRules(): array
+    {
+        $values = Collection::make($this->getSelectOptions())->map(
+            fn(SelectOption $option) => $option->getValue()
+        );
+
+        $inRule = 'in:' . $values->implode(',');
+
+        if ($this->isMultiple()) {
+            return [
+                $this->getName() => 'array',
+                "{$this->getName()}.*" => $inRule,
+            ];
+        }
+
+        return [ $this->getName() => 'in:' . $values->implode(',') ];
+    }
+
+    public function getConfig(): array
+    {
+        return [
+            'options'  => $this->getOptions(),
+            'multiple' => $this->isMultiple(),
+        ];
+    }
+
+    public function toMigration(): string
+    {
+        return '';
+    }
+
+    protected function getSelectOptions(): Collection
+    {
         if (! $this->options) {
             $this->options = $this->relatedEntryType->getItems()->map(function (Model $model) {
                 return SelectOption::make(
@@ -103,27 +139,6 @@ abstract class RelationField extends BaseSchemaField
             });
         }
 
-        return $this->options->toArray();
-    }
-
-    protected function getTypeRules(): string
-    {
-        $values = Collection::make($this->options)->map(
-            fn(SelectOption $option) => $option->getValue()
-        );
-
-        if ($this->isMultiple()) {
-            return 'array';
-        }
-
-        return 'in:' . $values->implode(',');
-    }
-
-    public function getConfig(): array
-    {
-        return [
-            'options'  => $this->getOptions(),
-            'multiple' => $this->isMultiple(),
-        ];
+        return $this->options;
     }
 }

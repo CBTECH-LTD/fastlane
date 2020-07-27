@@ -11,16 +11,18 @@ class ToggleField extends BaseSchemaField
         return 'toggle';
     }
 
-    public function toModelAttribute()
+    public function toModelAttribute(): array
     {
         return [
             $this->getName() => 'boolean',
         ];
     }
 
-    protected function getTypeRules(): string
+    protected function getTypeRules(): array
     {
-        return 'boolean';
+        return [
+            $this->getName() => 'boolean',
+        ];
     }
 
     protected function getMigrationMethod(): array

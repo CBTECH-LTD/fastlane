@@ -195,7 +195,7 @@ abstract class EntryType implements EntryTypeContract
         $this->hydrateFields(
             $request,
             $entry,
-            $this->schema()->toIndex(),
+            $this->schema()->toCreate(),
         );
 
         $beforeHook = new OnSavingHook($this, $entry, $request->validated());

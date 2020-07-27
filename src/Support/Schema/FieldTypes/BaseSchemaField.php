@@ -124,7 +124,9 @@ abstract class BaseSchemaField implements SchemaField
     {
         $baseRules = $this->getBaseRules();
 
-        return "{$baseRules}{$this->getTypeRules()}|{$this->createRules}";
+        $rules = array_merge([$baseRules], $this->getTypeRules(), [$this->createRules]);
+
+        return Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|');
     }
 
     public function setCreateRules(string $rules): self
@@ -137,7 +139,9 @@ abstract class BaseSchemaField implements SchemaField
     {
         $baseRules = $this->getBaseRules();
 
-        return "sometimes|{$baseRules}{$this->getTypeRules()}|{$this->updateRules}";
+        $rules = array_merge(['sometimes', $baseRules], $this->getTypeRules(), [$this->updateRules]);
+
+        return Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|');
     }
 
     public function setUpdateRules(string $rules): self
@@ -239,30 +243,34 @@ abstract class BaseSchemaField implements SchemaField
             $str[] = 'unique()';
         }
 
+        if (!is_null($this->default)) {
+            $str[] = 'default(' . $this->escapeString($this->default) . ')';
+        }
+
         return implode('->', $str);
     }
 
-    public function toModelAttribute()
+    public function toModelAttribute(): array
     {
         return [$this->getName() => null];
     }
 
     protected function getBaseRules(): string
     {
-        $requiredRule = $this->isRequired()
-            ? 'required'
-            : 'nullable';
+        $rules = $this->isRequired()
+            ? ['required']
+            : ['nullable'];
 
-        $uniqueRule = $this->hasUniqueRule()
-            ? (string)$this->getUniqueRule() . '|'
-            : '';
+        if ($this->hasUniqueRule()) {
+            $rules[] = (string) $this->getUniqueRule();
+        }
 
-        return $requiredRule . '|' . $uniqueRule;
+        return implode('|', $rules);
     }
 
-    protected function getTypeRules(): string
+    protected function getTypeRules(): array
     {
-        return '';
+        return [];
     }
 
     protected function getListWidth(): int
@@ -280,7 +288,7 @@ abstract class BaseSchemaField implements SchemaField
         return ['string'];
     }
 
-    private function buildMigrationMethodString(): string
+    protected function buildMigrationMethodString(): string
     {
         $method = $this->getMigrationMethod();
         $methodName = array_shift($method);
@@ -288,23 +296,32 @@ abstract class BaseSchemaField implements SchemaField
         $methodParams = empty($method)
             ? ''
             : ', ' . Collection::make($method)->map(function ($str) {
-                if (is_null($str)) {
-                    return 'null';
-                }
-
-                if ($str === true) {
-                    return 'true';
-                }
-
-                if ($str === false) {
-                    return 'false';
-                }
-
-                return is_string($str)
-                    ? "'{$str}'"
-                    : $str;
+                return $this->escapeString($str);
             })->implode(', ');
 
         return "{$methodName}('{$this->getName()}'{$methodParams})";
+    }
+
+    /**
+     * @param $str
+     * @return string
+     */
+    private function escapeString($str): string
+    {
+        if (is_null($str)) {
+            return 'null';
+        }
+
+        if ($str === true) {
+            return 'true';
+        }
+
+        if ($str === false) {
+            return 'false';
+        }
+
+        return is_string($str)
+            ? "'{$str}'"
+            : $str;
     }
 }

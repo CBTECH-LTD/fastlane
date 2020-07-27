@@ -1,20 +1,20 @@
 namespace {{ $namespace }};
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\StringType;
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\ToggleType;
+use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
 
 class {{ $class }} extends EntryType
 {
-    public function schema(): array
+    public function fields(): array
     {
         return [
-            StringType::make('name', 'Name')
+            StringField::make('name', 'Name')
                 ->required()
                 ->setRules('max:255')
                 ->showOnIndex(),
 
-            ToggleType::make('is_active', 'Active')
+            ToggleField::make('is_active', 'Active')
                 ->required(),
         ];
     }

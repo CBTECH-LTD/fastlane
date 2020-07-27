@@ -68,3 +68,18 @@
         }
     }
 </script>
+
+<style>
+    .form-input.v-select .vs__selected {
+        padding: 2px 4px !important;
+        ]margin-right: 4px !important;
+    }
+
+    .vs__selected {
+        font-size: theme('fontSize.xs') !important;
+        font-weight: theme('fontWeight.semibold') !important;
+        color: theme('colors.gray.800') !important;
+        background-color: theme('colors.gray.200') !important;
+        border-color: theme('colors.gray-400') !important;
+    }
+</style>
