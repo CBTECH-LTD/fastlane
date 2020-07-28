@@ -1,37 +1,34 @@
 export default {
-  inheritAttrs: false,
+    inheritAttrs: false,
 
-  props: {
-    field: {
-      type: Object,
-      required: true,
-    },
-  },
-
-  data: () => ({
-    value: null,
-  }),
-
-  methods: {
-    /**
-     * @param {FormObject} formObject
-     */
-    commit (formObject) {
-      formObject.put(this.field.name, this.field.value)
+    props: {
+        field: {
+            type: Object,
+            required: true,
+        },
     },
 
-    /**
-     * @param value
-     */
-    onInput (value) {
-      this.field.value = value
-    },
-  },
+    methods: {
+        /**
+         * @param {FormObject} formObject
+         */
+        commit (formObject) {
+            formObject.put(this.field.name, this.field.value)
+        },
 
-  mounted () {
-    // Make a copy of the `commit` method from this component
-    // to the form field instance, because we need to be able
-    // to run it from FormSchema instances.
-    this.field.setCommitCallback(this.commit)
-  }
+        /**
+         * @param value
+         */
+        onInput (value) {
+            this.field.value = value
+            this.$emit('input', this.field.value)
+        },
+    },
+
+    mounted () {
+        // Make a copy of the `commit` method from this component
+        // to the form field instance, because we need to be able
+        // to run it from FormSchema instances.
+        this.field.setCommitCallback(this.commit)
+    }
 }

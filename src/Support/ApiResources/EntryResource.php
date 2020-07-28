@@ -51,7 +51,7 @@ class EntryResource extends ResourceType
 
         return Collection::make($fields)
             ->mapWithKeys(
-                fn(SchemaField $field) => [$field->getName() => $field->readValue($this->model)]
+                fn(SchemaField $field) => $field->readValue($this->model)
             )->all();
     }
 

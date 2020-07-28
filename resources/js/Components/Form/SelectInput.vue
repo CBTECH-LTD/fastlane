@@ -14,7 +14,7 @@
     import VSelect from 'vue-select'
     import 'vue-select/dist/vue-select.css'
     import FormInput from '../Mixins/FormInput'
-    import { FormField } from '../../Support/FormField'
+    import { FormField, FormFieldFactory } from '../../Support/FormField'
     import filter from 'lodash/filter'
     import map from 'lodash/map'
 
@@ -60,7 +60,7 @@
                 return getValue().includes(o.value)
             })
 
-            return new FormField(
+            return FormFieldFactory(
                 field,
                 component,
                 filteredValue || field.default

@@ -68,13 +68,15 @@ abstract class BaseSchemaField implements SchemaField
         return $this;
     }
 
-    public function readValue(Model $model)
+    public function readValue(Model $model): array
     {
         if ($this->readCallback) {
             return call_user_func($this->readCallback, $model);
         }
 
-        return $model->{$this->getName()};
+        return [
+            $this->getName() => $model->{$this->getName()},
+        ];
     }
 
     public function resolve(EntryTypeContract $entryType, EntryRequest $request): void
@@ -133,7 +135,7 @@ abstract class BaseSchemaField implements SchemaField
 
     public function getCreateRules(): string
     {
-        $this->getResolvedConfig('createRules');
+        return $this->getResolvedConfig('createRules');
     }
 
     public function setCreateRules(string $rules): self

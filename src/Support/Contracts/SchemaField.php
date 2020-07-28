@@ -14,7 +14,7 @@ interface SchemaField extends Arrayable
 
     public function getLabel(): string;
 
-    public function readValue(Model $model);
+    public function readValue(Model $model): array;
 
     public function readValueUsing($callback): self;
 

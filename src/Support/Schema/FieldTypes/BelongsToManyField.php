@@ -12,14 +12,16 @@ class BelongsToManyField extends RelationField
     protected $default = [];
     protected bool $multiple = true;
 
-    public function readValue(Model $model)
+    public function readValue(Model $model): array
     {
-        return $model->{$this->getRelationshipName()}->map(
+        $values = $model->{$this->getRelationshipName()}->map(
             fn(Model $related) => SelectOption::make(
                 $related->getKey(),
                 $this->relatedEntryType->transformModelToString($related)
             )
         )->toArray();
+
+        return [$this->getName() => $values];
     }
 
     public function isMultiple(): bool

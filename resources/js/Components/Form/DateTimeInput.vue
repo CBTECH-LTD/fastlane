@@ -39,6 +39,8 @@
         methods: {
             onInput () {
                 this.field.value = this.$refs.datePicker.value
+
+                this.$emit('input', this.field.value)
             }
         },
 

@@ -44,6 +44,8 @@
 
             onInput (value) {
                 this.field.value = value
+
+                this.$emit('input', this.field.value)
             },
 
             async onFileAdded ({ attachment }) {

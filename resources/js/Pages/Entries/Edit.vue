@@ -20,19 +20,18 @@
 
         <form id="editForm" @submit.prevent="submitForm">
             <f-boxed-card>
-                <template v-for="field in form">
-                    <f-form-field :errors="$page.errors.get(field.name)" :required="field.isRequired()">
+                <template v-for="field in form.getAll()">
+                    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
                         <template v-if="field.label" v-slot:label>
                             {{ field.label }}
                         </template>
                         <component :is="field.component"
                                    :field="field"
-                                   :required="field.isRequired()"
-                                   :aria-required="field.isRequired()"
+                                   :required="field.required"
+                                   :aria-required="field.required"
                                    :placeholder="field.placeholder"
                                    :aria-placeholder="field.placeholder"
                         ></component>
-
                     </f-form-field>
                 </template>
             </f-boxed-card>
@@ -60,8 +59,8 @@
 </template>
 
 <script>
-    import FormSchema from '../../Support/FormSchema'
     import Dialogs from '../../Support/Dialogs'
+    import { FormSchemaFactory } from '../../Support/FormSchema'
 
     export default {
         name: 'Entries.Edit',
@@ -73,14 +72,14 @@
             },
         },
 
-        remember: ['form'],
+        // remember: ['form'],
 
         data () {
             return {
                 isUpdating: false,
-                form: new FormSchema({
-                    ...this.item.attributes,
-                }, this.item.meta.entry_type.schema),
+                form: new FormSchemaFactory(
+                    this.item.attributes, this.item.meta.entry_type.schema
+                )
             }
         },
 

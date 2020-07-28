@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 export class FormField {
     value = null
     #originalValue = null
@@ -55,4 +57,28 @@ export class FormField {
 
         this.#commitCallback(formObject)
     }
+}
+
+export function FormFieldFactory (field, component, value, customData = {}) {
+    return Vue.observable({
+        component,
+        value,
+        name: field.name,
+        label: field.label,
+        placeholder: field.placeholder,
+        originalValue: value,
+        required: field.required,
+        config: field.config,
+        commitCallback: null,
+        ...customData,
+        setCommitCallback (callbackFn) {
+            this.commitCallback = callbackFn
+        },
+        commit (formObject) {
+            this.commitCallback(formObject)
+        },
+        isDirty () {
+            return this.value !== this.originalValue
+        },
+    })
 }

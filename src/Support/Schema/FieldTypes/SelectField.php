@@ -56,15 +56,17 @@ class SelectField extends BaseSchemaField
         return $this->getResolvedConfig('config')['options']->toArray();
     }
 
-    public function readValue(Model $model)
+    public function readValue(Model $model): array
     {
         $value = Arr::wrap($model->{$this->getName()});
 
         $options = $this->resolvedConfig->get('config')['options'];
 
-        return $options->filter(
-            fn(SelectOption $opt) => $opt->isSelected() || in_array($opt->getValue(), $value)
-        )->toArray();
+        return [
+            $this->getName() => $options->filter(
+                fn(SelectOption $opt) => $opt->isSelected() || in_array($opt->getValue(), $value)
+            )->toArray(),
+        ];
     }
 
     protected function getTypeRules(): array

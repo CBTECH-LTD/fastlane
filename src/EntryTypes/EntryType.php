@@ -144,7 +144,9 @@ abstract class EntryType implements EntryTypeContract
             return $model->toString();
         }
 
-        return $this->fields()[0]->readValue($model);
+        $field = $this->fields()[0];
+
+        return $field->readValue($model)[$field->getName()];
     }
 
     public function install(): void

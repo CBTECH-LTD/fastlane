@@ -61,7 +61,7 @@ abstract class RelationField extends BaseSchemaField
         return $this->withTimestamps(false);
     }
 
-    public function readValue(Model $model)
+    public function readValue(Model $model): array
     {
         throw new \Exception('readValue not implemented.');
     }

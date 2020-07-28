@@ -5,6 +5,7 @@ import SelectInput from '../../Components/Form/SelectInput'
 import ImageInput from '../../Components/Form/ImageInput'
 import DateTimeInput from '../../Components/Form/DateTimeInput'
 import RichEditorInput from '../../Components/Form/RichEditorInput'
+import FieldPanelInput from '../../Components/Form/FieldPanelInput'
 import Simple from '../../Components/List/Simple'
 import Image from '../../Components/List/Image'
 import Select from '../../Components/List/Select'
@@ -42,4 +43,8 @@ export default {
         list: Simple,
         form: RichEditorInput,
     },
+    panel: {
+        list: null,
+        form: FieldPanelInput,
+    }
 }

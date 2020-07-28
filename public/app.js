@@ -238,6 +238,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     onInput: function onInput() {
       this.field.value = this.$refs.datePicker.value;
+      this.$emit('input', this.field.value);
     }
   },
   mounted: function mounted() {
@@ -345,6 +346,82 @@ __webpack_require__.r(__webpack_exports__);
 
       return base;
     }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/Form/FieldPanelInput.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Components/Form/FieldPanelInput.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Mixins_FormInput__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Mixins/FormInput */ "./resources/js/Components/Mixins/FormInput.js");
+/* harmony import */ var _Support_FormField__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Support/FormField */ "./resources/js/Support/FormField.js");
+/* harmony import */ var _Support_FormSchema__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../Support/FormSchema */ "./resources/js/Support/FormSchema.js");
+/* harmony import */ var lodash_each__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/each */ "./node_modules/lodash/each.js");
+/* harmony import */ var lodash_each__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_each__WEBPACK_IMPORTED_MODULE_3__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'FieldPanelInput',
+  mixins: [_Mixins_FormInput__WEBPACK_IMPORTED_MODULE_0__["default"]],
+  methods: {
+    /**
+     * @param {FormObject} formObject
+     */
+    commit: function commit(formObject) {
+      formObject.put(this.field.name, this.field.value);
+    },
+    onInput: function onInput() {
+      var data = {};
+      lodash_each__WEBPACK_IMPORTED_MODULE_3___default()(this.field.childrenSchema.getAll(), function (child) {
+        data[child.name] = child.value;
+      });
+      this.field.value = data;
+      this.$emit('input', this.field.value);
+    }
+  },
+  buildForSchema: function buildForSchema(_ref) {
+    var field = _ref.field,
+        component = _ref.component,
+        data = _ref.data;
+    var childrenData = {};
+    field.config.children.forEach(function (c) {
+      childrenData[c.name] = data[c.name];
+    });
+    return Object(_Support_FormField__WEBPACK_IMPORTED_MODULE_1__["FormFieldFactory"])(field, component, childrenData, {
+      childrenSchema: Object(_Support_FormSchema__WEBPACK_IMPORTED_MODULE_2__["FormSchemaFactory"])(childrenData, field.config.children)
+    });
   }
 });
 
@@ -543,6 +620,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     onInput: function onInput(value) {
       this.field.value = value;
+      this.$emit('input', this.field.value);
     },
     onFileAdded: function onFileAdded(_ref) {
       var _this = this;
@@ -690,7 +768,7 @@ __webpack_require__.r(__webpack_exports__);
     var filteredValue = lodash_filter__WEBPACK_IMPORTED_MODULE_4___default()(field.config.options, function (o) {
       return getValue().includes(o.value);
     });
-    return new _Support_FormField__WEBPACK_IMPORTED_MODULE_3__["FormField"](field, component, filteredValue || field["default"]);
+    return Object(_Support_FormField__WEBPACK_IMPORTED_MODULE_3__["FormFieldFactory"])(field, component, filteredValue || field["default"]);
   }
 });
 
@@ -1781,7 +1859,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       isCreating: false,
-      form: new _Support_FormSchema__WEBPACK_IMPORTED_MODULE_1__["default"]({}, this.entryType.schema)
+      form: new _Support_FormSchema__WEBPACK_IMPORTED_MODULE_1__["FormSchemaFactory"]({}, this.entryType.schema)
     };
   },
   computed: {
@@ -1843,21 +1921,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Support_FormSchema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Support/FormSchema */ "./resources/js/Support/FormSchema.js");
-/* harmony import */ var _Support_Dialogs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../Support/Dialogs */ "./resources/js/Support/Dialogs.js");
+/* harmony import */ var _Support_Dialogs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Support/Dialogs */ "./resources/js/Support/Dialogs.js");
+/* harmony import */ var _Support_FormSchema__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../Support/FormSchema */ "./resources/js/Support/FormSchema.js");
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-//
 //
 //
 //
@@ -1928,11 +1999,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       type: Object
     }
   },
-  remember: ['form'],
+  // remember: ['form'],
   data: function data() {
     return {
       isUpdating: false,
-      form: new _Support_FormSchema__WEBPACK_IMPORTED_MODULE_1__["default"](_objectSpread({}, this.item.attributes), this.item.meta.entry_type.schema)
+      form: new _Support_FormSchema__WEBPACK_IMPORTED_MODULE_2__["FormSchemaFactory"](this.item.attributes, this.item.meta.entry_type.schema)
     };
   },
   computed: {
@@ -1999,7 +2070,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 }
 
                 _context2.next = 4;
-                return _Support_Dialogs__WEBPACK_IMPORTED_MODULE_2__["default"].confirm('Are you absolutely sure?');
+                return _Support_Dialogs__WEBPACK_IMPORTED_MODULE_1__["default"].confirm('Are you absolutely sure?');
 
               case 4:
                 _context2.t0 = _context2.sent;
@@ -29532,6 +29603,91 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/Form/FieldPanelInput.vue?vue&type=template&id=451168c0&":
+/*!***********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Components/Form/FieldPanelInput.vue?vue&type=template&id=451168c0& ***!
+  \***********************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "w-full" },
+    [
+      _c(
+        "f-boxed-card",
+        [
+          _vm._l(_vm.field.childrenSchema.getAll(), function(field) {
+            return [
+              _c(
+                "f-form-field",
+                {
+                  attrs: {
+                    errors: _vm.$page.errors.get(field.name),
+                    required: field.requuired
+                  },
+                  scopedSlots: _vm._u(
+                    [
+                      field.label
+                        ? {
+                            key: "label",
+                            fn: function() {
+                              return [
+                                _vm._v(
+                                  "\n                    " +
+                                    _vm._s(field.label) +
+                                    "\n                "
+                                )
+                              ]
+                            },
+                            proxy: true
+                          }
+                        : null
+                    ],
+                    null,
+                    true
+                  )
+                },
+                [
+                  _vm._v(" "),
+                  _c(field.component, {
+                    tag: "component",
+                    attrs: {
+                      field: field,
+                      required: field.required,
+                      "aria-required": field.required,
+                      placeholder: field.placeholder,
+                      "aria-placeholder": field.placeholder
+                    },
+                    on: { input: _vm.onInput }
+                  })
+                ],
+                1
+              )
+            ]
+          })
+        ],
+        2
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/Form/ImageInput.vue?vue&type=template&id=439168ff&":
 /*!******************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Components/Form/ImageInput.vue?vue&type=template&id=439168ff& ***!
@@ -31159,14 +31315,14 @@ var render = function() {
           _c(
             "f-boxed-card",
             [
-              _vm._l(_vm.form, function(field) {
+              _vm._l(_vm.form.getAll(), function(field) {
                 return [
                   _c(
                     "f-form-field",
                     {
                       attrs: {
                         errors: _vm.$page.errors.get(field.name),
-                        required: field.isRequired()
+                        required: field.required
                       },
                       scopedSlots: _vm._u(
                         [
@@ -31196,8 +31352,8 @@ var render = function() {
                         tag: "component",
                         attrs: {
                           field: field,
-                          required: field.isRequired(),
-                          "aria-required": field.isRequired(),
+                          required: field.required,
+                          "aria-required": field.required,
                           placeholder: field.placeholder,
                           "aria-placeholder": field.placeholder
                         }
@@ -31314,14 +31470,14 @@ var render = function() {
           _c(
             "f-boxed-card",
             [
-              _vm._l(_vm.form, function(field) {
+              _vm._l(_vm.form.getAll(), function(field) {
                 return [
                   _c(
                     "f-form-field",
                     {
                       attrs: {
                         errors: _vm.$page.errors.get(field.name),
-                        required: field.isRequired()
+                        required: field.required
                       },
                       scopedSlots: _vm._u(
                         [
@@ -31351,8 +31507,8 @@ var render = function() {
                         tag: "component",
                         attrs: {
                           field: field,
-                          required: field.isRequired(),
-                          "aria-required": field.isRequired(),
+                          required: field.required,
+                          "aria-required": field.required,
                           placeholder: field.placeholder,
                           "aria-placeholder": field.placeholder
                         }
@@ -32150,6 +32306,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Field_vue_vue_type_template_id_44cd264c___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Field_vue_vue_type_template_id_44cd264c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/Components/Form/FieldPanelInput.vue":
+/*!**********************************************************!*\
+  !*** ./resources/js/Components/Form/FieldPanelInput.vue ***!
+  \**********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _FieldPanelInput_vue_vue_type_template_id_451168c0___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FieldPanelInput.vue?vue&type=template&id=451168c0& */ "./resources/js/Components/Form/FieldPanelInput.vue?vue&type=template&id=451168c0&");
+/* harmony import */ var _FieldPanelInput_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FieldPanelInput.vue?vue&type=script&lang=js& */ "./resources/js/Components/Form/FieldPanelInput.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _FieldPanelInput_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _FieldPanelInput_vue_vue_type_template_id_451168c0___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _FieldPanelInput_vue_vue_type_template_id_451168c0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/Components/Form/FieldPanelInput.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/Components/Form/FieldPanelInput.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************!*\
+  !*** ./resources/js/Components/Form/FieldPanelInput.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_FieldPanelInput_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./FieldPanelInput.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/Form/FieldPanelInput.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_FieldPanelInput_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/Components/Form/FieldPanelInput.vue?vue&type=template&id=451168c0&":
+/*!*****************************************************************************************!*\
+  !*** ./resources/js/Components/Form/FieldPanelInput.vue?vue&type=template&id=451168c0& ***!
+  \*****************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FieldPanelInput_vue_vue_type_template_id_451168c0___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./FieldPanelInput.vue?vue&type=template&id=451168c0& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/Form/FieldPanelInput.vue?vue&type=template&id=451168c0&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FieldPanelInput_vue_vue_type_template_id_451168c0___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FieldPanelInput_vue_vue_type_template_id_451168c0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -33294,11 +33519,6 @@ __webpack_require__.r(__webpack_exports__);
       required: true
     }
   },
-  data: function data() {
-    return {
-      value: null
-    };
-  },
   methods: {
     /**
      * @param {FormObject} formObject
@@ -33312,6 +33532,7 @@ __webpack_require__.r(__webpack_exports__);
      */
     onInput: function onInput(value) {
       this.field.value = value;
+      this.$emit('input', this.field.value);
     }
   },
   mounted: function mounted() {
@@ -34323,12 +34544,19 @@ function ErrorBagsFactory(errors) {
 /*!*******************************************!*\
   !*** ./resources/js/Support/FormField.js ***!
   \*******************************************/
-/*! exports provided: FormField */
+/*! exports provided: FormField, FormFieldFactory */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FormField", function() { return FormField; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FormFieldFactory", function() { return FormFieldFactory; });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -34340,6 +34568,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _classPrivateFieldGet(receiver, privateMap) { var descriptor = privateMap.get(receiver); if (!descriptor) { throw new TypeError("attempted to get private field on non-instance"); } if (descriptor.get) { return descriptor.get.call(receiver); } return descriptor.value; }
 
 function _classPrivateFieldSet(receiver, privateMap, value) { var descriptor = privateMap.get(receiver); if (!descriptor) { throw new TypeError("attempted to set private field on non-instance"); } if (descriptor.set) { descriptor.set.call(receiver, value); } else { if (!descriptor.writable) { throw new TypeError("attempted to set read only private field"); } descriptor.value = value; } return value; }
+
+
 
 var _originalValue = new WeakMap();
 
@@ -34444,6 +34674,30 @@ var FormField = /*#__PURE__*/function () {
 
   return FormField;
 }();
+function FormFieldFactory(field, component, value) {
+  var customData = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+  return vue__WEBPACK_IMPORTED_MODULE_0___default.a.observable(_objectSpread(_objectSpread({
+    component: component,
+    value: value,
+    name: field.name,
+    label: field.label,
+    placeholder: field.placeholder,
+    originalValue: value,
+    required: field.required,
+    config: field.config,
+    commitCallback: null
+  }, customData), {}, {
+    setCommitCallback: function setCommitCallback(callbackFn) {
+      this.commitCallback = callbackFn;
+    },
+    commit: function commit(formObject) {
+      this.commitCallback(formObject);
+    },
+    isDirty: function isDirty() {
+      return this.value !== this.originalValue;
+    }
+  }));
+}
 
 /***/ }),
 
@@ -34501,27 +34755,27 @@ var FormObject = /*#__PURE__*/function () {
 /*!********************************************!*\
   !*** ./resources/js/Support/FormSchema.js ***!
   \********************************************/
-/*! exports provided: default */
+/*! exports provided: FormSchemaFactory */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return FormSchema; });
-/* harmony import */ var lodash_each__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/each */ "./node_modules/lodash/each.js");
-/* harmony import */ var lodash_each__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_each__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var lodash_some__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/some */ "./node_modules/lodash/some.js");
-/* harmony import */ var lodash_some__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_some__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var lodash_filter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/filter */ "./node_modules/lodash/filter.js");
-/* harmony import */ var lodash_filter__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_filter__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var lodash_map__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/map */ "./node_modules/lodash/map.js");
-/* harmony import */ var lodash_map__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_map__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FormSchemaFactory", function() { return FormSchemaFactory; });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var lodash_each__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/each */ "./node_modules/lodash/each.js");
+/* harmony import */ var lodash_each__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_each__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var lodash_some__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/some */ "./node_modules/lodash/some.js");
+/* harmony import */ var lodash_some__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_some__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var lodash_filter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash/filter */ "./node_modules/lodash/filter.js");
+/* harmony import */ var lodash_filter__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash_filter__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var lodash_tap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lodash/tap */ "./node_modules/lodash/tap.js");
 /* harmony import */ var lodash_tap__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(lodash_tap__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var lodash_camelCase__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! lodash/camelCase */ "./node_modules/lodash/camelCase.js");
 /* harmony import */ var lodash_camelCase__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(lodash_camelCase__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _FormObject__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./FormObject */ "./resources/js/Support/FormObject.js");
-/* harmony import */ var _FormField__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./FormField */ "./resources/js/Support/FormField.js");
-/* harmony import */ var _utils_schemaComponents__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils/schemaComponents */ "./resources/js/Support/utils/schemaComponents.js");
+/* harmony import */ var _utils_schemaComponents__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils/schemaComponents */ "./resources/js/Support/utils/schemaComponents.js");
+/* harmony import */ var _FormObject__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./FormObject */ "./resources/js/Support/FormObject.js");
+/* harmony import */ var _FormField__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./FormField */ "./resources/js/Support/FormField.js");
 
 
 
@@ -34531,70 +34785,84 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * Define methods to be accessible on the instance of FormSchema.
+ */
 
-
-function FormSchema(data, schema) {
-  var _this = this;
-
-  lodash_each__WEBPACK_IMPORTED_MODULE_0___default()(schema, function (field) {
-    var component = _utils_schemaComponents__WEBPACK_IMPORTED_MODULE_8__["default"][lodash_camelCase__WEBPACK_IMPORTED_MODULE_5___default()(field.type)].form;
-    var value = data.hasOwnProperty(field.name) ? data[field.name] : field["default"];
-    _this[field.name] = !!component.buildForSchema ? component.buildForSchema({
-      field: field,
-      component: component,
-      value: value
-    }) : new _FormField__WEBPACK_IMPORTED_MODULE_7__["FormField"](field, component, value);
-  }); // Now we define some useful methods...
-
-  Object.defineProperties(this, {
-    getSchema: {
-      value: function value() {
-        return schema;
-      }
-    },
+function generateMethods(form) {
+  var obj = {};
+  Object.defineProperties(obj, {
     isDirty: {
       value: function value() {
-        return lodash_some__WEBPACK_IMPORTED_MODULE_1___default()(_this, function (v) {
-          return v.isDirty();
+        return lodash_some__WEBPACK_IMPORTED_MODULE_2___default()(form, function (field) {
+          return field.isDirty();
         });
       }
     },
     getDirty: {
       value: function value() {
-        return lodash_filter__WEBPACK_IMPORTED_MODULE_2___default()(_this, function (f) {
-          return f.isDirty();
+        return lodash_filter__WEBPACK_IMPORTED_MODULE_3___default()(form, function (field) {
+          return field.isDirty();
         });
       }
     },
     getAll: {
       value: function value() {
-        return lodash_map__WEBPACK_IMPORTED_MODULE_3___default()(_this, function (f) {
-          return f;
-        });
-      }
-    },
-    restart: {
-      value: function value(attributes) {
-        return new FormSchema(attributes, _this.getSchema());
+        return form;
       }
     },
     toFormObject: {
       value: function value() {
         var onlyDirty = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-        var items = onlyDirty ? _this.getDirty() : _this.getAll();
+        var items = onlyDirty ? obj.getDirty() : obj.getAll();
 
         if (items.length === 0) {
           return null;
         }
 
-        return lodash_tap__WEBPACK_IMPORTED_MODULE_4___default()(new _FormObject__WEBPACK_IMPORTED_MODULE_6__["default"](), function (formObject) {
-          lodash_each__WEBPACK_IMPORTED_MODULE_0___default()(items, function (field) {
-            field.commit(formObject);
+        return lodash_tap__WEBPACK_IMPORTED_MODULE_4___default()(new _FormObject__WEBPACK_IMPORTED_MODULE_7__["default"](), function (formObject) {
+          lodash_each__WEBPACK_IMPORTED_MODULE_1___default()(items, function (field) {
+            if (!field.commitCallback) {
+              throw new Error('No Commit Callback set on the field ' + field.name);
+            }
+
+            field.commitCallback(formObject);
           });
         });
       }
     }
   });
+  lodash_each__WEBPACK_IMPORTED_MODULE_1___default()(form, function (field) {
+    Object.defineProperty(obj, field.name, {
+      get: function get() {
+        return field.value;
+      },
+      enumerable: true
+    });
+  });
+  return obj;
+}
+/**
+ * Generate a new Form Schema instance.
+ *
+ * @param data
+ * @param schema
+ */
+
+
+function FormSchemaFactory(data, schema) {
+  var __fields = {};
+  lodash_each__WEBPACK_IMPORTED_MODULE_1___default()(schema, function (field) {
+    var component = _utils_schemaComponents__WEBPACK_IMPORTED_MODULE_6__["default"][lodash_camelCase__WEBPACK_IMPORTED_MODULE_5___default()(field.type)].form;
+    var value = data.hasOwnProperty(field.name) ? data[field.name] : field["default"];
+    __fields[field.name] = vue__WEBPACK_IMPORTED_MODULE_0___default.a.observable(!!component.buildForSchema ? component.buildForSchema({
+      field: field,
+      component: component,
+      value: value,
+      data: data
+    }) : Object(_FormField__WEBPACK_IMPORTED_MODULE_8__["FormFieldFactory"])(field, component, value));
+  });
+  return generateMethods(__fields);
 }
 
 /***/ }),
@@ -34651,9 +34919,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Components_Form_ImageInput__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../Components/Form/ImageInput */ "./resources/js/Components/Form/ImageInput.vue");
 /* harmony import */ var _Components_Form_DateTimeInput__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../Components/Form/DateTimeInput */ "./resources/js/Components/Form/DateTimeInput.vue");
 /* harmony import */ var _Components_Form_RichEditorInput__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../Components/Form/RichEditorInput */ "./resources/js/Components/Form/RichEditorInput.vue");
-/* harmony import */ var _Components_List_Simple__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../Components/List/Simple */ "./resources/js/Components/List/Simple.vue");
-/* harmony import */ var _Components_List_Image__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../Components/List/Image */ "./resources/js/Components/List/Image.vue");
-/* harmony import */ var _Components_List_Select__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../Components/List/Select */ "./resources/js/Components/List/Select.vue");
+/* harmony import */ var _Components_Form_FieldPanelInput__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../Components/Form/FieldPanelInput */ "./resources/js/Components/Form/FieldPanelInput.vue");
+/* harmony import */ var _Components_List_Simple__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../Components/List/Simple */ "./resources/js/Components/List/Simple.vue");
+/* harmony import */ var _Components_List_Image__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../Components/List/Image */ "./resources/js/Components/List/Image.vue");
+/* harmony import */ var _Components_List_Select__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../Components/List/Select */ "./resources/js/Components/List/Select.vue");
+
 
 
 
@@ -34666,36 +34936,40 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   string: {
-    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_7__["default"],
+    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_8__["default"],
     form: _Components_Form_StringInput__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   text: {
-    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_7__["default"],
+    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_8__["default"],
     form: _Components_Form_TextInput__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   toggle: {
-    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_7__["default"],
+    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_8__["default"],
     form: _Components_Form_ToggleInput__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   select: {
-    list: _Components_List_Select__WEBPACK_IMPORTED_MODULE_9__["default"],
+    list: _Components_List_Select__WEBPACK_IMPORTED_MODULE_10__["default"],
     form: _Components_Form_SelectInput__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   image: {
-    list: _Components_List_Image__WEBPACK_IMPORTED_MODULE_8__["default"],
+    list: _Components_List_Image__WEBPACK_IMPORTED_MODULE_9__["default"],
     form: _Components_Form_ImageInput__WEBPACK_IMPORTED_MODULE_4__["default"]
   },
   file: {
-    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_7__["default"],
+    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_8__["default"],
     form: _Components_Form_StringInput__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
   date: {
-    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_7__["default"],
+    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_8__["default"],
     form: _Components_Form_DateTimeInput__WEBPACK_IMPORTED_MODULE_5__["default"]
   },
   richEditor: {
-    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_7__["default"],
+    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_8__["default"],
     form: _Components_Form_RichEditorInput__WEBPACK_IMPORTED_MODULE_6__["default"]
+  },
+  panel: {
+    list: null,
+    form: _Components_Form_FieldPanelInput__WEBPACK_IMPORTED_MODULE_7__["default"]
   }
 });
 
