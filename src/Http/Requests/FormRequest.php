@@ -2,8 +2,6 @@
 
 namespace CbtechLtd\Fastlane\Http\Requests;
 
-use App\CMS\DTO\IncomingData;
-
 abstract class FormRequest extends \Illuminate\Foundation\Http\FormRequest
 {
     /**
@@ -26,10 +24,5 @@ abstract class FormRequest extends \Illuminate\Foundation\Http\FormRequest
         return [
             //
         ];
-    }
-
-    public function getIncomingData(): IncomingData
-    {
-        return new IncomingData($this->validator->validated());
     }
 }

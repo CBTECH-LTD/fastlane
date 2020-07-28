@@ -2,6 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
+use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -13,7 +15,6 @@ class SelectField extends BaseSchemaField
     protected $default = null;
     protected bool $multiple = false;
     protected $options;
-    protected $loadedOptions;
 
     static public function make(string $name, string $label, array $options = []): self
     {
@@ -44,24 +45,31 @@ class SelectField extends BaseSchemaField
         return $this->multiple;
     }
 
-    public function getOptions(): array
-    {
-        if (! $this->loadedOptions) {
-            $this->loadOptions();
-        }
-
-        return Collection::make($this->loadedOptions)->toArray();
-    }
-
-    public function setOptions($options): self
+    public function withOptions($options): self
     {
         $this->options = $options;
         return $this;
     }
 
+    public function getOptions(): array
+    {
+        return $this->getResolvedConfig('config')['options']->toArray();
+    }
+
+    public function readValue(Model $model)
+    {
+        $value = Arr::wrap($model->{$this->getName()});
+
+        $options = $this->resolvedConfig->get('config')['options'];
+
+        return $options->filter(
+            fn(SelectOption $opt) => $opt->isSelected() || in_array($opt->getValue(), $value)
+        )->toArray();
+    }
+
     protected function getTypeRules(): array
     {
-        $values = Collection::make($this->options)->map(
+        $values = $this->getResolvedConfig('config')['options']->map(
             fn(SelectOption $option) => $option->getValue()
         );
 
@@ -69,39 +77,28 @@ class SelectField extends BaseSchemaField
 
         if ($this->isMultiple()) {
             return [
-                $this->getName() => 'array',
+                $this->getName()       => 'array',
                 "{$this->getName()}.*" => $inRule,
             ];
         }
 
-        return [ $this->getName() => 'in:' . $values->implode(',') ];
+        return [$this->getName() => 'in:' . $values->implode(',')];
     }
 
-    public function getConfig(): array
+    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
     {
         return [
-            'options' => $this->getOptions(),
+            'options'  => $this->resolveOptions($request),
             'multiple' => $this->isMultiple(),
         ];
     }
 
-    public function readValue(Model $model)
+    protected function resolveOptions(EntryRequest $request): Collection
     {
-        $value = Arr::wrap($model->{$this->getName()});
+        $options = is_callable($this->options)
+            ? call_user_func($this->options, $request)
+            : $this->options;
 
-        if (count($value) === 0) {
-            return [];
-        }
-
-        return Collection::make($this->options)->filter(
-            fn(SelectOption $opt) => in_array($opt->getValue(), $value)
-        )->toArray();
-    }
-
-    protected function loadOptions(): void
-    {
-        $this->loadedOptions = is_callable($this->options)
-            ? call_user_func($this->options)
-            : $this->loadedOptions;
+        return Collection::make($options);
     }
 }

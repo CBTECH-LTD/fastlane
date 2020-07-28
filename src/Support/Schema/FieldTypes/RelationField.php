@@ -3,7 +3,7 @@
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +15,7 @@ abstract class RelationField extends BaseSchemaField
     protected bool $multiple = false;
     protected bool $withTimestamps = true;
     protected ?Collection $options = null;
-    protected EntryType $relatedEntryType;
+    protected EntryTypeContract $relatedEntryType;
 
     abstract public function isMultiple(): bool;
 
@@ -38,7 +38,7 @@ abstract class RelationField extends BaseSchemaField
 
     public function __construct(string $relatedEntryType, ?string $label = null)
     {
-        /** @var EntryType $class */
+        /** @var EntryTypeContract $class */
         $this->relatedEntryType = app()->make($relatedEntryType);
 
         $this->label = $this->relatedEntryType->pluralName();
@@ -81,12 +81,12 @@ abstract class RelationField extends BaseSchemaField
         $this->hydrateRelation($model, $value, $request);
     }
 
-    public function getRelatedEntryType(): EntryType
+    public function getRelatedEntryType(): EntryTypeContract
     {
         return $this->relatedEntryType;
     }
 
-    public function setRelatedEntryType(EntryType $relatedEntryType): self
+    public function setRelatedEntryType(EntryTypeContract $relatedEntryType): self
     {
         $this->relatedEntryType = $relatedEntryType;
         return $this;
@@ -94,12 +94,12 @@ abstract class RelationField extends BaseSchemaField
 
     public function getOptions(): array
     {
-        return $this->getSelectOptions()->toArray();
+        return $this->getResolvedConfig('config')['options']->toArray();
     }
 
     protected function getTypeRules(): array
     {
-        $values = Collection::make($this->getSelectOptions())->map(
+        $values = $this->getResolvedConfig('config')['options']->map(
             fn(SelectOption $option) => $option->getValue()
         );
 
@@ -107,20 +107,12 @@ abstract class RelationField extends BaseSchemaField
 
         if ($this->isMultiple()) {
             return [
-                $this->getName() => 'array',
+                $this->getName()       => 'array',
                 "{$this->getName()}.*" => $inRule,
             ];
         }
 
-        return [ $this->getName() => 'in:' . $values->implode(',') ];
-    }
-
-    public function getConfig(): array
-    {
-        return [
-            'options'  => $this->getOptions(),
-            'multiple' => $this->isMultiple(),
-        ];
+        return [$this->getName() => 'in:' . $values->implode(',')];
     }
 
     public function toMigration(): string
@@ -128,17 +120,21 @@ abstract class RelationField extends BaseSchemaField
         return '';
     }
 
-    protected function getSelectOptions(): Collection
+    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
     {
-        if (! $this->options) {
-            $this->options = $this->relatedEntryType->getItems()->map(function (Model $model) {
-                return SelectOption::make(
-                    $model->getKey(),
-                    $this->entryType->transformModelToString($model)
-                );
-            });
-        }
+        return [
+            'options'  => $this->resolveOptions($entryType, $request),
+            'multiple' => $this->isMultiple(),
+        ];
+    }
 
-        return $this->options;
+    protected function resolveOptions(EntryTypeContract $entryType, EntryRequest $request): Collection
+    {
+        return $this->relatedEntryType->getItems()->map(function (Model $model) use ($entryType) {
+            return SelectOption::make(
+                $model->getKey(),
+                $entryType->transformModelToString($model)
+            );
+        });
     }
 }

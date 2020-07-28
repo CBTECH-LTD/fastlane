@@ -2,8 +2,9 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
+use CbtechLtd\Fastlane\Exceptions\UnresolvedException;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
@@ -35,8 +36,10 @@ abstract class BaseSchemaField implements SchemaField
     protected bool $showOnUpdate = true;
     protected ?string $placeholder;
     protected $default = null;
-    protected EntryType $entryType;
+    protected $readCallback;
     protected $hydrateCallback;
+
+    protected ?Collection $resolvedConfig = null;
 
     protected function __construct(string $name, string $label)
     {
@@ -59,20 +62,28 @@ abstract class BaseSchemaField implements SchemaField
         return $this->label;
     }
 
+    public function readValueUsing($callback): self
+    {
+        $this->readCallback = $callback;
+        return $this;
+    }
+
     public function readValue(Model $model)
     {
+        if ($this->readCallback) {
+            return call_user_func($this->readCallback, $model);
+        }
+
         return $model->{$this->getName()};
     }
 
-    public function getEntryType(): EntryType
+    public function resolve(EntryTypeContract $entryType, EntryRequest $request): void
     {
-        return $this->entryType;
-    }
+        $this->resolvedConfig = Collection::make();
 
-    public function setEntryType(EntryType $relatedEntryType): self
-    {
-        $this->entryType = $relatedEntryType;
-        return $this;
+        $this->resolvedConfig->put('config', $this->resolveConfig($entryType, $request));
+        $this->resolvedConfig->put('createRules', $this->resolveCreateRules($entryType, $request));
+        $this->resolvedConfig->put('updateRules', $this->resolveUpdateRules($entryType, $request));
     }
 
     public function getPlaceholder(): string
@@ -122,11 +133,7 @@ abstract class BaseSchemaField implements SchemaField
 
     public function getCreateRules(): string
     {
-        $baseRules = $this->getBaseRules();
-
-        $rules = array_merge([$baseRules], $this->getTypeRules(), [$this->createRules]);
-
-        return Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|');
+        $this->getResolvedConfig('createRules');
     }
 
     public function setCreateRules(string $rules): self
@@ -137,11 +144,7 @@ abstract class BaseSchemaField implements SchemaField
 
     public function getUpdateRules(): string
     {
-        $baseRules = $this->getBaseRules();
-
-        $rules = array_merge(['sometimes', $baseRules], $this->getTypeRules(), [$this->updateRules]);
-
-        return Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|');
+        return $this->getResolvedConfig('updateRules');
     }
 
     public function setUpdateRules(string $rules): self
@@ -243,7 +246,7 @@ abstract class BaseSchemaField implements SchemaField
             $str[] = 'unique()';
         }
 
-        if (!is_null($this->default)) {
+        if (! is_null($this->default)) {
             $str[] = 'default(' . $this->escapeString($this->default) . ')';
         }
 
@@ -262,7 +265,7 @@ abstract class BaseSchemaField implements SchemaField
             : ['nullable'];
 
         if ($this->hasUniqueRule()) {
-            $rules[] = (string) $this->getUniqueRule();
+            $rules[] = (string)$this->getUniqueRule();
         }
 
         return implode('|', $rules);
@@ -280,7 +283,7 @@ abstract class BaseSchemaField implements SchemaField
 
     protected function getConfig(): array
     {
-        return [];
+        return $this->getResolvedConfig('config');
     }
 
     protected function getMigrationMethod(): array
@@ -323,5 +326,37 @@ abstract class BaseSchemaField implements SchemaField
         return is_string($str)
             ? "'{$str}'"
             : $str;
+    }
+
+    protected function getResolvedConfig(string $config, $default = null)
+    {
+        if (! $this->resolvedConfig) {
+            throw new UnresolvedException;
+        }
+
+        return $this->resolvedConfig->get($config, $default);
+    }
+
+    protected function resolveCreateRules(EntryTypeContract $entryType, EntryRequest $request): string
+    {
+        $baseRules = $this->getBaseRules();
+
+        $rules = array_merge([$baseRules], $this->getTypeRules(), [$this->createRules]);
+
+        return Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|');
+    }
+
+    protected function resolveUpdateRules(EntryTypeContract $entryType, EntryRequest $request): string
+    {
+        $baseRules = $this->getBaseRules();
+
+        $rules = array_merge(['sometimes', $baseRules], $this->getTypeRules(), [$this->updateRules]);
+
+        return Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|');
+    }
+
+    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
+    {
+        return [];
     }
 }

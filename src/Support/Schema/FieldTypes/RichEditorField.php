@@ -5,9 +5,8 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
 use CbtechLtd\Fastlane\FileAttachment\StoreDraftAttachment;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 
 class RichEditorField extends BaseSchemaField
@@ -55,12 +54,12 @@ class RichEditorField extends BaseSchemaField
         }
     }
 
-    protected function getConfig(): array
+    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
     {
         return [
             'acceptFiles' => $this->acceptFiles,
             'links'       => [
-                'self' => URL::relative("cp.{$this->getEntryType()->identifier()}.attachments", $this->getName()),
+                'self' => URL::relative("cp.{$entryType->identifier()}.attachments", $this->getName()),
             ],
         ];
     }

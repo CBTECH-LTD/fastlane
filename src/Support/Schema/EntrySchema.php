@@ -2,27 +2,43 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema;
 
-use CbtechLtd\Fastlane\EntryTypes\EntryType;
+use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class EntrySchema implements Contracts\EntrySchema
 {
-    private EntryType $entryType;
+    private EntryTypeContract $entryType;
+    private EntryRequest $request;
+    private bool $isResolved = false;
     private array $allFields = [];
     private array $indexFields = [];
     private array $createFields = [];
     private array $updateFields = [];
 
-    public function __construct(EntryType $entryType)
+    public function __construct(EntryTypeContract $entryType)
     {
         $this->entryType = $entryType;
+    }
+
+    public function resolve(EntryRequest $request): self
+    {
+        $this->request = $request;
 
         $this->allFields = $this->build($this->entryType->fields());
         $this->indexFields = $this->build($this->entryType->fieldsOnIndex());
         $this->createFields = $this->build($this->entryType->fieldsOnCreate());
         $this->updateFields = $this->build($this->entryType->fieldsOnUpdate());
+
+        $this->isResolved = true;
+        return $this;
+    }
+
+    public function isResolved(): bool
+    {
+        return $this->isResolved;
     }
 
     public function all(): array
@@ -54,7 +70,8 @@ class EntrySchema implements Contracts\EntrySchema
     {
         return Collection::make($fields)
             ->map(function (SchemaField $field) {
-                return $field->setEntryType($this->entryType);
+                $field->resolve($this->entryType, $this->request);
+                return $field;
             })->all();
     }
 }

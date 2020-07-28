@@ -36,13 +36,13 @@ trait RelatesToEntryType
     {
         if ($this->attributesFromSchema) {
             $this->loadAttributesFromEntrySchema(
-                $this->getEntryType()->schema()->all()
+                $this->getEntryType()->fields()
             );
         }
 
         if ($this->relationsFromSchema) {
             $this->loadRelationsFromEntrySchema(
-                $this->getEntryType()->schema()->all()
+                $this->getEntryType()->fields()
             );
         }
     }

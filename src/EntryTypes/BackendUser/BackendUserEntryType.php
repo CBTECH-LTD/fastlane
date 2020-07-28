@@ -54,7 +54,7 @@ class BackendUserEntryType extends EntryType
                 ->showOnIndex(),
 
             SelectField::make('role', 'Role')
-                ->setOptions(
+                ->withOptions(
                     Role::all()->map(
                         fn(Role $role) => SelectOption::make($role->name, $role->name)
                     )->all()

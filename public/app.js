@@ -1926,17 +1926,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     item: {
       required: true,
       type: Object
-    },
-    entryType: {
-      required: true,
-      type: Object
     }
   },
   remember: ['form'],
   data: function data() {
     return {
       isUpdating: false,
-      form: new _Support_FormSchema__WEBPACK_IMPORTED_MODULE_1__["default"](_objectSpread({}, this.item.attributes), this.entryType.schema)
+      form: new _Support_FormSchema__WEBPACK_IMPORTED_MODULE_1__["default"](_objectSpread({}, this.item.attributes), this.item.meta.entry_type.schema)
     };
   },
   computed: {
@@ -31249,14 +31245,14 @@ var render = function() {
         {
           key: "title",
           fn: function() {
-            return [_vm._v(_vm._s(_vm.item.attributes.name))]
+            return [_vm._v(_vm._s(_vm.item.meta.item_label))]
           },
           proxy: true
         },
         {
           key: "subtitle",
           fn: function() {
-            return [_vm._v(_vm._s(_vm.entryType.singular_name))]
+            return [_vm._v(_vm._s(_vm.item.meta.entry_type.singular_name))]
           },
           proxy: true
         },

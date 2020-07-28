@@ -8,6 +8,7 @@ class SelectOption implements Arrayable
 {
     private string $value;
     private string $label;
+    private bool $selected = false;
 
     public function __construct(string $value, string $label)
     {
@@ -28,6 +29,17 @@ class SelectOption implements Arrayable
     public function getLabel(): string
     {
         return $this->label;
+    }
+
+    public function selected(bool $state = true): self
+    {
+        $this->selected = $state;
+        return $this;
+    }
+
+    public function isSelected(): bool
+    {
+        return $this->selected;
     }
 
     public function toArray()

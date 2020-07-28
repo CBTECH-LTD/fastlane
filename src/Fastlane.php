@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\Http\Controllers\EntriesController;
+use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuManager as MenuManagerContract;
 use CbtechLtd\Fastlane\Support\Menu\MenuManager;
@@ -124,8 +125,8 @@ class Fastlane
 
         $classes = array_merge(config('fastlane.entry_types'), $builtinTypes);
 
-        // Iterate over every entry type, instantiate it using the Laravel Container
-        // and register their policies as well.
+        // Iterate over every entry type, instantiate a base instance of  it using
+        // the Laravel Container and register their policies as well.
         $this->entryTypes = Collection::make($classes)->map(function ($typeClass) {
             /** @var EntryType $instance */
             $instance = app()->make($typeClass);

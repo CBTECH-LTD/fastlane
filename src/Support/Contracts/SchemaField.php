@@ -16,13 +16,13 @@ interface SchemaField extends Arrayable
 
     public function readValue(Model $model);
 
+    public function readValueUsing($callback): self;
+
     public function hydrateValue($model, $value, EntryRequest $request): void;
 
     public function hydrateUsing($callback): self;
 
-    public function getEntryType(): EntryType;
-
-    public function setEntryType(EntryType $entryType): self;
+    public function resolve(EntryType $entryType, EntryRequest $request): void;
 
     public function isRequired(): bool;
 

@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes;
 
+use CbtechLtd\Fastlane\EntryTypes\Concerns\Resolvable;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\BeforeHydratingHook;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
@@ -10,8 +11,6 @@ use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\HandlesHooks;
-use CbtechLtd\Fastlane\Support\Schema\Contracts\EntrySchema as EntrySchemaContract;
-use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,7 +23,7 @@ use ReflectionClass;
 
 abstract class EntryType implements EntryTypeContract
 {
-    use HandlesHooks;
+    use HandlesHooks, Resolvable;
 
     /** Parameters: EntryRequest $request, Model $entry, array $fields, array $data */
     const HOOK_BEFORE_HYDRATING = 'beforeHydrating';
@@ -47,12 +46,9 @@ abstract class EntryType implements EntryTypeContract
 
     protected Gate $gate;
 
-    protected EntrySchemaContract $entrySchema;
-
     public function __construct(Gate $gate)
     {
         $this->gate = $gate;
-        $this->entrySchema = new EntrySchema($this);
     }
 
     public function name(): string
@@ -116,11 +112,6 @@ abstract class EntryType implements EntryTypeContract
         return $name;
     }
 
-    public function schema(): EntrySchema
-    {
-        return $this->entrySchema;
-    }
-
     public function fields(): array
     {
         return [];
@@ -153,7 +144,7 @@ abstract class EntryType implements EntryTypeContract
             return $model->toString();
         }
 
-        return $this->schema()->all()[0]->readValue($model);
+        return $this->fields()[0]->readValue($model);
     }
 
     public function install(): void

@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\Http\Controllers;
 
 use CbtechLtd\Fastlane\FastlaneFacade;
+use CbtechLtd\Fastlane\Http\Requests\EntryEditRequest;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Http\Requests\EntryStoreRequest;
 use CbtechLtd\Fastlane\Http\Requests\EntryUpdateRequest;
@@ -65,17 +66,12 @@ class EntriesController extends Controller
         return Redirect::route("cp.{$request->entryType()->identifier()}.edit", [$entry]);
     }
 
-    public function edit(EntryRequest $request, string $id)
+    public function edit(EntryEditRequest $request)
     {
-        $entry = $request->entryType()->findItem($id);
+        $entry = $request->entry();
 
         return $this->render('Entries/Edit', [
-            'item'      => new ApiResource((new EntryResource($entry, $request->entryType()))->toUpdate()),
-            'entryType' => [
-                'schema'        => $request->entryType()->schema()->toUpdate(),
-                'singular_name' => $request->entryType()->name(),
-                'plural_name'   => Str::plural($request->entryType()->name()),
-            ],
+            'item' => new ApiResource((new EntryResource($entry, $request->entryType()))->toUpdate()),
         ]);
     }
 
