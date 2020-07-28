@@ -3,7 +3,7 @@
 namespace CbtechLtd\Fastlane\Http\Controllers;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryAttachmentStoreRequest;
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Concerns\HandlesAttachments;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 
 class EntryAttachmentsController extends Controller
 {

@@ -39,6 +39,6 @@ class MenuBuilder implements Menu
                 });
         })->filter();
 
-        return array_merge($typeLinks->all(), $baseLinks);
+        return array_merge($baseLinks, $typeLinks->all());
     }
 }

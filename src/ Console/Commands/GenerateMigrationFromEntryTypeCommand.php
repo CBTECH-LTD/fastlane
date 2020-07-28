@@ -4,7 +4,7 @@ namespace CbtechLtd\Fastlane\Console\Commands;
 
 use Carbon\Carbon;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
+use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -12,21 +12,21 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
 
-class GenerateMigrationFromEntrySchemaCommand extends Command
+class GenerateMigrationFromEntryTypeCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'fastlane:entry-types:schema-to-migration {entryType}';
+    protected $signature = 'fastlane:entry-types:migration {entryType}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Generate a migration from the given schema';
+    protected $description = 'Generate a migration from the given Entry Type';
 
     /**
      * Create a new command instance.
@@ -90,17 +90,12 @@ class GenerateMigrationFromEntrySchemaCommand extends Command
         $className = 'Create' . $entryType->pluralName() . 'Table';
         $table = Str::plural(Str::snake($entryType->identifier(), '_'));
 
-        $fields = Collection::make($entryType->schema()->getDefinition()->getFields())
-            ->filter(function (SchemaFieldType $field) {
+        $fields = Collection::make($entryType->schema()->all())
+            ->filter(function (SchemaField $field) {
                 return $field->getName() !== 'is_active';
             });
 
         $this->createClassFile($className, $table, get_class($entryType), $fields->all(), 'EntryMigration');
-    }
-
-    protected function makeFilePath(string $relativeClass): string
-    {
-        return app_path('EntryTypes/' . $this->getEntryTypeClass() . '/' . str_replace('\\', DIRECTORY_SEPARATOR, $relativeClass));
     }
 
     protected function fileExists(string $file): bool
@@ -125,9 +120,13 @@ class GenerateMigrationFromEntrySchemaCommand extends Command
             throw new \Exception('File ' . $filePath . ' already exists');
         }
 
-        $colDef = Collection::make($columns)->map(function (SchemaFieldType $f) {
-            return $f->toMigration();
-        });
+        $colDef = Collection::make($columns)->map(function (SchemaField $f) {
+            $migration = $f->toMigration();
+
+            return ! empty($migration)
+                ? $migration
+                : null;
+        })->filter();
 
         $view = View::file(
             __DIR__ . '/../../../stubs/' . $stub . '.blade.php',

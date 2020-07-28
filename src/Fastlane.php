@@ -4,7 +4,10 @@ namespace CbtechLtd\Fastlane;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\Http\Controllers\EntriesController;
+use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuManager as MenuManagerContract;
+use CbtechLtd\Fastlane\Support\Menu\MenuManager;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -16,10 +19,12 @@ class Fastlane
     protected Collection $entryTypes;
     protected Collection $routes;
     protected array $flashMessages = [];
+    protected MenuManagerContract $menuManager;
 
     public function __construct()
     {
         $this->registerEntryTypes();
+        $this->registerMenuManager();
     }
 
     public function flashSuccess(string $message, ?string $icon = null): void
@@ -91,12 +96,38 @@ class Fastlane
         return $this->entryTypes;
     }
 
+    public function getEntryTypeByIdentifier(string $identifier): EntryType
+    {
+        return $this->entryTypes->first(
+            fn(EntryType $entryType) => $entryType->identifier() === $identifier
+        );
+    }
+
+    public function getEntryTypeByClass(string $class): EntryType
+    {
+        return $this->entryTypes->first(
+            fn(EntryType $entryType) => $entryType instanceof $class
+        );
+    }
+
+    public function getMenuManager(): MenuManagerContract
+    {
+        return $this->menuManager;
+    }
+
     protected function registerEntryTypes(): void
     {
-        $defaultTypes = [BackendUserEntryType::class];
-        $classes = array_merge(config('fastlane.entry_types'), $defaultTypes);
+        // Merge the user-defined types with the built-in types.
+        // We don't add built-in types to the default config file because
+        // it would error prone (devs could just remove it), but for now
+        // we require all these built-in types to be correctly registered.
+        $builtinTypes = [BackendUserEntryType::class];
 
-        $this->entryTypes = Collection::make($classes)->mapWithKeys(function ($typeClass) {
+        $classes = array_merge(config('fastlane.entry_types'), $builtinTypes);
+
+        // Iterate over every entry type, instantiate a base instance of  it using
+        // the Laravel Container and register their policies as well.
+        $this->entryTypes = Collection::make($classes)->map(function ($typeClass) {
             /** @var EntryType $instance */
             $instance = app()->make($typeClass);
 
@@ -104,7 +135,12 @@ class Fastlane
                 Gate::policy($instance->model(), $instance->policy());
             }
 
-            return [$instance->identifier() => $instance];
+            return $instance;
         });
+    }
+
+    protected function registerMenuManager(): void
+    {
+        $this->menuManager = new MenuManager;
     }
 }

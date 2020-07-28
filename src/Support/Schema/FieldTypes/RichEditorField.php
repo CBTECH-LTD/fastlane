@@ -1,15 +1,15 @@
 <?php declare(strict_types = 1);
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
 use CbtechLtd\Fastlane\FileAttachment\StoreDraftAttachment;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
-use CbtechLtd\Fastlane\Support\Schema\FieldTypes\Concerns\HandlesAttachments;
-use Illuminate\Database\Schema\Blueprint;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 use Illuminate\Support\Facades\URL;
 
-class RichEditorType extends BaseType
+class RichEditorField extends BaseSchemaField
 {
     use HandlesAttachments;
 
@@ -54,12 +54,12 @@ class RichEditorType extends BaseType
         }
     }
 
-    protected function getConfig(): array
+    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
     {
         return [
             'acceptFiles' => $this->acceptFiles,
             'links'       => [
-                'self' => URL::relative("cp.{$this->getEntryType()->identifier()}.attachments", $this->getName()),
+                'self' => URL::relative("cp.{$entryType->identifier()}.attachments", $this->getName()),
             ],
         ];
     }
@@ -67,15 +67,5 @@ class RichEditorType extends BaseType
     protected function getMigrationMethod(): array
     {
         return ['longText'];
-    }
-
-
-    public function runOnMigration(Blueprint $table): void
-    {
-        $col = $table->longText($this->getName())->nullable(! $this->isRequired());
-
-        if ($this->hasUniqueRule()) {
-            $col->unique();
-        }
     }
 }

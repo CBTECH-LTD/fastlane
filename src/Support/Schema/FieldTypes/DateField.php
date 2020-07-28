@@ -1,8 +1,8 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-class DateType extends BaseType
+class DateField extends BaseSchemaField
 {
     protected ?string $displayFormat = null;
     protected bool $enableTime = false;
@@ -48,7 +48,7 @@ class DateType extends BaseType
         return 'd/m/Y - H:i:S';
     }
 
-    public function toModelAttribute()
+    public function toModelAttribute(): array
     {
         [$type, $format] = $this->enableTime
             ? ['datetime', $this->getSaveFormat()]
@@ -68,9 +68,11 @@ class DateType extends BaseType
         ];
     }
 
-    protected function getTypeRules(): string
+    protected function getTypeRules(): array
     {
-        return 'date_format:' . $this->getSaveFormat();
+        return [
+            $this->getName() => 'date_format:' . $this->getSaveFormat()
+        ];
     }
 
     protected function getSaveFormat(): string

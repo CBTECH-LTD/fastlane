@@ -1,11 +1,11 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use Illuminate\Support\Str;
 
-class ImageType extends FileType
+class ImageField extends FileField
 {
     protected array $accept = [
         'images/jpeg',
@@ -29,10 +29,11 @@ class ImageType extends FileType
         return $this;
     }
 
-    protected function getTypeRules(): string
+    protected function getTypeRules(): array
     {
-        return 'url|starts_with:' .
-            $this->getBaseImageUrl();
+        return [
+            $this->getName()=> 'url|starts_with:' . $this->getBaseImageUrl(),
+        ];
     }
 
     protected function getConfig(): array

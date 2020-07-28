@@ -12,4 +12,9 @@ class EntryRequest extends FormRequest
     {
         return [];
     }
+
+    protected function prepareForValidation()
+    {
+        $this->resolveEntryType();
+    }
 }

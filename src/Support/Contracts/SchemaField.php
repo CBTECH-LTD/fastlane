@@ -4,8 +4,9 @@ namespace CbtechLtd\Fastlane\Support\Contracts;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Model;
 
-interface SchemaFieldType extends Arrayable
+interface SchemaField extends Arrayable
 {
     public function getType(): string;
 
@@ -13,9 +14,15 @@ interface SchemaFieldType extends Arrayable
 
     public function getLabel(): string;
 
-    public function getEntryType(): EntryType;
+    public function readValue(Model $model);
 
-    public function setEntryType(EntryType $entryType): self;
+    public function readValueUsing($callback): self;
+
+    public function hydrateValue($model, $value, EntryRequest $request): void;
+
+    public function hydrateUsing($callback): self;
+
+    public function resolve(EntryType $entryType, EntryRequest $request): void;
 
     public function isRequired(): bool;
 
@@ -49,11 +56,18 @@ interface SchemaFieldType extends Arrayable
 
     public function isShownOnUpdate(): bool;
 
-    public function hydrateValue($model, $value, EntryRequest $request): void;
-
-    public function hydrateUsing($callback): self;
-
     public function toMigration(): string;
 
-    public function toModelAttribute();
+    /**
+     * Exports an array to be used by the model to define
+     * a fillable column and its casting type.
+     *
+     * The returned array must be in the following format:
+     *  [
+     *      "field_name" => string | null
+     * ]
+     *
+     * @return array
+     */
+    public function toModelAttribute(): array;
 }

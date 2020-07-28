@@ -19,7 +19,7 @@ class BackendUserResource extends ResourceType
             'name'      => $this->model->name,
             'email'     => $this->model->email,
             'is_active' => $this->model->is_active,
-            'role'      => optional($this->model->roles->first())->name,
+            'role'      => $this->model->role,
         ];
     }
 

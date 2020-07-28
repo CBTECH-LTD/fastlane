@@ -3,15 +3,15 @@
 namespace CbtechLtd\Fastlane\FileAttachment;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryAttachmentStoreRequest;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
+use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 
 class StoreDraftAttachment
 {
-    protected SchemaFieldType $field;
+    protected SchemaField $field;
 
-    public function __construct(SchemaFieldType $field)
+    public function __construct(SchemaField $field)
     {
         $this->field = $field;
     }

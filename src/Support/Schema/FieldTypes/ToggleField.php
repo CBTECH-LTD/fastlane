@@ -1,8 +1,8 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-class ToggleType extends BaseType
+class ToggleField extends BaseSchemaField
 {
     protected $default = true;
 
@@ -11,16 +11,18 @@ class ToggleType extends BaseType
         return 'toggle';
     }
 
-    public function toModelAttribute()
+    public function toModelAttribute(): array
     {
         return [
             $this->getName() => 'boolean',
         ];
     }
 
-    protected function getTypeRules(): string
+    protected function getTypeRules(): array
     {
-        return 'boolean';
+        return [
+            $this->getName() => 'boolean',
+        ];
     }
 
     protected function getMigrationMethod(): array

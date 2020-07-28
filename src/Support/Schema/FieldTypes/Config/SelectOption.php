@@ -1,6 +1,6 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes\Config;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields\Config;
 
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -8,6 +8,7 @@ class SelectOption implements Arrayable
 {
     private string $value;
     private string $label;
+    private bool $selected = false;
 
     public function __construct(string $value, string $label)
     {
@@ -30,13 +31,24 @@ class SelectOption implements Arrayable
         return $this->label;
     }
 
+    public function selected(bool $state = true): self
+    {
+        $this->selected = $state;
+        return $this;
+    }
+
+    public function isSelected(): bool
+    {
+        return $this->selected;
+    }
+
     public function toArray()
     {
         $val = $this->getValue();
 
         return [
             'label' => $this->getLabel(),
-            'value' => (int)$val,
+            'value' => is_int($val) ? $val : $val,
         ];
     }
 }

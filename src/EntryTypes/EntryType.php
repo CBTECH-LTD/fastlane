@@ -2,19 +2,19 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes;
 
+use CbtechLtd\Fastlane\EntryTypes\Concerns\Resolvable;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\BeforeHydratingHook;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaFieldType;
+use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\HandlesHooks;
-use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
-use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
-use CbtechLtd\JsonApiTransformer\ApiResources\ApiResourceCollection;
+use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -23,7 +23,7 @@ use ReflectionClass;
 
 abstract class EntryType implements EntryTypeContract
 {
-    use HandlesHooks;
+    use HandlesHooks, Resolvable;
 
     /** Parameters: EntryRequest $request, Model $entry, array $fields, array $data */
     const HOOK_BEFORE_HYDRATING = 'beforeHydrating';
@@ -91,6 +91,7 @@ abstract class EntryType implements EntryTypeContract
 
     public function apiResource(): string
     {
+        /** @var ResourceType $name */
         $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'Resource';
 
         if (! class_exists($name)) {
@@ -111,15 +112,39 @@ abstract class EntryType implements EntryTypeContract
         return $name;
     }
 
-    public function schema(): EntrySchema
+    public function fields(): array
     {
-        $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'Schema';
+        return [];
+    }
 
-        if (! class_exists($name)) {
-            ClassDoesNotExistException::model($name);
+    public function fieldsOnIndex(): array
+    {
+        return Collection::make($this->fields())->filter(
+            fn(SchemaField $f) => $f->isShownOnIndex()
+        )->all();
+    }
+
+    public function fieldsOnCreate(): array
+    {
+        return Collection::make($this->fields())->filter(
+            fn(SchemaField $f) => $f->isShownOnCreate()
+        )->all();
+    }
+
+    public function fieldsOnUpdate(): array
+    {
+        return Collection::make($this->fields())->filter(
+            fn(SchemaField $f) => $f->isShownOnUpdate()
+        )->all();
+    }
+
+    public function transformModelToString(Model $model): string
+    {
+        if (method_exists($model, 'toString')) {
+            return $model->toString();
         }
 
-        return new $name($this);
+        return $this->fields()[0]->readValue($model);
     }
 
     public function install(): void
@@ -132,18 +157,17 @@ abstract class EntryType implements EntryTypeContract
         return true;
     }
 
-    public function getItems(): ApiResourceCollection
+    public function getItems(): EloquentCollection
     {
         $this->gate->authorize('list', $this->model());
 
         $query = $this->newModelInstance()->newModelQuery();
         $this->queryItems($query);
-        $items = $query->get();
 
-        return $this->apiResource()::collection($items);
+        return $query->get();
     }
 
-    public function findItem(string $hashid): ApiResource
+    public function findItem(string $hashid): Model
     {
         $query = $this->newModelInstance()->newModelQuery();
         $this->querySingleItem($query, $hashid);
@@ -151,7 +175,7 @@ abstract class EntryType implements EntryTypeContract
 
         $this->gate->authorize('show', $entry);
 
-        return $this->apiResource()::single($entry);
+        return $entry;
     }
 
     public function store(EntryRequest $request): Model
@@ -162,7 +186,7 @@ abstract class EntryType implements EntryTypeContract
         $this->hydrateFields(
             $request,
             $entry,
-            $this->schema()->getDefinition()->toCreate()->getFields(),
+            $this->schema()->toCreate(),
         );
 
         $beforeHook = new OnSavingHook($this, $entry, $request->validated());
@@ -187,7 +211,7 @@ abstract class EntryType implements EntryTypeContract
         $this->hydrateFields(
             $request,
             $entry,
-            $this->schema()->getDefinition()->toUpdate()->getFields(),
+            $this->schema()->toUpdate(),
         );
 
         $beforeHook = $this->executeHooks(static::HOOK_BEFORE_UPDATING, new OnSavingHook($this, $entry, $request->validated()));
@@ -259,10 +283,15 @@ abstract class EntryType implements EntryTypeContract
         //
     }
 
+    protected function transformModelToSchema(): array
+    {
+
+    }
+
     /**
-     * @param EntryRequest      $request
-     * @param Model             $model
-     * @param SchemaFieldType[] $fields
+     * @param EntryRequest  $request
+     * @param Model         $model
+     * @param SchemaField[] $fields
      */
     protected function hydrateFields(EntryRequest $request, Model $model, array $fields): void
     {

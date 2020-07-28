@@ -3,13 +3,14 @@
 namespace CbtechLtd\Fastlane\Support\Contracts;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
-use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
-use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
-use CbtechLtd\JsonApiTransformer\ApiResources\ApiResourceCollection;
+use CbtechLtd\Fastlane\Support\Schema\Contracts\EntrySchema;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 interface EntryType
 {
+    public function resolveForRequest(EntryRequest $request): EntryType;
+
     public function identifier(): string;
 
     public function name(): string;
@@ -24,13 +25,21 @@ interface EntryType
 
     public function policy(): ?string;
 
+    public function fields(): array;
+
+    public function fieldsOnIndex(): array;
+
+    public function fieldsOnCreate(): array;
+
+    public function fieldsOnUpdate(): array;
+
     public function schema(): EntrySchema;
 
     public function isVisibleOnMenu(): bool;
 
-    public function getItems(): ApiResourceCollection;
+    public function getItems(): Collection;
 
-    public function findItem(string $hashid): ApiResource;
+    public function findItem(string $hashid): Model;
 
     public function store(EntryRequest $request): Model;
 
@@ -39,4 +48,6 @@ interface EntryType
     public function delete(string $hashid): Model;
 
     public function install(): void;
+
+    public function transformModelToString(Model $model): string;
 }

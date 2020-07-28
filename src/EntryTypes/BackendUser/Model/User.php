@@ -12,6 +12,7 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends BaseModel implements
@@ -57,6 +58,11 @@ class User extends BaseModel implements
     public function newCollection(array $models = [])
     {
         return new UserCollection($models);
+    }
+
+    public function getRoleAttribute(): string
+    {
+        return $this->roles->first()->name;
     }
 
     public function setPasswordAttribute(string $value): self

@@ -1,7 +1,7 @@
 <template>
     <f-the-app-layout>
-        <template v-slot:title>{{ item.attributes.name }}</template>
-        <template v-slot:subtitle>{{ entryType.singular_name }}</template>
+        <template v-slot:title>{{ item.meta.item_label }}</template>
+        <template v-slot:subtitle>{{ item.meta.entry_type.singular_name }}</template>
         <template v-slot:actions>
             <f-button :href="item.links.parent" variant="outline" left-icon="arrow-left">
                 Back to list
@@ -71,10 +71,6 @@
                 required: true,
                 type: Object,
             },
-            entryType: {
-                required: true,
-                type: Object,
-            },
         },
 
         remember: ['form'],
@@ -84,7 +80,7 @@
                 isUpdating: false,
                 form: new FormSchema({
                     ...this.item.attributes,
-                }, this.entryType.schema),
+                }, this.item.meta.entry_type.schema),
             }
         },
 

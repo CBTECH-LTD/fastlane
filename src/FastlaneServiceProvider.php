@@ -2,7 +2,8 @@
 
 namespace CbtechLtd\Fastlane;
 
-use CbtechLtd\Fastlane\Console\Commands\GenerateMigrationFromEntrySchemaCommand;
+use CbtechLtd\Fastlane\Console\Commands\GenerateMigrationFromEntryTypeCommand;
+use CbtechLtd\Fastlane\Console\Commands\GeneratePivotTableCommand;
 use CbtechLtd\Fastlane\Console\Commands\InstallEntryTypesCommand;
 use CbtechLtd\Fastlane\Console\Commands\MakeEntryTypeCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
@@ -63,7 +64,8 @@ class FastlaneServiceProvider extends ServiceProvider
             $this->commands([
                 MakeEntryTypeCommand::class,
                 InstallEntryTypesCommand::class,
-                GenerateMigrationFromEntrySchemaCommand::class,
+                GenerateMigrationFromEntryTypeCommand::class,
+                GeneratePivotTableCommand::class,
                 CreateSystemAdminCommand::class,
             ]);
         }
@@ -82,7 +84,6 @@ class FastlaneServiceProvider extends ServiceProvider
 
         // Register views and menu
         $this->registerViews();
-        $this->registerMenu();
 
         // Register the main class to use with the facade
         $this->app->singleton('fastlane', function () {
@@ -152,13 +153,12 @@ class FastlaneServiceProvider extends ServiceProvider
         });
 
         Inertia::share('flashMessages', function () {
-//            dd(session()->get('fastlane-messages'));
             return Session::get('fastlane-messages');
         });
 
         Inertia::share('menu', function () {
             if (Auth::check()) {
-                return app(MenuManager::class)->build();
+                return FastlaneFacade::getMenuManager()->build();
             }
 
             return null;
@@ -206,13 +206,6 @@ class FastlaneServiceProvider extends ServiceProvider
 
         Inertia::version(function () {
             return md5_file(__DIR__ . '/../public/mix-manifest.json');
-        });
-    }
-
-    protected function registerMenu(): void
-    {
-        $this->app->singleton(MenuManagerContract::class, function () {
-            return new MenuManager;
         });
     }
 }

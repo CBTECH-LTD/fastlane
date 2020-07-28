@@ -3,9 +3,14 @@
 namespace CbtechLtd\Fastlane\Http\Controllers;
 
 use CbtechLtd\Fastlane\FastlaneFacade;
+use CbtechLtd\Fastlane\Http\Requests\EntryEditRequest;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Http\Requests\EntryStoreRequest;
 use CbtechLtd\Fastlane\Http\Requests\EntryUpdateRequest;
+use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
+use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
+use CbtechLtd\JsonApiTransformer\ApiResources\ApiResourceCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -14,12 +19,16 @@ class EntriesController extends Controller
 {
     public function index(EntryRequest $request)
     {
-        $items = $request->entryType()->getItems();
+        $collection = new ApiResourceCollection(
+            $request->entryType()->getItems()->map(
+                fn(Model $m) => (new EntryResource($m, $request->entryType()))->toIndex()
+            )
+        );
 
         return $this->render('Entries/Index', [
-            'items'     => $items,
+            'items'     => $collection,
             'entryType' => [
-                'schema'        => $request->entryType()->schema()->getDefinition()->toIndex()->toArray(),
+                'schema'        => $request->entryType()->schema()->toIndex(),
                 'singular_name' => $request->entryType()->name(),
                 'plural_name'   => Str::plural($request->entryType()->name()),
             ],
@@ -35,7 +44,7 @@ class EntriesController extends Controller
 
         return $this->render('Entries/Create', [
             'entryType' => [
-                'schema'        => $request->entryType()->schema()->getDefinition()->toCreate()->toArray(),
+                'schema'        => $request->entryType()->schema()->toCreate(),
                 'singular_name' => $request->entryType()->name(),
                 'plural_name'   => Str::plural($request->entryType()->name()),
             ],
@@ -57,17 +66,12 @@ class EntriesController extends Controller
         return Redirect::route("cp.{$request->entryType()->identifier()}.edit", [$entry]);
     }
 
-    public function edit(EntryRequest $request, string $id)
+    public function edit(EntryEditRequest $request)
     {
-        $entry = $request->entryType()->findItem($id);
+        $entry = $request->entry();
 
         return $this->render('Entries/Edit', [
-            'item'      => $entry,
-            'entryType' => [
-                'schema'        => $request->entryType()->schema()->getDefinition()->toUpdate()->toArray(),
-                'singular_name' => $request->entryType()->name(),
-                'plural_name'   => Str::plural($request->entryType()->name()),
-            ],
+            'item' => new ApiResource((new EntryResource($entry, $request->entryType()))->toUpdate()),
         ]);
     }
 

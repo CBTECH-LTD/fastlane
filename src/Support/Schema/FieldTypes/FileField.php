@@ -1,8 +1,8 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Schema\FieldTypes;
+namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-class FileType extends BaseType
+class FileField extends BaseSchemaField
 {
     protected array $accept = [];
 
@@ -22,8 +22,10 @@ class FileType extends BaseType
         return $this;
     }
 
-    protected function getTypeRules(): string
+    protected function getTypeRules(): array
     {
-        return 'file';
+        return [
+            $this->getName() => 'file'
+        ];
     }
 }
