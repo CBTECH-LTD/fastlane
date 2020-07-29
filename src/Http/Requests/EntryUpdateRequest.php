@@ -9,13 +9,8 @@ class EntryUpdateRequest extends EntryRequest
 {
     public function rules()
     {
-        return Collection::make($this->entryType()->schema()->toUpdate())
-            ->mapWithKeys(function (SchemaField $fieldType) {
-                $rules = $fieldType->getUpdateRules();
-
-                return [
-                    $fieldType->getName() => 'sometimes|' . $rules,
-                ];
-            })->all();
+        return Collection::make($this->entryType()->schema()->getUpdateFields())
+            ->mapWithKeys(fn(SchemaField $fieldType) => $fieldType->getUpdateRules())
+            ->all();
     }
 }

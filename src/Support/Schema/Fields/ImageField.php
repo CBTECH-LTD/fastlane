@@ -44,9 +44,9 @@ class ImageField extends FileField
         ];
     }
 
-    public function hydrateValue($model, $value, EntryRequest $request): void
+    public function fillModel($model, $value, EntryRequest $request): void
     {
-        parent::hydrateValue(
+        parent::fillModel(
             $model,
             Str::replaceFirst($this->getBaseImageUrl(), '', $value),
             $request

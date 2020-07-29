@@ -16,17 +16,17 @@ class SelectField extends BaseSchemaField
     protected bool $multiple = false;
     protected $options;
 
-    static public function make(string $name, string $label, array $options = []): self
+    protected function __construct(string $name, string $label, array $options = [])
     {
+        parent::__construct($name, $label);
+
         Assert::allIsInstanceOf(
             $options,
             SelectOption::class,
             'All options must be instances of ' . SelectOption::class
         );
 
-        $instance = new static($name, $label);
-        $instance->options = $options;
-        return $instance;
+        $this->options = $options;
     }
 
     public function getType(): string
@@ -56,15 +56,17 @@ class SelectField extends BaseSchemaField
         return $this->getResolvedConfig('config')['options']->toArray();
     }
 
-    public function readValue(Model $model)
+    public function resolveValue(Model $model): array
     {
         $value = Arr::wrap($model->{$this->getName()});
 
         $options = $this->resolvedConfig->get('config')['options'];
 
-        return $options->filter(
-            fn(SelectOption $opt) => $opt->isSelected() || in_array($opt->getValue(), $value)
-        )->toArray();
+        return [
+            $this->getName() => $options->filter(
+                fn(SelectOption $opt) => $opt->isSelected() || in_array($opt->getValue(), $value)
+            )->toArray(),
+        ];
     }
 
     protected function getTypeRules(): array

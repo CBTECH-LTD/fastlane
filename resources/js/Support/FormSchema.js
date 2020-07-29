@@ -1,60 +1,33 @@
-'use strict'
-
+import Vue from 'vue'
 import each from 'lodash/each'
 import some from 'lodash/some'
 import filter from 'lodash/filter'
-import map from 'lodash/map'
 import tap from 'lodash/tap'
 import camelCase from 'lodash/camelCase'
-import FormObject from './FormObject'
-import { FormField } from './FormField'
 import components from './utils/schemaComponents'
+import FormObject from './FormObject'
+import { FormFieldFactory } from './FormField'
+import schemaComponents from './utils/schemaComponents'
 
-export default function FormSchema (data, schema) {
-    each(schema, field => {
-        const component = components[camelCase(field.type)].form
+/**
+ * Define methods to be accessible on the instance of FormSchema.
+ */
+function generateMethods (form) {
+    const obj = {}
 
-        const value = data.hasOwnProperty(field.name)
-            ? data[field.name]
-            : field.default
-
-        this[field.name] = !!component.buildForSchema
-            ? component.buildForSchema({ field, component, value })
-            : new FormField(field, component, value)
-    })
-
-    // Now we define some useful methods...
-    Object.defineProperties(this, {
-        getSchema: {
-            value: () => {
-                return schema
-            },
-        },
+    Object.defineProperties(obj, {
         isDirty: {
-            value: () => {
-                return some(this, v => v.isDirty())
-            }
+            value: () => some(form, field => field.isDirty()),
         },
         getDirty: {
-            value: () => {
-                return filter(this, f => f.isDirty())
-            },
+            value: () => filter(form, field => field.isDirty()),
         },
         getAll: {
-            value: () => {
-                return map(this, f => f)
-            }
+            value: () => form,
         },
-
-        restart: {
-            value: (attributes) => {
-                return new FormSchema(attributes, this.getSchema())
-            }
-        },
-
         toFormObject: {
             value: (onlyDirty = true) => {
-                const items = onlyDirty ? this.getDirty() : this.getAll()
+                const items = onlyDirty ? obj.getDirty() : obj.getAll()
 
                 if (items.length === 0) {
                     return null
@@ -62,10 +35,51 @@ export default function FormSchema (data, schema) {
 
                 return tap(new FormObject(), formObject => {
                     each(items, (field) => {
-                        field.commit(formObject)
+                        if (!field.commitCallback) {
+                            throw new Error('No Commit Callback set on the field ' + field.name)
+                        }
+
+                        field.commitCallback(formObject)
                     })
                 })
             }
-        },
+        }
     })
+
+    each(form, field => {
+        Object.defineProperty(obj, field.name, {
+            get () {
+                return field.value
+            },
+            enumerable: true,
+        })
+    })
+
+    return obj
+}
+
+/**
+ * Generate a new Form Schema instance.
+ *
+ * @param data
+ * @param schema
+ */
+export function FormSchemaFactory (data, schema) {
+    const __fields = {}
+
+    each(schema, field => {
+        const component = components[camelCase(field.type)].form
+
+        const value = data.hasOwnProperty(field.name)
+            ? data[field.name]
+            : field.default
+
+        __fields[field.name] = Vue.observable(
+            !!component.buildForSchema
+                ? component.buildForSchema({ field, component, value, data })
+                : FormFieldFactory(field, component, value)
+        )
+    })
+
+    return generateMethods(__fields)
 }

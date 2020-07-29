@@ -8,6 +8,7 @@ import FFormSelectInput from './Components/Form/SelectInput'
 import FFormStringInput from './Components/Form/StringInput'
 import FFormToggleInput from './Components/Form/ToggleInput'
 import FFormTextInput from './Components/Form/TextInput'
+import FFormRoot from './Components/Form/FormRoot'
 import FIcon from './Components/Icon'
 import FLink from './Components/Link'
 import FListCard from './Components/ListCard'
@@ -43,6 +44,7 @@ export default {
         Vue.component('f-menu-link', FMenuLink)
 
         // Form specific..)
+        Vue.component('f-form-root', FFormRoot)
         Vue.component('f-form-field', FFormField)
         Vue.component('f-form-date-time-input', FFormDateTimeInput)
         Vue.component('f-form-radio-input', FFormRadioInput)

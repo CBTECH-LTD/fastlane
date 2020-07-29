@@ -1,14 +1,17 @@
 <template>
-    <div class="w-full relative">
-        <input ref="fileInput" type="file" @change="uploadFile" class="hidden w-0 h-0">
-        <div @click="openFileDialog" class="w-32 h-32 form-input cursor-pointer overflow-hidden flex items-center justify-center" v-bind="$attrs">
-            <img v-if="field.value" :src="field.value" alt="" class="w-full">
-            <span v-else class="flex flex-col items-center justify-center">
-                <f-icon class="text-2xl text-gray-600" name="upload"></f-icon>
-                <span class="mt-2 text-xs text-gray-600">Upload image</span>
-            </span>
+    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
+        <template v-if="field.label" v-slot:label>{{ field.label }}</template>
+        <div class="w-full relative">
+            <input ref="fileInput" type="file" @change="uploadFile" class="hidden w-0 h-0">
+            <div @click="openFileDialog" class="w-32 h-32 form-input cursor-pointer overflow-hidden flex items-center justify-center" v-bind="$attrs">
+                <img v-if="field.value" :src="field.value" alt="" class="w-full">
+                <span v-else class="flex flex-col items-center justify-center">
+                    <f-icon class="text-2xl text-gray-600" name="upload"></f-icon>
+                    <span class="mt-2 text-xs text-gray-600">Upload image</span>
+                </span>
+            </div>
         </div>
-    </div>
+    </f-form-field>
 </template>
 
 <script>

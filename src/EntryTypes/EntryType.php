@@ -8,9 +8,11 @@ use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
+use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
-use CbtechLtd\Fastlane\Support\HandlesHooks;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility;
+use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Builder;
@@ -117,25 +119,37 @@ abstract class EntryType implements EntryTypeContract
         return [];
     }
 
+    public function allFields(): array
+    {
+        return Collection::make($this->fields())
+            ->flatMap(function (SchemaField $field) {
+                if ($field instanceof FieldPanel) {
+                    return $field->getFields();
+                }
+
+                return [$field];
+            })->all();
+    }
+
     public function fieldsOnIndex(): array
     {
-        return Collection::make($this->fields())->filter(
-            fn(SchemaField $f) => $f->isShownOnIndex()
-        )->all();
+        return Collection::make($this->allFields())
+            ->filter(fn($f) => $f instanceof WithVisibility && $f->isShownOnIndex())
+            ->all();
     }
 
     public function fieldsOnCreate(): array
     {
-        return Collection::make($this->fields())->filter(
-            fn(SchemaField $f) => $f->isShownOnCreate()
-        )->all();
+        return Collection::make($this->allFields())
+            ->filter(fn($f) => $f instanceof WithVisibility && $f->isShownOnCreate())
+            ->all();
     }
 
     public function fieldsOnUpdate(): array
     {
-        return Collection::make($this->fields())->filter(
-            fn(SchemaField $f) => $f->isShownOnUpdate()
-        )->all();
+        return Collection::make($this->allFields())
+            ->filter(fn($f) => $f instanceof WithVisibility && $f->isShownOnUpdate())
+            ->all();
     }
 
     public function transformModelToString(Model $model): string
@@ -144,7 +158,9 @@ abstract class EntryType implements EntryTypeContract
             return $model->toString();
         }
 
-        return $this->fields()[0]->readValue($model);
+        $field = $this->allFields()[0];
+
+        return $field->resolveValue($model)[$field->getName()];
     }
 
     public function install(): void
@@ -183,10 +199,18 @@ abstract class EntryType implements EntryTypeContract
         $this->gate->authorize('create', $this->model());
         $entry = $this->newModelInstance();
 
+        $fields = Collection::make($this->schema()->getCreateFields())->flatMap(function (SchemaField $field) {
+            if ($field instanceof FieldPanel) {
+                return $field->getFields();
+            }
+
+            return $field;
+        })->all();
+
         $this->hydrateFields(
             $request,
             $entry,
-            $this->schema()->toCreate(),
+            $fields,
         );
 
         $beforeHook = new OnSavingHook($this, $entry, $request->validated());
@@ -211,7 +235,7 @@ abstract class EntryType implements EntryTypeContract
         $this->hydrateFields(
             $request,
             $entry,
-            $this->schema()->toUpdate(),
+            $this->schema()->getUpdateFields(),
         );
 
         $beforeHook = $this->executeHooks(static::HOOK_BEFORE_UPDATING, new OnSavingHook($this, $entry, $request->validated()));
@@ -304,7 +328,7 @@ abstract class EntryType implements EntryTypeContract
 
         foreach ($fields as $field) {
             if (Arr::has($hookClass->data, $field->getName())) {
-                $field->hydrateValue($model, Arr::get($hookClass->data, $field->getName()), $request);
+                $field->fillModel($model, Arr::get($hookClass->data, $field->getName()), $request);
             }
         }
     }

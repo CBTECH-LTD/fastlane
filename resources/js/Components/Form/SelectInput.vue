@@ -1,20 +1,23 @@
 <template>
-    <div class="w-full">
-        <v-select
-            class="form-input"
-            :clearable="false"
-            :options="field.config.options"
-            :multiple="field.config.multiple"
-            v-model="field.value">
-        </v-select>
-    </div>
+    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
+        <template v-if="field.label" v-slot:label>{{ field.label }}</template>
+        <div class="w-full">
+            <v-select
+                class="form-input"
+                :clearable="false"
+                :options="field.config.options"
+                :multiple="field.config.multiple"
+                v-model="field.value">
+            </v-select>
+        </div>
+    </f-form-field>
 </template>
 
 <script>
     import VSelect from 'vue-select'
     import 'vue-select/dist/vue-select.css'
     import FormInput from '../Mixins/FormInput'
-    import { FormField } from '../../Support/FormField'
+    import { FormField, FormFieldFactory } from '../../Support/FormField'
     import filter from 'lodash/filter'
     import map from 'lodash/map'
 
@@ -60,7 +63,7 @@
                 return getValue().includes(o.value)
             })
 
-            return new FormField(
+            return FormFieldFactory(
                 field,
                 component,
                 filteredValue || field.default

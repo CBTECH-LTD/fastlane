@@ -45,11 +45,6 @@ abstract class RelationField extends BaseSchemaField
         $this->name = "relations__{$this->relatedEntryType->identifier()}";
     }
 
-    static public function make(string $relatedEntryType, ?string $label = null): self
-    {
-        return new static($relatedEntryType, $label);
-    }
-
     public function withTimestamps(bool $state = true): self
     {
         $this->withTimestamps = $state;
@@ -61,7 +56,7 @@ abstract class RelationField extends BaseSchemaField
         return $this->withTimestamps(false);
     }
 
-    public function readValue(Model $model)
+    public function resolveValue(Model $model): array
     {
         throw new \Exception('readValue not implemented.');
     }
@@ -71,10 +66,10 @@ abstract class RelationField extends BaseSchemaField
         return 'select';
     }
 
-    public function hydrateValue($model, $value, EntryRequest $request): void
+    public function fillModel($model, $value, EntryRequest $request): void
     {
-        if (is_callable($this->hydrateCallback)) {
-            call_user_func($this->hydrateCallback, $model, $value, $request);
+        if (is_callable($this->fillValueCallback)) {
+            call_user_func($this->fillValueCallback, $model, $value, $request);
             return;
         }
 

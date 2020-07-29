@@ -1,15 +1,18 @@
 <template>
-    <div class="w-full">
-        <f-trix
-            name="richEditor"
-            :value="field.value"
-            v-bind="$attrs"
-            :files-enabled="field.config.acceptFiles"
-            @change="onInput"
-            @file-add="onFileAdded"
-            @file-remove="onFileRemoved"
-        />
-    </div>
+    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
+        <template v-if="field.label" v-slot:label>{{ field.label }}</template>
+        <div class="w-full">
+            <f-trix
+                name="richEditor"
+                :value="field.value"
+                v-bind="$attrs"
+                :files-enabled="field.config.acceptFiles"
+                @change="onInput"
+                @file-add="onFileAdded"
+                @file-remove="onFileRemoved"
+            />
+        </div>
+    </f-form-field>
 </template>
 
 <script>
@@ -44,6 +47,8 @@
 
             onInput (value) {
                 this.field.value = value
+
+                this.$emit('input', this.field.value)
             },
 
             async onFileAdded ({ attachment }) {

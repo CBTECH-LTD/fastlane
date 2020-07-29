@@ -27,6 +27,8 @@ interface EntryType
 
     public function fields(): array;
 
+    public function allFields(): array;
+
     public function fieldsOnIndex(): array;
 
     public function fieldsOnCreate(): array;

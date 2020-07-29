@@ -18,27 +18,19 @@
             </f-button>
         </template>
 
-        <form id="editForm" @submit.prevent="submitForm">
-            <f-boxed-card>
-                <template v-for="field in form">
-                    <f-form-field :errors="$page.errors.get(field.name)" :required="field.isRequired()">
-                        <template v-if="field.label" v-slot:label>
-                            {{ field.label }}
-                        </template>
-                        <component :is="field.component"
-                                   :field="field"
-                                   :required="field.isRequired()"
-                                   :aria-required="field.isRequired()"
-                                   :placeholder="field.placeholder"
-                                   :aria-placeholder="field.placeholder"
-                        ></component>
+        <f-form-root id="editForm" @submit.prevent="submitForm">
+            <template v-for="field in form.getAll()" v-slot:[getFieldSlot(field)]>
+                <component :is="field.component"
+                           :field="field"
+                           :required="field.required"
+                           :aria-required="field.required"
+                           :placeholder="field.placeholder"
+                           :aria-placeholder="field.placeholder"
+                ></component>
+            </template>
+        </f-form-root>
 
-                    </f-form-field>
-                </template>
-            </f-boxed-card>
-        </form>
-
-        <f-boxed-card class="mt-8">
+        <f-boxed-card class="mt-8 border-red-500">
             <template v-slot:title>
                 <span class="flex items-center text-danger-600">
                     <f-icon name="exclamation-triangle" class="text-2xl mr-2"/>
@@ -60,8 +52,8 @@
 </template>
 
 <script>
-    import FormSchema from '../../Support/FormSchema'
     import Dialogs from '../../Support/Dialogs'
+    import { FormSchemaFactory } from '../../Support/FormSchema'
 
     export default {
         name: 'Entries.Edit',
@@ -73,14 +65,14 @@
             },
         },
 
-        remember: ['form'],
+        // remember: ['form'],
 
         data () {
             return {
                 isUpdating: false,
-                form: new FormSchema({
-                    ...this.item.attributes,
-                }, this.item.meta.entry_type.schema),
+                form: new FormSchemaFactory(
+                    this.item.attributes, this.item.meta.entry_type.schema
+                )
             }
         },
 
@@ -91,6 +83,14 @@
         },
 
         methods: {
+            getFieldSlot (field) {
+                if (field.type === 'panel') {
+                    return `panels__${field.name}`;
+                }
+
+                return `generalPanel__${field.name}`;
+            },
+
             async submitForm () {
                 const formObject = this.form.toFormObject()
 

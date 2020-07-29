@@ -61,7 +61,7 @@ class BackendUserEntryType extends EntryType
                 )
                 ->required()
                 ->showOnIndex()
-                ->hydrateUsing(function ($model, $value) {
+                ->fillModelUsing(function ($model, $value) {
                     if ($value) {
                         $model->assignRole($value);
                     }
