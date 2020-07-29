@@ -17,24 +17,11 @@
             </f-button>
         </template>
 
-        <form id="createForm" @submit.prevent="submitForm">
-            <f-boxed-card>
-                <template v-for="field in form.getAll()">
-                    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
-                        <template v-if="field.label" v-slot:label>
-                            {{ field.label }}
-                        </template>
-                        <component :is="field.component"
-                                   :field="field"
-                                   :required="field.required"
-                                   :aria-required="field.required"
-                                   :placeholder="field.placeholder"
-                                   :aria-placeholder="field.placeholder"
-                        ></component>
-                    </f-form-field>
-                </template>
-            </f-boxed-card>
-        </form>
+        <f-form-root id="createForm"
+                     @submit.prevent="submitForm"
+                     :form="form"
+                     :panels="entryType.panels">
+        </f-form-root>
     </f-the-app-layout>
 </template>
 
@@ -71,6 +58,12 @@
         },
 
         methods: {
+            getFieldSlot (field) {
+                return field.panel
+                    ? `${field.panel}____${field.name}`
+                    : `default_panel____${field.name}`
+            },
+
             async submitForm () {
                 if (this.form.isDirty() && !this.isCreating) {
                     this.isCreating = true

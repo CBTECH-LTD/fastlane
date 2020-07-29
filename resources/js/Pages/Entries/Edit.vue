@@ -18,16 +18,10 @@
             </f-button>
         </template>
 
-        <f-form-root id="editForm" @submit.prevent="submitForm">
-            <template v-for="field in form.getAll()" v-slot:[getFieldSlot(field)]>
-                <component :is="field.component"
-                           :field="field"
-                           :required="field.required"
-                           :aria-required="field.required"
-                           :placeholder="field.placeholder"
-                           :aria-placeholder="field.placeholder"
-                ></component>
-            </template>
+        <f-form-root id="editForm"
+                     @submit.prevent="submitForm"
+                     :form="form"
+                     :panels="item.meta.entry_type.panels">
         </f-form-root>
 
         <f-boxed-card class="mt-8 border-red-500">
@@ -79,16 +73,14 @@
         computed: {
             isFormDisabled () {
                 return this.isUpdating || !this.form.isDirty()
-            }
+            },
         },
 
         methods: {
             getFieldSlot (field) {
-                if (field.type === 'panel') {
-                    return `panels__${field.name}`;
-                }
-
-                return `generalPanel__${field.name}`;
+                return field.panel
+                    ? `${field.panel}____${field.name}`
+                    : `default_panel____${field.name}`
             },
 
             async submitForm () {

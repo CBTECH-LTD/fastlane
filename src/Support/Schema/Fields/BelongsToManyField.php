@@ -17,7 +17,7 @@ class BelongsToManyField extends RelationField
         $values = $model->{$this->getRelationshipName()}->map(
             fn(Model $related) => SelectOption::make(
                 $related->getKey(),
-                $this->relatedEntryType->transformModelToString($related)
+                $this->relatedEntryType->makeModelTitle($related)
             )
         )->toArray();
 

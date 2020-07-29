@@ -29,19 +29,19 @@ class EntryResource extends ResourceType
 
     public function toIndex(): self
     {
-        $this->destination = 'getIndexFields';
+        $this->destination = 'index';
         return $this;
     }
 
     public function toCreate(): self
     {
-        $this->destination = 'getCreateFields';
+        $this->destination = 'create';
         return $this;
     }
 
     public function toUpdate(): self
     {
-        $this->destination = 'getUpdateFields';
+        $this->destination = 'update';
         return $this;
     }
 
@@ -58,10 +58,10 @@ class EntryResource extends ResourceType
     protected function meta(): array
     {
         return [
-            ResourceMeta::make('item_label', $this->entryType->transformModelToString($this->model)),
+            ResourceMeta::make('item_label', $this->entryType->makeModelTitle($this->model)),
             ResourceMeta::make('entry_type', [
                 'schema'        => Collection::make($this->getSchemaFields()),
-                'panels'        => Collection::make($this->entryType->schema()->getPanels()),
+                'panels'        => Collection::make($this->getSchemaPanels()),
                 'singular_name' => $this->entryType->name(),
                 'plural_name'   => $this->entryType->pluralName(),
                 'identifier'    => $this->entryType->identifier(),
@@ -78,11 +78,25 @@ class EntryResource extends ResourceType
         ];
     }
 
-    /**
-     * @return mixed
-     */
     private function getSchemaFields()
     {
-        return $this->entryType->schema()->{$this->destination}();
+        if ($this->destination === 'update') {
+            return $this->entryType->schema()->getUpdateFields();
+        }
+
+        if ($this->destination === 'create') {
+            return $this->entryType->schema()->getCreateFields();
+        }
+
+        return $this->entryType->schema()->getIndexFields();
+    }
+
+    private function getSchemaPanels()
+    {
+        if ($this->destination === 'index') {
+            return [];
+        }
+
+        return $this->entryType->schema()->getPanels();
     }
 }

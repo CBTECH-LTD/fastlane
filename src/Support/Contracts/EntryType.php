@@ -21,19 +21,13 @@ interface EntryType
 
     public function model(): string;
 
+    public function newModelInstance(): Model;
+
     public function apiResource(): string;
 
     public function policy(): ?string;
 
     public function fields(): array;
-
-    public function allFields(): array;
-
-    public function fieldsOnIndex(): array;
-
-    public function fieldsOnCreate(): array;
-
-    public function fieldsOnUpdate(): array;
 
     public function schema(): EntrySchema;
 
@@ -51,5 +45,5 @@ interface EntryType
 
     public function install(): void;
 
-    public function transformModelToString(Model $model): string;
+    public function makeModelTitle(Model $model): string;
 }

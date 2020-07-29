@@ -128,7 +128,7 @@ abstract class RelationField extends BaseSchemaField
         return $this->relatedEntryType->getItems()->map(function (Model $model) use ($entryType) {
             return SelectOption::make(
                 $model->getKey(),
-                $entryType->transformModelToString($model)
+                $entryType->makeModelTitle($model)
             );
         });
     }

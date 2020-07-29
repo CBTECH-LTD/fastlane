@@ -11,7 +11,6 @@ use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -119,46 +118,15 @@ abstract class EntryType implements EntryTypeContract
         return [];
     }
 
-    public function allFields(): array
-    {
-        return Collection::make($this->fields())
-            ->flatMap(function (SchemaField $field) {
-                if ($field instanceof FieldPanel) {
-                    return $field->getFields();
-                }
-
-                return [$field];
-            })->all();
-    }
-
-    public function fieldsOnIndex(): array
-    {
-        return Collection::make($this->allFields())
-            ->filter(fn($f) => $f instanceof WithVisibility && $f->isShownOnIndex())
-            ->all();
-    }
-
-    public function fieldsOnCreate(): array
-    {
-        return Collection::make($this->allFields())
-            ->filter(fn($f) => $f instanceof WithVisibility && $f->isShownOnCreate())
-            ->all();
-    }
-
-    public function fieldsOnUpdate(): array
-    {
-        return Collection::make($this->allFields())
-            ->filter(fn($f) => $f instanceof WithVisibility && $f->isShownOnUpdate())
-            ->all();
-    }
-
-    public function transformModelToString(Model $model): string
+    public function makeModelTitle(Model $model): string
     {
         if (method_exists($model, 'toString')) {
             return $model->toString();
         }
 
-        $field = $this->allFields()[0];
+        $field = Collection::make($this->fields())->flatMap(
+            fn(SchemaField $f) => $f instanceof FieldPanel ? $f->getFields() : [$f]
+        )->first();
 
         return $field->resolveValue($model)[$field->getName()];
     }
@@ -258,7 +226,7 @@ abstract class EntryType implements EntryTypeContract
         return $entry;
     }
 
-    protected function newModelInstance(): Model
+    public function newModelInstance(): Model
     {
         return app()->make($this->model());
     }

@@ -6,74 +6,115 @@ use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility;
+use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class EntrySchema implements Contracts\EntrySchema
 {
     private EntryTypeContract $entryType;
     private EntryRequest $request;
-    private array $allFields = [];
-    private array $indexFields = [];
-    private array $createFields = [];
-    private array $updateFields = [];
-    private array $panels = [];
+    private Collection $cache;
 
     public function __construct(EntryTypeContract $entryType)
     {
         $this->entryType = $entryType;
+        $this->cache = new Collection;
     }
 
     public function resolve(EntryRequest $request): self
     {
         $this->request = $request;
-
-        $this->allFields = $this->build($this->entryType->allFields());
-        $this->indexFields = $this->build($this->entryType->fieldsOnIndex());
-        $this->createFields = $this->build($this->entryType->fieldsOnCreate());
-        $this->updateFields = $this->build($this->entryType->fieldsOnUpdate());
-
         return $this;
     }
 
     public function getFields(): array
     {
-        return $this->allFields;
+        return $this->fromCache('all')->all();
     }
 
     public function getIndexFields(): array
     {
-        return $this->indexFields;
+        return $this->fromCache('index')->all();
     }
 
     public function getCreateFields(): array
     {
-        return $this->createFields;
+        return $this->fromCache('create')->all();
     }
 
     public function getUpdateFields(): array
     {
-        return $this->updateFields;
+        return $this->fromCache('update')->all();
     }
 
     public function getPanels(): array
     {
-        return [];
+        return Collection::make($this->entryType->fields())
+            ->filter(fn(SchemaField $f) => $f instanceof FieldPanel)
+            ->all();
     }
 
     public function findField(string $name): SchemaField
     {
-        return Arr::get($this->allFields, $name);
+        return Arr::get($this->fromCache('all'), $name);
     }
 
-    private function build(array $fields): array
+    private function fromCache(string $cache): Collection
     {
-        return Collection::make($fields)
-            ->filter(fn($field) => $field instanceof Resolvable)
-            ->map(function ($field) {
-                $field->resolve($this->entryType, $this->request);
-                return $field;
-            })
-            ->all();
+        if (! $this->cache->has($cache)) {
+            $method = 'build' . Str::ucfirst($cache);
+
+            $data = $this->{$method}();
+
+            $this->cache->put($cache, $data);
+        }
+
+        return $this->cache->get($cache);
+    }
+
+    private function build(Collection $fields): Collection
+    {
+        return $fields->flatMap(function ($field) {
+            if ($field instanceof Resolvable) {
+                return $field->resolve($this->entryType, $this->request);
+            }
+
+            return null;
+        });
+    }
+
+    private function buildAll(): Collection
+    {
+        return $this->build(Collection::make($this->entryType->fields()));
+    }
+
+    private function buildIndex(): Collection
+    {
+        return $this->build(
+            Collection::make($this->fromCache('all'))->filter(
+                fn($f) => $f instanceof WithVisibility && $f->isShownOnIndex()
+            )
+        );
+    }
+
+    private function buildCreate(): Collection
+    {
+        return $this->build(
+            Collection::make($this->fromCache('all'))->filter(
+                fn($f) => $f instanceof WithVisibility && $f->isShownOnCreate()
+            )
+        );
+    }
+
+    private function buildUpdate(): Collection
+    {
+        return $this->build(
+            Collection::make($this->fromCache('all'))->filter(
+                fn($f) => $f instanceof WithVisibility && $f->isShownOnUpdate()
+            )
+        );
     }
 }

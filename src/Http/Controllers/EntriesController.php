@@ -11,6 +11,7 @@ use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResourceCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -45,6 +46,7 @@ class EntriesController extends Controller
         return $this->render('Entries/Create', [
             'entryType' => [
                 'schema'        => $request->entryType()->schema()->getCreateFields(),
+                'panels'        => Collection::make($request->entryType()->schema()->getPanels()),
                 'singular_name' => $request->entryType()->name(),
                 'plural_name'   => Str::plural($request->entryType()->name()),
             ],

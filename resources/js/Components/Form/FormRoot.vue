@@ -1,40 +1,59 @@
 <template>
     <form @submit="e => $emit('submit', e)">
-        <f-boxed-card v-if="panelSlots.general.length" data-panel="general">
-            <template v-for="slotName in panelSlots.general">
-                <slot :name="slotName" />
-            </template>
-        </f-boxed-card>
-
-        <template v-if="panelSlots.panels.length">
-            <div v-for="slotName in panelSlots.panels" :key="slotName" class="w-full my-6">
-                <slot :name="slotName" />
-            </div>
-        </template>
+        <div v-for="panel in panelSlots" :key="panel.name" class="w-full my-6">
+            <f-form-field-panel :name="panel.name" :label="panel.label" :icon="panel.icon">
+                <template v-for="field in panel.fields">
+                    <component :is="field.component"
+                               :field="field"
+                               :required="field.required"
+                               :aria-required="field.required"
+                               :placeholder="field.placeholder"
+                               :aria-placeholder="field.placeholder"
+                    ></component>
+                </template>
+            </f-form-field-panel>
+        </div>
     </form>
 </template>
 
 <script>
     import each from 'lodash/each'
+    import find from 'lodash/find'
 
     export default {
         name: 'FormRoot',
 
-        data: () => ({
-            panelSlots: {
-                general: [],
-                panels: [],
+        props: {
+            panels: {
+                type: Object,
+                required: true,
+            },
+            form: {
+                type: Object,
+                required: true,
             }
+        },
+
+        data: () => ({
+            panelSlots: {},
         }),
 
         mounted () {
-            each(this.$slots, (items, key) => {
-                if (key.startsWith('generalPanel__')) {
-                    this.panelSlots.general.push(key)
-                    return
+            each(this.form.getAll(), (field) => {
+                const panelKey = field.panel || 'default_panel'
+
+                if (!this.panelSlots[panelKey]) {
+                    const panelConfig = panelKey !== 'default_panel'
+                        ? find(this.panels, p => p.name === panelKey)
+                        : { name: 'default_panel', label: '', icon: '', }
+
+                    this.$set(this.panelSlots, panelKey, {
+                        ...panelConfig,
+                        fields: [],
+                    })
                 }
 
-                this.panelSlots.panels.push(key)
+                this.panelSlots[panelKey].fields.push(field)
             })
         }
     }

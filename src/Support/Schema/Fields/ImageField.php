@@ -13,6 +13,8 @@ class ImageField extends FileField
         'images/gif',
     ];
 
+    protected int $listWidth = 150;
+
     public function getType(): string
     {
         return 'image';
@@ -32,7 +34,7 @@ class ImageField extends FileField
     protected function getTypeRules(): array
     {
         return [
-            $this->getName()=> 'url|starts_with:' . $this->getBaseImageUrl(),
+            $this->getName() => 'url|starts_with:' . $this->getBaseImageUrl(),
         ];
     }
 
@@ -59,10 +61,5 @@ class ImageField extends FileField
     protected function getBaseImageUrl()
     {
         return config('fastlane.thumbor_url');
-    }
-
-    protected function getListWidth(): int
-    {
-        return 150;
     }
 }

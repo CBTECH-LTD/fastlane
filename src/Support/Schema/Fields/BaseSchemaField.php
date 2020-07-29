@@ -11,6 +11,7 @@ use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Makeable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Migratable as MigratableContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Panelizable as PanelizableContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable as ResolvableContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\SupportModel as SupportModelContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules as WithRulesContract;
@@ -19,7 +20,7 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility as WithVis
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithValueContract, WithRulesContract, MigratableContract, SupportModelContract, WithVisibilityContract
+abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithValueContract, WithRulesContract, MigratableContract, SupportModelContract, WithVisibilityContract, PanelizableContract
 {
     use HandlesHooks, Makeable, Resolvable;
 
@@ -34,6 +35,8 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
     protected bool $showOnUpdate = true;
     protected ?string $placeholder;
     protected $default = null;
+    protected ?string $panel = null;
+    protected int $listWidth = 0;
     protected $resolveValueCallback;
     protected $fillValueCallback;
 
@@ -48,11 +51,6 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function getLabel(): string
-    {
-        return $this->label;
     }
 
     public function resolveValueUsing($callback): self
@@ -72,18 +70,15 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
         ];
     }
 
-    public function resolve(EntryTypeContract $entryType, EntryRequest $request): void
+    public function resolve(EntryTypeContract $entryType, EntryRequest $request): array
     {
         $this->resolvedConfig = Collection::make();
 
         $this->resolvedConfig->put('config', $this->resolveConfig($entryType, $request));
         $this->resolvedConfig->put('createRules', $this->resolveCreateRules($entryType, $request));
         $this->resolvedConfig->put('updateRules', $this->resolveUpdateRules($entryType, $request));
-    }
 
-    public function getPlaceholder(): string
-    {
-        return $this->placeholder ?? $this->label;
+        return [$this];
     }
 
     public function setPlaceholder(string $placeholder): self
@@ -92,30 +87,21 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
         return $this;
     }
 
-    public function isRequired(): bool
-    {
-        return $this->required;
-    }
-
     public function required(bool $required = true): self
     {
         $this->required = $required;
         return $this;
     }
 
-    public function hasUniqueRule(): bool
-    {
-        return $this->unique instanceof Unique;
-    }
-
-    public function getUniqueRule(): ?Unique
-    {
-        return $this->unique;
-    }
-
     public function unique(Unique $unique): self
     {
         $this->unique = $unique;
+        return $this;
+    }
+
+    public function setDefault($default): self
+    {
+        $this->default = $default;
         return $this;
     }
 
@@ -145,17 +131,6 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
     public function setUpdateRules(string $rules): self
     {
         $this->updateRules = $rules;
-        return $this;
-    }
-
-    public function getDefault()
-    {
-        return $this->default;
-    }
-
-    public function setDefault($default): self
-    {
-        $this->default = $default;
         return $this;
     }
 
@@ -219,13 +194,13 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
         return [
             'name'        => $this->getName(),
             'type'        => $this->getType(),
-            'label'       => $this->getLabel(),
-            'placeholder' => $this->getPlaceholder(),
-            'default'     => $this->getDefault(),
-            'required'    => $this->isRequired(),
-            'config'      => array_merge([
-                'listWidth' => $this->getListWidth(),
-            ], $this->getConfig()),
+            'label'       => $this->label,
+            'placeholder' => $this->placeholder ?? $this->label,
+            'default'     => $this->default,
+            'required'    => $this->required,
+            'listWidth'   => $this->listWidth,
+            'panel'       => $this->panel,
+            'config'      => $this->getConfig(),
         ];
     }
 
@@ -233,11 +208,11 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
     {
         $str = [$this->buildMigrationMethodString()];
 
-        if (! $this->isRequired()) {
+        if (! $this->required) {
             $str[] = 'nullable()';
         }
 
-        if ($this->hasUniqueRule()) {
+        if ($this->unique instanceof Unique) {
             $str[] = 'unique()';
         }
 
@@ -253,14 +228,20 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
         return [$this->getName() => null];
     }
 
+    public function inPanel(FieldPanel $panel): self
+    {
+        $this->panel = $panel->getName();
+        return $this;
+    }
+
     protected function getBaseRules(): string
     {
-        $rules = $this->isRequired()
+        $rules = $this->required
             ? ['required']
             : ['nullable'];
 
-        if ($this->hasUniqueRule()) {
-            $rules[] = (string)$this->getUniqueRule();
+        if ($this->unique instanceof Unique) {
+            $rules[] = (string)$this->unique;
         }
 
         return implode('|', $rules);
@@ -269,11 +250,6 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
     protected function getTypeRules(): array
     {
         return [];
-    }
-
-    protected function getListWidth(): int
-    {
-        return 0;
     }
 
     protected function getConfig(): array
@@ -298,29 +274,6 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
             })->implode(', ');
 
         return "{$methodName}('{$this->getName()}'{$methodParams})";
-    }
-
-    /**
-     * @param $str
-     * @return string
-     */
-    private function escapeString($str): string
-    {
-        if (is_null($str)) {
-            return 'null';
-        }
-
-        if ($str === true) {
-            return 'true';
-        }
-
-        if ($str === false) {
-            return 'false';
-        }
-
-        return is_string($str)
-            ? "'{$str}'"
-            : $str;
     }
 
     protected function getResolvedConfig(string $config, $default = null)
@@ -357,5 +310,24 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
     protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
     {
         return [];
+    }
+
+    private function escapeString($str): string
+    {
+        if (is_null($str)) {
+            return 'null';
+        }
+
+        if ($str === true) {
+            return 'true';
+        }
+
+        if ($str === false) {
+            return 'false';
+        }
+
+        return is_string($str)
+            ? "'{$str}'"
+            : $str;
     }
 }

@@ -7,7 +7,7 @@
 
         <f-table-card :items="items.data">
             <template v-slot:columns>
-                <th v-for="field in listSchema" :key="field.name" class="table__column" :width="field.config.listWidth > 0 ? field.config.listWidth : 'auto'">
+                <th v-for="field in listSchema" :key="field.name" class="table__column" :width="field.listWidth || 'auto'">
                     {{ field.label }}
                 </th>
                 <th width="160"></th>

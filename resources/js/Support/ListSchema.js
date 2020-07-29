@@ -7,10 +7,7 @@ import components from './utils/schemaComponents'
 export default function ListSchema (schema) {
     each(schema, field => {
         this[field.name] = {
-            type: field.type,
-            name: field.name,
-            label: field.label,
-            config: field.config,
+            ...field,
             component: components[camelCase(field.type)].list,
         }
     })
