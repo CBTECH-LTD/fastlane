@@ -7,6 +7,7 @@ import camelCase from 'lodash/camelCase'
 import components from './utils/schemaComponents'
 import FormObject from './FormObject'
 import { FormFieldFactory } from './FormField'
+import schemaComponents from './utils/schemaComponents'
 
 /**
  * Define methods to be accessible on the instance of FormSchema.
@@ -64,7 +65,7 @@ function generateMethods (form) {
  * @param schema
  */
 export function FormSchemaFactory (data, schema) {
-    let __fields = {}
+    const __fields = {}
 
     each(schema, field => {
         const component = components[camelCase(field.type)].form

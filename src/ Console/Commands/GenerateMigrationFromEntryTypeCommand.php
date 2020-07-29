@@ -90,7 +90,7 @@ class GenerateMigrationFromEntryTypeCommand extends Command
         $className = 'Create' . $entryType->pluralName() . 'Table';
         $table = Str::plural(Str::snake($entryType->identifier(), '_'));
 
-        $fields = Collection::make($entryType->schema()->all())
+        $fields = Collection::make($entryType->schema()->getFields())
             ->filter(function (SchemaField $field) {
                 return $field->getName() !== 'is_active';
             });

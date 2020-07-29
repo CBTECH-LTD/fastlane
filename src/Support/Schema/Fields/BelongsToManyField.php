@@ -12,7 +12,7 @@ class BelongsToManyField extends RelationField
     protected $default = [];
     protected bool $multiple = true;
 
-    public function readValue(Model $model): array
+    public function resolveValue(Model $model): array
     {
         $values = $model->{$this->getRelationshipName()}->map(
             fn(Model $related) => SelectOption::make(

@@ -63,6 +63,7 @@ export function FormFieldFactory (field, component, value, customData = {}) {
     return Vue.observable({
         component,
         value,
+        type: field.type,
         name: field.name,
         label: field.label,
         placeholder: field.placeholder,
@@ -70,7 +71,6 @@ export function FormFieldFactory (field, component, value, customData = {}) {
         required: field.required,
         config: field.config,
         commitCallback: null,
-        ...customData,
         setCommitCallback (callbackFn) {
             this.commitCallback = callbackFn
         },
@@ -80,5 +80,6 @@ export function FormFieldFactory (field, component, value, customData = {}) {
         isDirty () {
             return this.value !== this.originalValue
         },
+        ...customData,
     })
 }

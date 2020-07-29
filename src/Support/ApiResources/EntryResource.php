@@ -29,19 +29,19 @@ class EntryResource extends ResourceType
 
     public function toIndex(): self
     {
-        $this->destination = 'toIndex';
+        $this->destination = 'getIndexFields';
         return $this;
     }
 
     public function toCreate(): self
     {
-        $this->destination = 'toCreate';
+        $this->destination = 'getCreateFields';
         return $this;
     }
 
     public function toUpdate(): self
     {
-        $this->destination = 'toUpdate';
+        $this->destination = 'getUpdateFields';
         return $this;
     }
 
@@ -51,7 +51,7 @@ class EntryResource extends ResourceType
 
         return Collection::make($fields)
             ->mapWithKeys(
-                fn(SchemaField $field) => $field->readValue($this->model)
+                fn(SchemaField $field) => $field->resolveValue($this->model)
             )->all();
     }
 
@@ -61,6 +61,7 @@ class EntryResource extends ResourceType
             ResourceMeta::make('item_label', $this->entryType->transformModelToString($this->model)),
             ResourceMeta::make('entry_type', [
                 'schema'        => Collection::make($this->getSchemaFields()),
+                'panels'        => Collection::make($this->entryType->schema()->getPanels()),
                 'singular_name' => $this->entryType->name(),
                 'plural_name'   => $this->entryType->pluralName(),
                 'identifier'    => $this->entryType->identifier(),

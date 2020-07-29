@@ -7,7 +7,9 @@ namespace CbtechLtd\Fastlane\Support\Eloquent\Concerns;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
 use CbtechLtd\Fastlane\Support\Schema\Fields\RelationField;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 
@@ -34,53 +36,69 @@ trait RelatesToEntryType
 
     public function initializeRelatesToEntryType(): void
     {
-        if ($this->attributesFromSchema) {
-            $this->loadAttributesFromEntrySchema(
-                $this->getEntryType()->fields()
-            );
+        if (! $this->attributesFromSchema && ! $this->relationsFromSchema) {
+            return;
         }
 
-        if ($this->relationsFromSchema) {
-            $this->loadRelationsFromEntrySchema(
-                $this->getEntryType()->fields()
-            );
+        $allFields = Collection::make($this->getEntryType()->fields())
+            ->map(
+                function (SchemaField $field) {
+                    if ($field instanceof FieldPanel) {
+                        return $field->getFields();
+                    }
+
+                    return [$field];
+                }
+            )
+            ->flatten(0)
+            ->mapToGroups(function (SchemaField $field) {
+                $group = $field instanceof RelationField
+                    ? 'relations'
+                    : 'attributes';
+
+                return [$group => $field];
+            });
+
+        if ($this->attributesFromSchema && $allFields->has('attributes')) {
+            $this->loadAttributesFromEntrySchema($allFields->get('attributes'));
+        }
+
+        if ($this->relationsFromSchema && $allFields->has('relations')) {
+            $this->loadRelationsFromEntrySchema($allFields->get('relations'));
         }
     }
 
     /**
-     * @param SchemaField[] $fields
+     * @param Collection<SchemaField> $fields
      */
-    private function loadAttributesFromEntrySchema(array $fields): void
+    private function loadAttributesFromEntrySchema(Collection $fields): void
     {
-        $fields = Collection::make($fields)
-            ->mapWithKeys(function (SchemaField $ft) {
-                if ($ft->isShownOnCreate() || $ft->isShownOnUpdate()) {
-                    return $ft->toModelAttribute();
-                }
+        $fields = $fields->mapWithKeys(function (SchemaField $ft) {
+            if ($ft->isShownOnCreate() || $ft->isShownOnUpdate()) {
+                return $ft->toModelAttribute();
+            }
 
-                return [];
-            });
+            return [];
+        });
 
         $this->mergeFillable($fields->except($this->fillable)->keys()->all());
         $this->mergeCasts($fields->except(array_keys($this->casts))->filter()->all());
     }
 
     /**
-     * @param SchemaField[] $fields
+     * @param Collection<SchemaField> $fields
      */
-    private function loadRelationsFromEntrySchema(array $fields): void
+    private function loadRelationsFromEntrySchema(Collection $fields): void
     {
-        Collection::make($fields)
-            ->filter(fn(SchemaField $ft) => $ft instanceof RelationField)
-            ->each(function (RelationField $ft) {
-                // We dynamically add a relation to the model if there's no
-                // method declared with the same name.
-                if (! method_exists($this, $ft->getRelationshipName())) {
-                    static::resolveRelationUsing(
-                        $ft->getRelationshipName(),
-                        $ft->getRelationshipMethod()
-                    );
-                }
-            });
+        $fields->each(function (RelationField $ft) {
+            // We dynamically add a relation to the model if there's no
+            // method declared with the same name.
+            if (! method_exists($this, $ft->getRelationshipName())) {
+                static::resolveRelationUsing(
+                    $ft->getRelationshipName(),
+                    $ft->getRelationshipMethod()
+                );
+            }
+        });
     }
 }

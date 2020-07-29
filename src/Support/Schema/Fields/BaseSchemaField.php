@@ -2,28 +2,26 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
+use CbtechLtd\Fastlane\EntryTypes\Concerns\Resolvable;
 use CbtechLtd\Fastlane\Exceptions\UnresolvedException;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
+use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
-use CbtechLtd\Fastlane\Support\HandlesHooks;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Makeable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Migratable as MigratableContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable as ResolvableContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\SupportModel as SupportModelContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules as WithRulesContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithValue as WithValueContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility as WithVisibilityContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-abstract class BaseSchemaField implements SchemaField
+abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithValueContract, WithRulesContract, MigratableContract, SupportModelContract, WithVisibilityContract
 {
-    use HandlesHooks;
-
-    /** Parameters: EntryRequest $request, Model $entry, array $fields, array $data */
-    const HOOK_BEFORE_HYDRATING = 'beforeHydrating';
-    /** Parameters: EntryRequest $request, Model $entry, array $fields, array $data */
-    const HOOK_AFTER_HYDRATING = 'afterHydrating';
-
-    protected array $hooks = [
-        self::HOOK_BEFORE_HYDRATING => [],
-        self::HOOK_AFTER_HYDRATING  => [],
-    ];
+    use HandlesHooks, Makeable, Resolvable;
 
     protected string $name;
     protected string $label;
@@ -36,8 +34,8 @@ abstract class BaseSchemaField implements SchemaField
     protected bool $showOnUpdate = true;
     protected ?string $placeholder;
     protected $default = null;
-    protected $readCallback;
-    protected $hydrateCallback;
+    protected $resolveValueCallback;
+    protected $fillValueCallback;
 
     protected ?Collection $resolvedConfig = null;
 
@@ -45,11 +43,6 @@ abstract class BaseSchemaField implements SchemaField
     {
         $this->name = $name;
         $this->label = $label;
-    }
-
-    public static function make(string $name, string $label): self
-    {
-        return new static($name, $label);
     }
 
     public function getName(): string
@@ -62,16 +55,16 @@ abstract class BaseSchemaField implements SchemaField
         return $this->label;
     }
 
-    public function readValueUsing($callback): self
+    public function resolveValueUsing($callback): self
     {
-        $this->readCallback = $callback;
+        $this->resolveValueCallback = $callback;
         return $this;
     }
 
-    public function readValue(Model $model): array
+    public function resolveValue(Model $model): array
     {
-        if ($this->readCallback) {
-            return call_user_func($this->readCallback, $model);
+        if ($this->resolveValueCallback) {
+            return call_user_func($this->resolveValueCallback, $model);
         }
 
         return [
@@ -133,7 +126,7 @@ abstract class BaseSchemaField implements SchemaField
         return $this;
     }
 
-    public function getCreateRules(): string
+    public function getCreateRules(): array
     {
         return $this->getResolvedConfig('createRules');
     }
@@ -144,7 +137,7 @@ abstract class BaseSchemaField implements SchemaField
         return $this;
     }
 
-    public function getUpdateRules(): string
+    public function getUpdateRules(): array
     {
         return $this->getResolvedConfig('updateRules');
     }
@@ -205,19 +198,19 @@ abstract class BaseSchemaField implements SchemaField
         return $this->showOnUpdate;
     }
 
-    public function hydrateValue($model, $value, EntryRequest $request): void
+    public function fillModel($model, $value, EntryRequest $request): void
     {
-        if (is_callable($this->hydrateCallback)) {
-            call_user_func($this->hydrateCallback, $model, $value, $request);
+        if (is_callable($this->fillValueCallback)) {
+            call_user_func($this->fillValueCallback, $model, $value, $request);
             return;
         }
 
         $model->{$this->getName()} = $value;
     }
 
-    public function hydrateUsing($callback): self
+    public function fillModelUsing($callback): self
     {
-        $this->hydrateCallback = $callback;
+        $this->fillValueCallback = $callback;
         return $this;
     }
 
@@ -339,22 +332,26 @@ abstract class BaseSchemaField implements SchemaField
         return $this->resolvedConfig->get($config, $default);
     }
 
-    protected function resolveCreateRules(EntryTypeContract $entryType, EntryRequest $request): string
+    protected function resolveCreateRules(EntryTypeContract $entryType, EntryRequest $request): array
     {
         $baseRules = $this->getBaseRules();
 
         $rules = array_merge([$baseRules], $this->getTypeRules(), [$this->createRules]);
 
-        return Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|');
+        return [
+            $this->getName() => Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|'),
+        ];
     }
 
-    protected function resolveUpdateRules(EntryTypeContract $entryType, EntryRequest $request): string
+    protected function resolveUpdateRules(EntryTypeContract $entryType, EntryRequest $request): array
     {
         $baseRules = $this->getBaseRules();
 
         $rules = array_merge(['sometimes', $baseRules], $this->getTypeRules(), [$this->updateRules]);
 
-        return Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|');
+        return [
+            $this->getName() => Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|'),
+        ];
     }
 
     protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array

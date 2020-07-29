@@ -37,9 +37,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'BoxedCard',
   props: {
+    icon: {
+      type: String,
+      "default": ''
+    },
     spaceless: {
       type: Boolean,
       "default": false
@@ -203,6 +210,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _Mixins_FormInput__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Mixins/FormInput */ "./resources/js/Components/Mixins/FormInput.js");
+//
+//
+//
 //
 //
 //
@@ -382,12 +392,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
 
 
 
@@ -400,7 +404,9 @@ __webpack_require__.r(__webpack_exports__);
      * @param {FormObject} formObject
      */
     commit: function commit(formObject) {
-      formObject.put(this.field.name, this.field.value);
+      lodash_each__WEBPACK_IMPORTED_MODULE_3___default()(this.field.childrenSchema.getAll(), function (child) {
+        formObject.put(child.name, child.value);
+      });
     },
     onInput: function onInput() {
       var data = {};
@@ -420,7 +426,65 @@ __webpack_require__.r(__webpack_exports__);
       childrenData[c.name] = data[c.name];
     });
     return Object(_Support_FormField__WEBPACK_IMPORTED_MODULE_1__["FormFieldFactory"])(field, component, childrenData, {
-      childrenSchema: Object(_Support_FormSchema__WEBPACK_IMPORTED_MODULE_2__["FormSchemaFactory"])(childrenData, field.config.children)
+      childrenSchema: Object(_Support_FormSchema__WEBPACK_IMPORTED_MODULE_2__["FormSchemaFactory"])(childrenData, field.config.children),
+      isDirty: function isDirty() {
+        return this.childrenSchema.isDirty();
+      }
+    });
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/Form/FormRoot.vue?vue&type=script&lang=js&":
+/*!************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Components/Form/FormRoot.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var lodash_each__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/each */ "./node_modules/lodash/each.js");
+/* harmony import */ var lodash_each__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_each__WEBPACK_IMPORTED_MODULE_0__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'FormRoot',
+  data: function data() {
+    return {
+      panelSlots: {
+        general: [],
+        panels: []
+      }
+    };
+  },
+  mounted: function mounted() {
+    var _this = this;
+
+    lodash_each__WEBPACK_IMPORTED_MODULE_0___default()(this.$slots, function (items, key) {
+      if (key.startsWith('generalPanel__')) {
+        _this.panelSlots.general.push(key);
+
+        return;
+      }
+
+      _this.panelSlots.panels.push(key);
     });
   }
 });
@@ -447,6 +511,9 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+//
+//
+//
 //
 //
 //
@@ -549,6 +616,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'RadioInput',
@@ -578,6 +648,9 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+//
+//
+//
 //
 //
 //
@@ -716,6 +789,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 
 
@@ -795,6 +871,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'StringInput',
@@ -819,6 +898,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'TextInput',
@@ -837,6 +919,9 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Mixins_FormInput__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Mixins/FormInput */ "./resources/js/Components/Mixins/FormInput.js");
+//
+//
+//
 //
 //
 //
@@ -1982,13 +2067,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2012,6 +2090,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   methods: {
+    getFieldSlot: function getFieldSlot(field) {
+      if (field.type === 'panel') {
+        return "panels__".concat(field.name);
+      }
+
+      return "generalPanel__".concat(field.name);
+    },
     submitForm: function submitForm() {
       var _this = this;
 
@@ -29398,8 +29483,23 @@ var render = function() {
               staticClass:
                 "p-4 border-b border-gray-300 text-gray-700 font-semibold text-lg tracking-wider"
             },
-            [_vm._t("title")],
-            2
+            [
+              _c(
+                "div",
+                { staticClass: "flex items-center" },
+                [
+                  _vm.icon.length
+                    ? _c("f-icon", {
+                        staticClass: "mr-4 text-xl",
+                        attrs: { name: _vm.icon }
+                      })
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm._t("title")
+                ],
+                2
+              )
+            ]
           )
         : _vm._e(),
       _vm._v(" "),
@@ -29514,22 +29614,49 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "w-full" }, [
-    _c(
-      "input",
-      _vm._b(
-        {
-          ref: "datePicker",
-          staticClass: "w-full form-input",
-          attrs: { type: "text", placeholder: _vm.defaultPlaceholder },
-          domProps: { value: _vm.field.value }
-        },
-        "input",
-        _vm.$attrs,
-        false
+  return _c(
+    "f-form-field",
+    {
+      attrs: {
+        errors: _vm.$page.errors.get(_vm.field.name),
+        required: _vm.field.required
+      },
+      scopedSlots: _vm._u(
+        [
+          _vm.field.label
+            ? {
+                key: "label",
+                fn: function() {
+                  return [_vm._v(_vm._s(_vm.field.label))]
+                },
+                proxy: true
+              }
+            : null
+        ],
+        null,
+        true
       )
-    )
-  ])
+    },
+    [
+      _vm._v(" "),
+      _c("div", { staticClass: "w-full" }, [
+        _c(
+          "input",
+          _vm._b(
+            {
+              ref: "datePicker",
+              staticClass: "w-full form-input",
+              attrs: { type: "text", placeholder: _vm.defaultPlaceholder },
+              domProps: { value: _vm.field.value }
+            },
+            "input",
+            _vm.$attrs,
+            false
+          )
+        )
+      ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -29619,66 +29746,97 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c(
-    "div",
-    { staticClass: "w-full" },
+    "f-boxed-card",
+    {
+      attrs: { "data-panel": _vm.field.name, icon: _vm.field.config.icon },
+      scopedSlots: _vm._u([
+        {
+          key: "title",
+          fn: function() {
+            return [_vm._v(_vm._s(_vm.field.label))]
+          },
+          proxy: true
+        }
+      ])
+    },
     [
-      _c(
-        "f-boxed-card",
-        [
-          _vm._l(_vm.field.childrenSchema.getAll(), function(field) {
-            return [
-              _c(
-                "f-form-field",
-                {
-                  attrs: {
-                    errors: _vm.$page.errors.get(field.name),
-                    required: field.requuired
-                  },
-                  scopedSlots: _vm._u(
-                    [
-                      field.label
-                        ? {
-                            key: "label",
-                            fn: function() {
-                              return [
-                                _vm._v(
-                                  "\n                    " +
-                                    _vm._s(field.label) +
-                                    "\n                "
-                                )
-                              ]
-                            },
-                            proxy: true
-                          }
-                        : null
-                    ],
-                    null,
-                    true
-                  )
-                },
-                [
-                  _vm._v(" "),
-                  _c(field.component, {
-                    tag: "component",
-                    attrs: {
-                      field: field,
-                      required: field.required,
-                      "aria-required": field.required,
-                      placeholder: field.placeholder,
-                      "aria-placeholder": field.placeholder
-                    },
-                    on: { input: _vm.onInput }
-                  })
-                ],
-                1
-              )
-            ]
+      _vm._v(" "),
+      _vm._l(_vm.field.childrenSchema.getAll(), function(child) {
+        return [
+          _c(child.component, {
+            tag: "component",
+            attrs: {
+              field: child,
+              required: child.required,
+              "aria-required": child.required,
+              placeholder: child.placeholder,
+              "aria-placeholder": child.placeholder
+            },
+            on: { input: _vm.onInput }
           })
-        ],
-        2
-      )
+        ]
+      })
     ],
-    1
+    2
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/Form/FormRoot.vue?vue&type=template&id=4f263416&":
+/*!****************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Components/Form/FormRoot.vue?vue&type=template&id=4f263416& ***!
+  \****************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "form",
+    {
+      on: {
+        submit: function(e) {
+          return _vm.$emit("submit", e)
+        }
+      }
+    },
+    [
+      _vm.panelSlots.general.length
+        ? _c(
+            "f-boxed-card",
+            { attrs: { "data-panel": "general" } },
+            [
+              _vm._l(_vm.panelSlots.general, function(slotName) {
+                return [_vm._t(slotName)]
+              })
+            ],
+            2
+          )
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.panelSlots.panels.length
+        ? _vm._l(_vm.panelSlots.panels, function(slotName) {
+            return _c(
+              "div",
+              { key: slotName, staticClass: "w-full my-6" },
+              [_vm._t(slotName)],
+              2
+            )
+          })
+        : _vm._e()
+    ],
+    2
   )
 }
 var staticRenderFns = []
@@ -29703,50 +29861,77 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "w-full relative" }, [
-    _c("input", {
-      ref: "fileInput",
-      staticClass: "hidden w-0 h-0",
-      attrs: { type: "file" },
-      on: { change: _vm.uploadFile }
-    }),
-    _vm._v(" "),
-    _c(
-      "div",
-      _vm._b(
-        {
-          staticClass:
-            "w-32 h-32 form-input cursor-pointer overflow-hidden flex items-center justify-center",
-          on: { click: _vm.openFileDialog }
-        },
-        "div",
-        _vm.$attrs,
-        false
-      ),
-      [
-        _vm.field.value
-          ? _c("img", {
-              staticClass: "w-full",
-              attrs: { src: _vm.field.value, alt: "" }
-            })
-          : _c(
-              "span",
-              { staticClass: "flex flex-col items-center justify-center" },
-              [
-                _c("f-icon", {
-                  staticClass: "text-2xl text-gray-600",
-                  attrs: { name: "upload" }
-                }),
-                _vm._v(" "),
-                _c("span", { staticClass: "mt-2 text-xs text-gray-600" }, [
-                  _vm._v("Upload image")
-                ])
-              ],
-              1
-            )
-      ]
-    )
-  ])
+  return _c(
+    "f-form-field",
+    {
+      attrs: {
+        errors: _vm.$page.errors.get(_vm.field.name),
+        required: _vm.field.required
+      },
+      scopedSlots: _vm._u(
+        [
+          _vm.field.label
+            ? {
+                key: "label",
+                fn: function() {
+                  return [_vm._v(_vm._s(_vm.field.label))]
+                },
+                proxy: true
+              }
+            : null
+        ],
+        null,
+        true
+      )
+    },
+    [
+      _vm._v(" "),
+      _c("div", { staticClass: "w-full relative" }, [
+        _c("input", {
+          ref: "fileInput",
+          staticClass: "hidden w-0 h-0",
+          attrs: { type: "file" },
+          on: { change: _vm.uploadFile }
+        }),
+        _vm._v(" "),
+        _c(
+          "div",
+          _vm._b(
+            {
+              staticClass:
+                "w-32 h-32 form-input cursor-pointer overflow-hidden flex items-center justify-center",
+              on: { click: _vm.openFileDialog }
+            },
+            "div",
+            _vm.$attrs,
+            false
+          ),
+          [
+            _vm.field.value
+              ? _c("img", {
+                  staticClass: "w-full",
+                  attrs: { src: _vm.field.value, alt: "" }
+                })
+              : _c(
+                  "span",
+                  { staticClass: "flex flex-col items-center justify-center" },
+                  [
+                    _c("f-icon", {
+                      staticClass: "text-2xl text-gray-600",
+                      attrs: { name: "upload" }
+                    }),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "mt-2 text-xs text-gray-600" }, [
+                      _vm._v("Upload image")
+                    ])
+                  ],
+                  1
+                )
+          ]
+        )
+      ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -29770,28 +29955,55 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "w-full flex items-center my-2" }, [
-    _c(
-      "input",
-      _vm._b(
-        {
-          staticClass: "form-radio",
-          attrs: { type: "radio" },
-          domProps: { checked: _vm.field.value },
-          on: {
-            input: function(ev) {
-              return _vm.onInput(ev.target.checked)
-            }
-          }
-        },
-        "input",
-        _vm.$attrs,
-        false
+  return _c(
+    "f-form-field",
+    {
+      attrs: {
+        errors: _vm.$page.errors.get(_vm.field.name),
+        required: _vm.field.required
+      },
+      scopedSlots: _vm._u(
+        [
+          _vm.field.label
+            ? {
+                key: "label",
+                fn: function() {
+                  return [_vm._v(_vm._s(_vm.field.label))]
+                },
+                proxy: true
+              }
+            : null
+        ],
+        null,
+        true
       )
-    ),
-    _vm._v(" "),
-    _c("span", { staticClass: "ml-2" }, [_vm._t("default")], 2)
-  ])
+    },
+    [
+      _vm._v(" "),
+      _c("div", { staticClass: "w-full flex items-center my-2" }, [
+        _c(
+          "input",
+          _vm._b(
+            {
+              staticClass: "form-radio",
+              attrs: { type: "radio" },
+              domProps: { checked: _vm.field.value },
+              on: {
+                input: function(ev) {
+                  return _vm.onInput(ev.target.checked)
+                }
+              }
+            },
+            "input",
+            _vm.$attrs,
+            false
+          )
+        ),
+        _vm._v(" "),
+        _c("span", { staticClass: "ml-2" }, [_vm._t("default")], 2)
+      ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -29816,31 +30028,58 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c(
-    "div",
-    { staticClass: "w-full" },
-    [
-      _c(
-        "f-trix",
-        _vm._b(
-          {
-            attrs: {
-              name: "richEditor",
-              value: _vm.field.value,
-              "files-enabled": _vm.field.config.acceptFiles
-            },
-            on: {
-              change: _vm.onInput,
-              "file-add": _vm.onFileAdded,
-              "file-remove": _vm.onFileRemoved
-            }
-          },
-          "f-trix",
-          _vm.$attrs,
-          false
-        )
+    "f-form-field",
+    {
+      attrs: {
+        errors: _vm.$page.errors.get(_vm.field.name),
+        required: _vm.field.required
+      },
+      scopedSlots: _vm._u(
+        [
+          _vm.field.label
+            ? {
+                key: "label",
+                fn: function() {
+                  return [_vm._v(_vm._s(_vm.field.label))]
+                },
+                proxy: true
+              }
+            : null
+        ],
+        null,
+        true
       )
-    ],
-    1
+    },
+    [
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "w-full" },
+        [
+          _c(
+            "f-trix",
+            _vm._b(
+              {
+                attrs: {
+                  name: "richEditor",
+                  value: _vm.field.value,
+                  "files-enabled": _vm.field.config.acceptFiles
+                },
+                on: {
+                  change: _vm.onInput,
+                  "file-add": _vm.onFileAdded,
+                  "file-remove": _vm.onFileRemoved
+                }
+              },
+              "f-trix",
+              _vm.$attrs,
+              false
+            )
+          )
+        ],
+        1
+      )
+    ]
   )
 }
 var staticRenderFns = []
@@ -29866,26 +30105,53 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c(
-    "div",
-    { staticClass: "w-full" },
+    "f-form-field",
+    {
+      attrs: {
+        errors: _vm.$page.errors.get(_vm.field.name),
+        required: _vm.field.required
+      },
+      scopedSlots: _vm._u(
+        [
+          _vm.field.label
+            ? {
+                key: "label",
+                fn: function() {
+                  return [_vm._v(_vm._s(_vm.field.label))]
+                },
+                proxy: true
+              }
+            : null
+        ],
+        null,
+        true
+      )
+    },
     [
-      _c("v-select", {
-        staticClass: "form-input",
-        attrs: {
-          clearable: false,
-          options: _vm.field.config.options,
-          multiple: _vm.field.config.multiple
-        },
-        model: {
-          value: _vm.field.value,
-          callback: function($$v) {
-            _vm.$set(_vm.field, "value", $$v)
-          },
-          expression: "field.value"
-        }
-      })
-    ],
-    1
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "w-full" },
+        [
+          _c("v-select", {
+            staticClass: "form-input",
+            attrs: {
+              clearable: false,
+              options: _vm.field.config.options,
+              multiple: _vm.field.config.multiple
+            },
+            model: {
+              value: _vm.field.value,
+              callback: function($$v) {
+                _vm.$set(_vm.field, "value", $$v)
+              },
+              expression: "field.value"
+            }
+          })
+        ],
+        1
+      )
+    ]
   )
 }
 var staticRenderFns = []
@@ -29910,37 +30176,64 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "w-full" }, [
-    _c(
-      "input",
-      _vm._b(
-        {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.field.value,
-              expression: "field.value"
-            }
-          ],
-          staticClass: "w-full form-input",
-          attrs: { type: "text" },
-          domProps: { value: _vm.field.value },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
+  return _c(
+    "f-form-field",
+    {
+      attrs: {
+        errors: _vm.$page.errors.get(_vm.field.name),
+        required: _vm.field.required
+      },
+      scopedSlots: _vm._u(
+        [
+          _vm.field.label
+            ? {
+                key: "label",
+                fn: function() {
+                  return [_vm._v(_vm._s(_vm.field.label))]
+                },
+                proxy: true
               }
-              _vm.$set(_vm.field, "value", $event.target.value)
-            }
-          }
-        },
-        "input",
-        _vm.$attrs,
-        false
+            : null
+        ],
+        null,
+        true
       )
-    )
-  ])
+    },
+    [
+      _vm._v(" "),
+      _c("div", { staticClass: "w-full" }, [
+        _c(
+          "input",
+          _vm._b(
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.field.value,
+                  expression: "field.value"
+                }
+              ],
+              staticClass: "w-full form-input",
+              attrs: { type: "text" },
+              domProps: { value: _vm.field.value },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.field, "value", $event.target.value)
+                }
+              }
+            },
+            "input",
+            _vm.$attrs,
+            false
+          )
+        )
+      ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -29964,37 +30257,64 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "w-full" }, [
-    _c(
-      "textarea",
-      _vm._b(
-        {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.field.value,
-              expression: "field.value"
-            }
-          ],
-          staticClass: "w-full form-input",
-          attrs: { rows: "4" },
-          domProps: { value: _vm.field.value },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
+  return _c(
+    "f-form-field",
+    {
+      attrs: {
+        errors: _vm.$page.errors.get(_vm.field.name),
+        required: _vm.field.required
+      },
+      scopedSlots: _vm._u(
+        [
+          _vm.field.label
+            ? {
+                key: "label",
+                fn: function() {
+                  return [_vm._v(_vm._s(_vm.field.label))]
+                },
+                proxy: true
               }
-              _vm.$set(_vm.field, "value", $event.target.value)
-            }
-          }
-        },
-        "textarea",
-        _vm.$attrs,
-        false
+            : null
+        ],
+        null,
+        true
       )
-    )
-  ])
+    },
+    [
+      _vm._v(" "),
+      _c("div", { staticClass: "w-full" }, [
+        _c(
+          "textarea",
+          _vm._b(
+            {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.field.value,
+                  expression: "field.value"
+                }
+              ],
+              staticClass: "w-full form-input",
+              attrs: { rows: "4" },
+              domProps: { value: _vm.field.value },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.field, "value", $event.target.value)
+                }
+              }
+            },
+            "textarea",
+            _vm.$attrs,
+            false
+          )
+        )
+      ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -30019,38 +30339,65 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c(
-    "div",
-    { staticClass: "w-full flex items-center my-2" },
+    "f-form-field",
+    {
+      attrs: {
+        errors: _vm.$page.errors.get(_vm.field.name),
+        required: _vm.field.required
+      },
+      scopedSlots: _vm._u(
+        [
+          _vm.field.label
+            ? {
+                key: "label",
+                fn: function() {
+                  return [_vm._v(_vm._s(_vm.field.label))]
+                },
+                proxy: true
+              }
+            : null
+        ],
+        null,
+        true
+      )
+    },
     [
-      _vm.field.value === true
-        ? _c("f-list-item-action", {
-            attrs: {
-              icon: "toggle-on",
-              color: "green",
-              title: "Click to turn off"
-            },
-            on: {
-              click: function() {
-                return _vm.onInput(false)
-              }
-            }
-          })
-        : _c("f-list-item-action", {
-            attrs: {
-              icon: "toggle-off",
-              color: "black",
-              title: "Click to turn on"
-            },
-            on: {
-              click: function() {
-                return _vm.onInput(true)
-              }
-            }
-          }),
       _vm._v(" "),
-      _c("span", { staticClass: "ml-2" }, [_vm._t("default")], 2)
-    ],
-    1
+      _c(
+        "div",
+        { staticClass: "w-full flex items-center my-2" },
+        [
+          _vm.field.value === true
+            ? _c("f-list-item-action", {
+                attrs: {
+                  icon: "toggle-on",
+                  color: "green",
+                  title: "Click to turn off"
+                },
+                on: {
+                  click: function() {
+                    return _vm.onInput(false)
+                  }
+                }
+              })
+            : _c("f-list-item-action", {
+                attrs: {
+                  icon: "toggle-off",
+                  color: "black",
+                  title: "Click to turn on"
+                },
+                on: {
+                  click: function() {
+                    return _vm.onInput(true)
+                  }
+                }
+              }),
+          _vm._v(" "),
+          _c("span", { staticClass: "ml-2" }, [_vm._t("default")], 2)
+        ],
+        1
+      )
+    ]
   )
 }
 var staticRenderFns = []
@@ -31455,80 +31802,46 @@ var render = function() {
       _vm._v(" "),
       _vm._v(" "),
       _vm._v(" "),
-      _c(
-        "form",
-        {
-          attrs: { id: "editForm" },
-          on: {
-            submit: function($event) {
-              $event.preventDefault()
-              return _vm.submitForm($event)
-            }
+      _c("f-form-root", {
+        attrs: { id: "editForm" },
+        on: {
+          submit: function($event) {
+            $event.preventDefault()
+            return _vm.submitForm($event)
           }
         },
-        [
-          _c(
-            "f-boxed-card",
-            [
-              _vm._l(_vm.form.getAll(), function(field) {
-                return [
-                  _c(
-                    "f-form-field",
-                    {
+        scopedSlots: _vm._u(
+          [
+            _vm._l(_vm.form.getAll(), function(field) {
+              return {
+                key: _vm.getFieldSlot(field),
+                fn: function() {
+                  return [
+                    _c(field.component, {
+                      tag: "component",
                       attrs: {
-                        errors: _vm.$page.errors.get(field.name),
-                        required: field.required
-                      },
-                      scopedSlots: _vm._u(
-                        [
-                          field.label
-                            ? {
-                                key: "label",
-                                fn: function() {
-                                  return [
-                                    _vm._v(
-                                      "\n                        " +
-                                        _vm._s(field.label) +
-                                        "\n                    "
-                                    )
-                                  ]
-                                },
-                                proxy: true
-                              }
-                            : null
-                        ],
-                        null,
-                        true
-                      )
-                    },
-                    [
-                      _vm._v(" "),
-                      _c(field.component, {
-                        tag: "component",
-                        attrs: {
-                          field: field,
-                          required: field.required,
-                          "aria-required": field.required,
-                          placeholder: field.placeholder,
-                          "aria-placeholder": field.placeholder
-                        }
-                      })
-                    ],
-                    1
-                  )
-                ]
-              })
-            ],
-            2
-          )
-        ],
-        1
-      ),
+                        field: field,
+                        required: field.required,
+                        "aria-required": field.required,
+                        placeholder: field.placeholder,
+                        "aria-placeholder": field.placeholder
+                      }
+                    })
+                  ]
+                },
+                proxy: true
+              }
+            })
+          ],
+          null,
+          true
+        )
+      }),
       _vm._v(" "),
       _c(
         "f-boxed-card",
         {
-          staticClass: "mt-8",
+          staticClass: "mt-8 border-red-500",
           scopedSlots: _vm._u([
             {
               key: "title",
@@ -32375,6 +32688,75 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FieldPanelInput_vue_vue_type_template_id_451168c0___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FieldPanelInput_vue_vue_type_template_id_451168c0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/Components/Form/FormRoot.vue":
+/*!***************************************************!*\
+  !*** ./resources/js/Components/Form/FormRoot.vue ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _FormRoot_vue_vue_type_template_id_4f263416___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FormRoot.vue?vue&type=template&id=4f263416& */ "./resources/js/Components/Form/FormRoot.vue?vue&type=template&id=4f263416&");
+/* harmony import */ var _FormRoot_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FormRoot.vue?vue&type=script&lang=js& */ "./resources/js/Components/Form/FormRoot.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _FormRoot_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _FormRoot_vue_vue_type_template_id_4f263416___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _FormRoot_vue_vue_type_template_id_4f263416___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/Components/Form/FormRoot.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/Components/Form/FormRoot.vue?vue&type=script&lang=js&":
+/*!****************************************************************************!*\
+  !*** ./resources/js/Components/Form/FormRoot.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_FormRoot_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./FormRoot.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/Form/FormRoot.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_FormRoot_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/Components/Form/FormRoot.vue?vue&type=template&id=4f263416&":
+/*!**********************************************************************************!*\
+  !*** ./resources/js/Components/Form/FormRoot.vue?vue&type=template&id=4f263416& ***!
+  \**********************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FormRoot_vue_vue_type_template_id_4f263416___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./FormRoot.vue?vue&type=template&id=4f263416& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/Form/FormRoot.vue?vue&type=template&id=4f263416&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FormRoot_vue_vue_type_template_id_4f263416___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_FormRoot_vue_vue_type_template_id_4f263416___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -34676,17 +35058,17 @@ var FormField = /*#__PURE__*/function () {
 }();
 function FormFieldFactory(field, component, value) {
   var customData = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-  return vue__WEBPACK_IMPORTED_MODULE_0___default.a.observable(_objectSpread(_objectSpread({
+  return vue__WEBPACK_IMPORTED_MODULE_0___default.a.observable(_objectSpread({
     component: component,
     value: value,
+    type: field.type,
     name: field.name,
     label: field.label,
     placeholder: field.placeholder,
     originalValue: value,
     required: field.required,
     config: field.config,
-    commitCallback: null
-  }, customData), {}, {
+    commitCallback: null,
     setCommitCallback: function setCommitCallback(callbackFn) {
       this.commitCallback = callbackFn;
     },
@@ -34696,7 +35078,7 @@ function FormFieldFactory(field, component, value) {
     isDirty: function isDirty() {
       return this.value !== this.originalValue;
     }
-  }));
+  }, customData));
 }
 
 /***/ }),
@@ -34776,6 +35158,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_schemaComponents__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils/schemaComponents */ "./resources/js/Support/utils/schemaComponents.js");
 /* harmony import */ var _FormObject__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./FormObject */ "./resources/js/Support/FormObject.js");
 /* harmony import */ var _FormField__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./FormField */ "./resources/js/Support/FormField.js");
+
 
 
 
@@ -35059,18 +35442,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Components_Form_StringInput__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Components/Form/StringInput */ "./resources/js/Components/Form/StringInput.vue");
 /* harmony import */ var _Components_Form_ToggleInput__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Components/Form/ToggleInput */ "./resources/js/Components/Form/ToggleInput.vue");
 /* harmony import */ var _Components_Form_TextInput__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Components/Form/TextInput */ "./resources/js/Components/Form/TextInput.vue");
-/* harmony import */ var _Components_Icon__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Components/Icon */ "./resources/js/Components/Icon.vue");
-/* harmony import */ var _Components_Link__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./Components/Link */ "./resources/js/Components/Link.vue");
-/* harmony import */ var _Components_ListCard__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./Components/ListCard */ "./resources/js/Components/ListCard.vue");
-/* harmony import */ var _Components_ListItemAction__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./Components/ListItemAction */ "./resources/js/Components/ListItemAction.vue");
-/* harmony import */ var _Components_MenuGroup__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./Components/MenuGroup */ "./resources/js/Components/MenuGroup.vue");
-/* harmony import */ var _Components_MenuLink__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./Components/MenuLink */ "./resources/js/Components/MenuLink.vue");
-/* harmony import */ var _Components_NavigationList__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./Components/NavigationList */ "./resources/js/Components/NavigationList.vue");
-/* harmony import */ var _Components_Sidebar__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./Components/Sidebar */ "./resources/js/Components/Sidebar.vue");
-/* harmony import */ var _Components_Spinner__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./Components/Spinner */ "./resources/js/Components/Spinner.vue");
-/* harmony import */ var _Components_TableCard__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./Components/TableCard */ "./resources/js/Components/TableCard.vue");
-/* harmony import */ var _Components_TheAppLayout__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./Components/TheAppLayout */ "./resources/js/Components/TheAppLayout.vue");
-/* harmony import */ var _Components_Trix__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./Components/Trix */ "./resources/js/Components/Trix.vue");
+/* harmony import */ var _Components_Form_FormRoot__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Components/Form/FormRoot */ "./resources/js/Components/Form/FormRoot.vue");
+/* harmony import */ var _Components_Icon__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./Components/Icon */ "./resources/js/Components/Icon.vue");
+/* harmony import */ var _Components_Link__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./Components/Link */ "./resources/js/Components/Link.vue");
+/* harmony import */ var _Components_ListCard__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./Components/ListCard */ "./resources/js/Components/ListCard.vue");
+/* harmony import */ var _Components_ListItemAction__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./Components/ListItemAction */ "./resources/js/Components/ListItemAction.vue");
+/* harmony import */ var _Components_MenuGroup__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./Components/MenuGroup */ "./resources/js/Components/MenuGroup.vue");
+/* harmony import */ var _Components_MenuLink__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./Components/MenuLink */ "./resources/js/Components/MenuLink.vue");
+/* harmony import */ var _Components_NavigationList__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./Components/NavigationList */ "./resources/js/Components/NavigationList.vue");
+/* harmony import */ var _Components_Sidebar__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./Components/Sidebar */ "./resources/js/Components/Sidebar.vue");
+/* harmony import */ var _Components_Spinner__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./Components/Spinner */ "./resources/js/Components/Spinner.vue");
+/* harmony import */ var _Components_TableCard__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./Components/TableCard */ "./resources/js/Components/TableCard.vue");
+/* harmony import */ var _Components_TheAppLayout__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./Components/TheAppLayout */ "./resources/js/Components/TheAppLayout.vue");
+/* harmony import */ var _Components_Trix__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./Components/Trix */ "./resources/js/Components/Trix.vue");
+
 
 
 
@@ -35098,20 +35483,21 @@ __webpack_require__.r(__webpack_exports__);
     Vue.config.ignoredElements = ['trix-editor'];
     Vue.component('f-boxed-card', _Components_BoxedCard__WEBPACK_IMPORTED_MODULE_0__["default"]);
     Vue.component('f-button', _Components_Button__WEBPACK_IMPORTED_MODULE_1__["default"]);
-    Vue.component('f-icon', _Components_Icon__WEBPACK_IMPORTED_MODULE_10__["default"]);
-    Vue.component('f-link', _Components_Link__WEBPACK_IMPORTED_MODULE_11__["default"]);
-    Vue.component('f-list-card', _Components_ListCard__WEBPACK_IMPORTED_MODULE_12__["default"]);
-    Vue.component('f-list-item-action', _Components_ListItemAction__WEBPACK_IMPORTED_MODULE_13__["default"]);
-    Vue.component('f-navigation-list', _Components_NavigationList__WEBPACK_IMPORTED_MODULE_16__["default"]);
-    Vue.component('f-table-card', _Components_TableCard__WEBPACK_IMPORTED_MODULE_19__["default"]);
-    Vue.component('f-sidebar', _Components_Sidebar__WEBPACK_IMPORTED_MODULE_17__["default"]);
-    Vue.component('f-spinner', _Components_Spinner__WEBPACK_IMPORTED_MODULE_18__["default"]);
-    Vue.component('f-the-app-layout', _Components_TheAppLayout__WEBPACK_IMPORTED_MODULE_20__["default"]);
-    Vue.component('f-trix', _Components_Trix__WEBPACK_IMPORTED_MODULE_21__["default"]); // Menu specific..)
+    Vue.component('f-icon', _Components_Icon__WEBPACK_IMPORTED_MODULE_11__["default"]);
+    Vue.component('f-link', _Components_Link__WEBPACK_IMPORTED_MODULE_12__["default"]);
+    Vue.component('f-list-card', _Components_ListCard__WEBPACK_IMPORTED_MODULE_13__["default"]);
+    Vue.component('f-list-item-action', _Components_ListItemAction__WEBPACK_IMPORTED_MODULE_14__["default"]);
+    Vue.component('f-navigation-list', _Components_NavigationList__WEBPACK_IMPORTED_MODULE_17__["default"]);
+    Vue.component('f-table-card', _Components_TableCard__WEBPACK_IMPORTED_MODULE_20__["default"]);
+    Vue.component('f-sidebar', _Components_Sidebar__WEBPACK_IMPORTED_MODULE_18__["default"]);
+    Vue.component('f-spinner', _Components_Spinner__WEBPACK_IMPORTED_MODULE_19__["default"]);
+    Vue.component('f-the-app-layout', _Components_TheAppLayout__WEBPACK_IMPORTED_MODULE_21__["default"]);
+    Vue.component('f-trix', _Components_Trix__WEBPACK_IMPORTED_MODULE_22__["default"]); // Menu specific..)
 
-    Vue.component('f-menu-group', _Components_MenuGroup__WEBPACK_IMPORTED_MODULE_14__["default"]);
-    Vue.component('f-menu-link', _Components_MenuLink__WEBPACK_IMPORTED_MODULE_15__["default"]); // Form specific..)
+    Vue.component('f-menu-group', _Components_MenuGroup__WEBPACK_IMPORTED_MODULE_15__["default"]);
+    Vue.component('f-menu-link', _Components_MenuLink__WEBPACK_IMPORTED_MODULE_16__["default"]); // Form specific..)
 
+    Vue.component('f-form-root', _Components_Form_FormRoot__WEBPACK_IMPORTED_MODULE_10__["default"]);
     Vue.component('f-form-field', _Components_Form_Field__WEBPACK_IMPORTED_MODULE_2__["default"]);
     Vue.component('f-form-date-time-input', _Components_Form_DateTimeInput__WEBPACK_IMPORTED_MODULE_3__["default"]);
     Vue.component('f-form-radio-input', _Components_Form_RadioInput__WEBPACK_IMPORTED_MODULE_4__["default"]);

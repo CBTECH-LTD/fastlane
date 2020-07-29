@@ -1,6 +1,6 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support;
+namespace CbtechLtd\Fastlane\Support\Concerns;
 
 use Illuminate\Pipeline\Pipeline;
 
@@ -17,7 +17,7 @@ trait HandlesHooks
         return $this;
     }
 
-    protected function isHookEmpty(string $hook): bool
+    public function isHookEmpty(string $hook): bool
     {
         if (! isset($this->hooks[$hook])) {
             throw new \Exception('This class does not have hook ' . $hook);
@@ -26,7 +26,7 @@ trait HandlesHooks
         return count($this->hooks[$hook]) === 0;
     }
 
-    protected function getHookFunctions(string $hook): array
+    public function getHookFunctions(string $hook): array
     {
         if (! isset($this->hooks[$hook])) {
             throw new \Exception('This class does not have hook ' . $hook);
@@ -35,7 +35,7 @@ trait HandlesHooks
         return $this->getHookFunctions($hook);
     }
 
-    protected function executeHooks(string $hook, $hookClass)
+    public function executeHooks(string $hook, $hookClass)
     {
         if ($this->isHookEmpty($hook)) {
             return $hookClass;

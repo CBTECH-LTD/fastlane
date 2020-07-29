@@ -1,24 +1,18 @@
 <template>
-    <div class="w-full">
-        <f-boxed-card>
-            <template v-for="field in field.childrenSchema.getAll()">
-                <f-form-field :errors="$page.errors.get(field.name)" :required="field.requuired">
-                    <template v-if="field.label" v-slot:label>
-                        {{ field.label }}
-                    </template>
-                    <component :is="field.component"
-                               :field="field"
-                               :required="field.required"
-                               :aria-required="field.required"
-                               :placeholder="field.placeholder"
-                               :aria-placeholder="field.placeholder"
-                               @input="onInput"
-                    ></component>
+    <f-boxed-card :data-panel="field.name" :icon="field.config.icon">
+        <template v-slot:title>{{ field.label }}</template>
 
-                </f-form-field>
-            </template>
-        </f-boxed-card>
-    </div>
+        <template v-for="child in field.childrenSchema.getAll()">
+            <component :is="child.component"
+                       :field="child"
+                       :required="child.required"
+                       :aria-required="child.required"
+                       :placeholder="child.placeholder"
+                       :aria-placeholder="child.placeholder"
+                       @input="onInput"
+            ></component>
+        </template>
+    </f-boxed-card>
 </template>
 
 <script>
@@ -36,7 +30,9 @@
              * @param {FormObject} formObject
              */
             commit (formObject) {
-                formObject.put(this.field.name, this.field.value)
+                each(this.field.childrenSchema.getAll(), child => {
+                    formObject.put(child.name, child.value)
+                })
             },
 
             onInput () {
@@ -63,7 +59,10 @@
                 component,
                 childrenData,
                 {
-                    childrenSchema: FormSchemaFactory(childrenData, field.config.children)
+                    childrenSchema: FormSchemaFactory(childrenData, field.config.children),
+                    isDirty () {
+                        return this.childrenSchema.isDirty()
+                    }
                 }
             )
         }

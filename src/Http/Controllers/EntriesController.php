@@ -28,7 +28,7 @@ class EntriesController extends Controller
         return $this->render('Entries/Index', [
             'items'     => $collection,
             'entryType' => [
-                'schema'        => $request->entryType()->schema()->toIndex(),
+                'schema'        => $request->entryType()->schema()->getIndexFields(),
                 'singular_name' => $request->entryType()->name(),
                 'plural_name'   => Str::plural($request->entryType()->name()),
             ],
@@ -44,7 +44,7 @@ class EntriesController extends Controller
 
         return $this->render('Entries/Create', [
             'entryType' => [
-                'schema'        => $request->entryType()->schema()->toCreate(),
+                'schema'        => $request->entryType()->schema()->getCreateFields(),
                 'singular_name' => $request->entryType()->name(),
                 'plural_name'   => Str::plural($request->entryType()->name()),
             ],

@@ -9,11 +9,8 @@ class EntryStoreRequest extends EntryRequest
 {
     public function rules()
     {
-        return Collection::make($this->entryType()->schema()->toCreate())
-            ->mapWithKeys(function (SchemaField $fieldType) {
-                return [
-                    $fieldType->getName() => $fieldType->getCreateRules(),
-                ];
-            })->all();
+        return Collection::make($this->entryType()->schema()->getCreateFields())
+            ->mapWithKeys(fn(SchemaField $fieldType) => $fieldType->getCreateRules())
+            ->all();
     }
 }

@@ -1,13 +1,16 @@
 <template>
-    <div class="w-full">
-        <input type="text"
-               ref="datePicker"
-               class="w-full form-input"
-               :placeholder="defaultPlaceholder"
-               v-bind="$attrs"
-               :value="field.value"
-        >
-    </div>
+    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
+        <template v-if="field.label" v-slot:label>{{ field.label }}</template>
+        <div class="w-full">
+            <input type="text"
+                   ref="datePicker"
+                   class="w-full form-input"
+                   :placeholder="defaultPlaceholder"
+                   v-bind="$attrs"
+                   :value="field.value"
+            >
+        </div>
+    </f-form-field>
 </template>
 
 <script>

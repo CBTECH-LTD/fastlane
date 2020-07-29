@@ -34,10 +34,10 @@ class RichEditorField extends BaseSchemaField
         return $this;
     }
 
-    public function hydrateValue($model, $value, EntryRequest $request): void
+    public function fillModel($model, $value, EntryRequest $request): void
     {
-        if (is_callable($this->hydrateCallback)) {
-            call_user_func($this->hydrateCallback, $request, $value, $model);
+        if (is_callable($this->fillValueCallback)) {
+            call_user_func($this->fillValueCallback, $request, $value, $model);
             return;
         }
 
