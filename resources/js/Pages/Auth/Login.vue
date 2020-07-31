@@ -44,7 +44,7 @@
                 </form>
             </div>
         </div>
-        <div class="hidden md:block flex-grow h-full bg-white right-panel" :style="`background-image: url(${$asset('img/login-bg-black.webp')})`"></div>
+        <div class="hidden md:block flex-grow h-full bg-white right-panel" :style="`background-image: url(${$asset('img/login-bg-black.jpg')})`"></div>
     </div>
 </template>
 

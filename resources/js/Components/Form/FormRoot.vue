@@ -25,7 +25,7 @@
 
         props: {
             panels: {
-                type: Object,
+                type: Object | Array,
                 required: true,
             },
             form: {

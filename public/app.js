@@ -441,7 +441,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   name: 'FormRoot',
   props: {
     panels: {
-      type: Object,
+      type: Object | Array,
       required: true
     },
     form: {
@@ -31477,7 +31477,7 @@ var render = function() {
     _c("div", {
       staticClass: "hidden md:block flex-grow h-full bg-white right-panel",
       style:
-        "background-image: url(" + _vm.$asset("img/login-bg-black.webp") + ")"
+        "background-image: url(" + _vm.$asset("img/login-bg-black.jpg") + ")"
     })
   ])
 }
