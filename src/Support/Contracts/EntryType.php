@@ -7,7 +7,7 @@ use CbtechLtd\Fastlane\Support\Schema\Contracts\EntrySchema;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-interface EntryType
+interface EntryType extends Hookable
 {
     public function resolveForRequest(EntryRequest $request): EntryType;
 

@@ -59,7 +59,9 @@ class EntrySchema implements Contracts\EntrySchema
 
     public function findField(string $name): SchemaField
     {
-        return Arr::get($this->fromCache('all'), $name);
+        return $this->fromCache('all')->first(
+            fn(SchemaField $f) => $f->getName() === $name
+        );
     }
 
     private function fromCache(string $cache): Collection
@@ -79,7 +81,7 @@ class EntrySchema implements Contracts\EntrySchema
     {
         return $fields->flatMap(function ($field) {
             if ($field instanceof Resolvable) {
-                return $field->resolve($this->entryType, $this->request);
+                return Arr::wrap($field->resolve($this->entryType, $this->request));
             }
 
             return null;

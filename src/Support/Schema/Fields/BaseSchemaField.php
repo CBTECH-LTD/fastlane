@@ -17,12 +17,21 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\SupportModel as SupportMo
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules as WithRulesContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithValue as WithValueContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility as WithVisibilityContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Hooks\OnFillingHook;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithValueContract, WithRulesContract, MigratableContract, SupportModelContract, WithVisibilityContract, PanelizableContract
 {
     use HandlesHooks, Makeable, Resolvable;
+
+    const HOOK_BEFORE_FILLING = 'beforeFilling';
+    const HOOK_AFTER_FILLING = 'afterFilling';
+
+    protected array $hooks = [
+        self::HOOK_BEFORE_FILLING => [],
+        self::HOOK_AFTER_FILLING  => [],
+    ];
 
     protected string $name;
     protected string $label;
@@ -175,12 +184,18 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
 
     public function fillModel($model, $value, EntryRequest $request): void
     {
+        $beforeHook = new OnFillingHook($this, $model, $value);
+        $this->executeHooks(static::HOOK_BEFORE_FILLING, $beforeHook);
+
         if (is_callable($this->fillValueCallback)) {
             call_user_func($this->fillValueCallback, $model, $value, $request);
             return;
         }
 
         $model->{$this->getName()} = $value;
+
+        $afterHook = new OnFillingHook($this, $model, $value);
+        $this->executeHooks(static::HOOK_AFTER_FILLING, $afterHook);
     }
 
     public function fillModelUsing($callback): self

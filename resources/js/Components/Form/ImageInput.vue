@@ -15,44 +15,45 @@
 </template>
 
 <script>
-    import axios from 'axios'
-    import FormInput from '../Mixins/FormInput'
+import axios from 'axios'
+import FormInput from '../Mixins/FormInput'
 
-    export default {
-        name: 'ImageInput',
-        mixins: [FormInput],
+export default {
+    name: 'ImageInput',
+    mixins: [FormInput],
 
-        data: () => ({
-            isUploading: false,
-        }),
+    data: () => ({
+        isUploading: false,
+    }),
 
-        methods: {
-            async uploadFile (event) {
-                if (this.isUploading) {
-                    return
-                }
-
-                const file = event.target.files[0]
-
-                if (!file) {
-                    return
-                }
-
-                const data = new FormData()
-                data.append('media', file)
-                data.append('type', file.type)
-                data.append('filename', file.name)
-
-                this.isUploading = true
-                const { headers: { location } } = await axios.post(this.field.config.uploadUrl, data)
-                this.isUploading = false
-
-                this.onInput(`${this.field.config.baseViewUrl}${location}`)
-            },
-
-            openFileDialog () {
-                this.$refs.fileInput.click()
+    methods: {
+        async uploadFile (event) {
+            if (this.isUploading) {
+                return
             }
+
+            const file = event.target.files[0]
+
+            if (!file) {
+                return
+            }
+
+            const data = new FormData()
+            data.append(this.field.name, file)
+            data.append('type', file.type)
+            data.append('filename', file.name)
+
+            this.isUploading = true
+            const { data: { url } } = await axios.post(this.field.config.uploadUrl, data)
+            this.isUploading = false
+
+            // this.onInput(`${this.field.config.baseViewUrl}${url}`)
+            this.onInput(url)
+        },
+
+        openFileDialog () {
+            this.$refs.fileInput.click()
         }
     }
+}
 </script>

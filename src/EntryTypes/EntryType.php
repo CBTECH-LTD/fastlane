@@ -26,23 +26,29 @@ abstract class EntryType implements EntryTypeContract
 {
     use HandlesHooks, Resolvable;
 
-    /** Parameters: EntryRequest $request, Model $entry, array $fields, array $data */
+    /** @description OnSavingHook */
     const HOOK_BEFORE_HYDRATING = 'beforeHydrating';
-    /** Parameters: Model $entry */
+    /** @description OnSavingHook */
     const HOOK_BEFORE_CREATING = 'beforeCreating';
-    /** Parameters: Model $entry */
+    /** @description OnSavingHook */
     const HOOK_BEFORE_UPDATING = 'beforeUpdating';
-    /** Parameters: Model $entry */
+    /** @description OnSavingHook */
+    const HOOK_BEFORE_SAVING = 'beforeSaving';
+    /** @description OnSavingHook */
     const HOOK_AFTER_CREATING = 'afterCreating';
-    /** Parameters: Model $entry */
+    /** @description OnSavingHook */
     const HOOK_AFTER_UPDATING = 'afterUpdating';
+    /** @description OnSavingHook */
+    const HOOK_AFTER_SAVING = 'afterSaving';
 
     protected array $hooks = [
         self::HOOK_BEFORE_HYDRATING => [],
         self::HOOK_BEFORE_CREATING  => [],
         self::HOOK_BEFORE_UPDATING  => [],
+        self::HOOK_BEFORE_SAVING    => [],
         self::HOOK_AFTER_CREATING   => [],
         self::HOOK_AFTER_UPDATING   => [],
+        self::HOOK_AFTER_SAVING     => [],
     ];
 
     protected Gate $gate;
@@ -166,14 +172,7 @@ abstract class EntryType implements EntryTypeContract
     {
         $this->gate->authorize('create', $this->model());
         $entry = $this->newModelInstance();
-
-        $fields = Collection::make($this->schema()->getCreateFields())->flatMap(function (SchemaField $field) {
-            if ($field instanceof FieldPanel) {
-                return $field->getFields();
-            }
-
-            return $field;
-        })->all();
+        $fields = $this->schema()->getCreateFields();
 
         $this->hydrateFields(
             $request,
@@ -183,11 +182,13 @@ abstract class EntryType implements EntryTypeContract
 
         $beforeHook = new OnSavingHook($this, $entry, $request->validated());
         $this->executeHooks(static::HOOK_BEFORE_CREATING, $beforeHook);
+        $this->executeHooks(static::HOOK_BEFORE_SAVING, $beforeHook);
 
         $beforeHook->model()->save();
 
         $afterHook = new OnSavingHook($this, $beforeHook->model(), $request->validated());
         $this->executeHooks(static::HOOK_AFTER_CREATING, $afterHook);
+        $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
 
         return $afterHook->model();
     }
@@ -206,10 +207,16 @@ abstract class EntryType implements EntryTypeContract
             $this->schema()->getUpdateFields(),
         );
 
-        $beforeHook = $this->executeHooks(static::HOOK_BEFORE_UPDATING, new OnSavingHook($this, $entry, $request->validated()));
+        $beforeHook = new OnSavingHook($this, $entry, $request->validated());
+        $this->executeHooks(static::HOOK_BEFORE_UPDATING, $beforeHook);
+        $this->executeHooks(static::HOOK_BEFORE_SAVING, $beforeHook);
+
         $beforeHook->model()->save();
 
-        $afterHook = $this->executeHooks(static::HOOK_AFTER_UPDATING, new OnSavingHook($this, $beforeHook->model(), $request->validated()));
+        $afterHook = new OnSavingHook($this, $beforeHook->model(), $request->validated());
+        $this->executeHooks(static::HOOK_AFTER_UPDATING, $afterHook);
+        $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
+
         return $afterHook->model();
     }
 

@@ -532,7 +532,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var file, data, _yield$axios$post, location;
+        var file, data, _yield$axios$post, url;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
@@ -557,7 +557,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 5:
                 data = new FormData();
-                data.append('media', file);
+                data.append(_this.field.name, file);
                 data.append('type', file.type);
                 data.append('filename', file.name);
                 _this.isUploading = true;
@@ -566,10 +566,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 12:
                 _yield$axios$post = _context.sent;
-                location = _yield$axios$post.headers.location;
-                _this.isUploading = false;
+                url = _yield$axios$post.data.url;
+                _this.isUploading = false; // this.onInput(`${this.field.config.baseViewUrl}${url}`)
 
-                _this.onInput("".concat(_this.field.config.baseViewUrl).concat(location));
+                _this.onInput(url);
 
               case 16:
               case "end":
@@ -819,7 +819,7 @@ __webpack_require__.r(__webpack_exports__);
 
     var getValue = function getValue() {
       if (!value) {
-        return null;
+        return [];
       }
 
       if (field.config.multiple === true) {
@@ -828,7 +828,7 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
 
-      return value[0].value || null;
+      return [value[0].value] || false;
     };
 
     var filteredValue = lodash_filter__WEBPACK_IMPORTED_MODULE_4___default()(field.config.options, function (o) {
@@ -2363,7 +2363,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".form-input.v-select .vs__selected {\n  padding: 2px 4px !important;\n  margin-right: 4px !important;\n}\n.vs__selected {\n  font-size: 0.75rem !important;\n  font-weight: 600 !important;\n  color: #2d3748 !important;\n  background-color: #edf2f7 !important;\n  border-color:  !important;\n}\n", ""]);
+exports.push([module.i, ".form-input.v-select .vs__selected {\n  padding: 2px 4px !important;\n  margin-right: 4 px !important;\n}\n.vs__selected {\n  font-size: 0.75rem !important;\n  font-weight: 600 !important;\n  color: #2d3748 !important;\n  background-color: #edf2f7 !important;\n  border-color:  !important;\n}\n", ""]);
 
 // exports
 

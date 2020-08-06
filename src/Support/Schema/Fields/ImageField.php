@@ -3,46 +3,45 @@
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
-use Illuminate\Support\Str;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Support\Contracts\ImageUploader;
+use Illuminate\Database\Eloquent\Model;
 
 class ImageField extends FileField
 {
-    protected array $accept = [
-        'images/jpeg',
-        'images/png',
-        'images/gif',
-    ];
+    protected ImageUploader $uploader;
 
     protected int $listWidth = 150;
+
+    public function __construct(string $name, string $label)
+    {
+        parent::__construct($name, $label);
+        $this->uploader = app()->make(config('fastlane.image_uploader.class'));
+    }
 
     public function getType(): string
     {
         return 'image';
     }
 
-    public function getAccept(): array
+    public function withUploader(ImageUploader $uploader): self
     {
-        return $this->accept;
+        $this->uploader = $uploader;
+        return $this;
     }
 
-    public function accept(array $accept): self
+    public function processUpload(EntryRequest $request): string
     {
-        $this->accept = $accept;
-        return $this;
+        return $this->uploader->processImageUpload(
+            $request->file($this->getName()),
+            $request->entryType()
+        );
     }
 
     protected function getTypeRules(): array
     {
         return [
-            $this->getName() => 'url|starts_with:' . $this->getBaseImageUrl(),
-        ];
-    }
-
-    protected function getConfig(): array
-    {
-        return [
-            'baseViewUrl' => $this->getBaseImageUrl(),
-            'uploadUrl'   => config('fastlane.image_upload_url'),
+            $this->getName() => $this->uploader->getImageRules(),
         ];
     }
 
@@ -50,16 +49,26 @@ class ImageField extends FileField
     {
         parent::fillModel(
             $model,
-            Str::replaceFirst($this->getBaseImageUrl(), '', $value),
+            $this->uploader->prepareValueToFill($request, $value),
             $request
         );
     }
 
-    /**
-     * @return \Illuminate\Config\Repository|\Illuminate\Contracts\Foundation\Application|mixed
-     */
-    protected function getBaseImageUrl()
+    public function resolveValue(Model $model): array
     {
-        return config('fastlane.thumbor_url');
+        if ($this->resolveValueCallback) {
+            return call_user_func($this->resolveValueCallback, $model);
+        }
+
+        return [
+            $this->getName() => $this->uploader->getImageUrl($model->{$this->getName()}),
+        ];
+    }
+
+    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
+    {
+        return [
+            'uploadUrl' => route("cp.{$entryType->identifier()}.images", $this->getName()),
+        ];
     }
 }

@@ -10,6 +10,7 @@ use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserResource;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Commands\CreateSystemAdminCommand;
 use CbtechLtd\Fastlane\Http\Controllers\EntryAttachmentsController;
+use CbtechLtd\Fastlane\Http\Controllers\EntryImagesController;
 use CbtechLtd\Fastlane\Http\Middleware\SetInertiaRootTemplate;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuManager as MenuManagerContract;
 use CbtechLtd\Fastlane\Support\Menu\MenuManager;
@@ -188,6 +189,9 @@ class FastlaneServiceProvider extends ServiceProvider
                 // Attachment management routes
                 $this->post('/attachments/{fieldName}', [EntryAttachmentsController::class, 'store'])->name("{$prefix}.attachments");
                 $this->delete('/attachments/{fieldName}', [EntryAttachmentsController::class, 'delete']);
+
+                // Image upload routes
+                $this->post('/images/{fieldName}', [EntryImagesController::class, 'store'])->name("{$prefix}.images");
             });
         });
 
