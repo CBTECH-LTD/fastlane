@@ -54,6 +54,8 @@ class BelongsToManyField extends RelationField
     {
         $request->entryType()->addHook(EntryType::HOOK_AFTER_SAVING, function (OnSavingHook $hook, Closure $next) use ($value) {
             $hook->model()->{$this->getRelationshipName()}()->sync($value);
+
+            $next($hook);
         });
     }
 }
