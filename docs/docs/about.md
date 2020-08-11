@@ -20,8 +20,7 @@ of how data will be saved to your database.
 
 ## You decide how to consume the content
 
-You're not restricted to use Laravel to build your website. For instance, you could consume
-your content through Fastlane API from your beloved static site generator while your mobile
-dev team fetch the content from an Android or iPhone native application. Of course, if you
-just want to use Laravel and its blade template system to build your site, Fastlane will
-provide you with ways to get the website content directly from your Laravel app.
+You're not restricted to use only Laravel to build your website frontend. For instance, you
+could consume your content through Fastlane API from your beloved static site generator while
+your mobile dev team fetch the content from an Android or iPhone native application. Anyway, if
+you want to use Laravel and its blade template system to build your site, Fastlane has your back.

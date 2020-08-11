@@ -5,9 +5,8 @@ sidebar_label: Requirements
 ---
 
 <p className="featured">
-    Fastlane is built as a Laravel package, a modern and famous PHP framework, and has
-    the same server requirements as it. These requirements may change depending on plugins
-    you install and functionalities your website needs.
+    Fastlane is built as a Laravel package, a modern and famous PHP framework, and has its
+    same server requirements.
 </p>
 
 ## Server requirements
@@ -36,13 +35,19 @@ on previous PHP versions.
 As Fastlane has requirements similar to Laravel, you can run it on any ordinary Laravel-ready
 environment. Laravel Homestead and Laravel Valet are options provided by Laravel itself.
 
-Although not so easy to get started with, we recommend you to use the development environment
-provided by us. We provide Docker and Kubernetes setups. They are basically the same thing,
-just used in distinguished ways. 
+Although not so easy to get started with, we recommend you to use the Docker-based development
+environment provided by us.
 
 ### Docker
 
-Fastlane provides a ready-to-go `docker-compose.yml` in the root directory of new projects.
+We provide a ready-to-go Docker setup with essential software plus additional perks:
+
+- Nginx with php-fpm
+- PostgreSQL
+- Redis
+- Minio
+- Chrome driver
+
 If you've installed Fastlane in an existent project, just copy the file:
 
 ```shell
@@ -50,11 +55,3 @@ cp vendor/cbtech-ltd/fastlane/docker-compose.yml ./
 ```
 
 Head to [Getting Started on Fastlane With Docker](#docker) for more information.
-
-### Kubernetes with DevSpace
-
-We have been using [DevSpace](https://devspace.sh/) successfully to create dev
-and production servers. Some developers use it with local `minikube`, others
-work directly on hosted Kubernetes clusters.
-
-[You can read more about setting it up here](#k8s).
