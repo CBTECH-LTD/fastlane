@@ -151,7 +151,11 @@ abstract class EntryType implements EntryTypeContract
     {
         $this->gate->authorize('list', $this->model());
 
-        $query = $this->newModelInstance()->newModelQuery();
+        $query = $this
+            ->newModelInstance()
+            ->newModelQuery()
+            ->orderBy('created_at', 'desc');
+
         $this->queryItems($query);
 
         return $query->get();

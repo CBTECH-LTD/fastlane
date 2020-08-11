@@ -19,5 +19,9 @@ export default {
             type: Object | Array,
             required: true,
         },
+        loading: {
+            type: Boolean,
+            default: false,
+        }
     },
 }

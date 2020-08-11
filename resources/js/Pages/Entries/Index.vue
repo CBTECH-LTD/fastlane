@@ -5,12 +5,12 @@
             <f-button v-if="links.create" :href="links.create" left-icon="plus" size="lg">Add {{ entryType.singular_name }}</f-button>
         </template>
 
-        <f-table-card :items="items.data">
+        <f-table-card :items="items.data" auto>
             <template v-slot:columns>
                 <th v-for="field in listSchema" :key="field.name" class="table__column" :width="field.listWidth || 'auto'">
                     {{ field.label }}
                 </th>
-                <th width="160"></th>
+                <th width="80"></th>
             </template>
             <template v-slot:item="{ item }">
                 <td v-for="field in listSchema" :key="field.name" class="table__cell">
@@ -20,17 +20,14 @@
                                    :name="field.name"
                                    :label="field.label"
                                    :config="field.config"
-                                   :value="item.attributes[field.name]">
-                        </component>
+                                   :value="item.attributes[field.name]"
+                                   :loading="isPerformingActionFor[item.id]"
+                                   @input="value => onInput(item, field, value)"
+                        ></component>
                     </slot>
                 </td>
                 <td class="table__cell">
                     <div class="w-full h-full flex items-center justify-end">
-                        <!-- Activate / Deactivate -->
-                        <template v-if="item.attributes.hasOwnProperty('is_active')">
-                            <f-list-item-action v-if="item.attributes.is_active" @click="toggleItemActivation(item, false)" icon="toggle-on" color="green" title="Click to deactivate" :loading="isUpdatingActivationStateFor[item.id]"/>
-                            <f-list-item-action v-else @click="toggleItemActivation(item, true)" icon="toggle-off" color="black" title="Click to activate" :loading="isUpdatingActivationStateFor[item.id]"/>
-                        </template>
                         <!-- Edit -->
                         <f-list-item-action v-if="item.links.self" :href="item.links.self" icon="pencil-alt" title="Edit"/>
                     </div>
@@ -42,47 +39,47 @@
 
 <script>
 
-    import ListSchema from '../../Support/ListSchema'
+import ListSchema from '../../Support/ListSchema'
 
-    export default {
-        name: 'Entries.Index',
+export default {
+    name: 'Entries.Index',
 
-        props: {
-            links: {
-                required: true,
-                type: Object,
-            },
-            items: {
-                required: true,
-                type: Object,
-            },
-            entryType: {
-                required: true,
-                type: Object,
-            }
+    props: {
+        links: {
+            required: true,
+            type: Object,
         },
-
-        data () {
-            return {
-                isUpdatingActivationStateFor: {},
-                listSchema: new ListSchema(this.entryType.schema),
-            }
+        items: {
+            required: true,
+            type: Object,
         },
+        entryType: {
+            required: true,
+            type: Object,
+        }
+    },
 
-        methods: {
-            async toggleItemActivation (item, state) {
-                if (!this.isUpdatingActivationStateFor[item.id]) {
-                    this.$set(this.isUpdatingActivationStateFor, item.id, true)
+    data () {
+        return {
+            isPerformingActionFor: {},
+            listSchema: new ListSchema(this.entryType.schema),
+        }
+    },
 
-                    try {
-                        await this.$inertia.patch(item.links.self, {
-                            is_active: state,
-                        })
-                    } catch {}
+    methods: {
+        async onInput (item, field, value) {
+            if (!this.isPerformingActionFor[item.id]) {
+                this.$set(this.isPerformingActionFor, item.id, true)
 
-                    this.$set(this.isUpdatingActivationStateFor, item.id, false)
-                }
+                try {
+                    await this.$inertia.patch(item.links.self, {
+                        [field.name]: value,
+                    })
+                } catch {}
+
+                this.$set(this.isPerformingActionFor, item.id, false)
             }
-        },
-    }
+        }
+    },
+}
 </script>

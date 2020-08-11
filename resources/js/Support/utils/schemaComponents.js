@@ -8,6 +8,7 @@ import RichEditorInput from '../../Components/Form/RichEditorInput'
 import Simple from '../../Components/List/Simple'
 import Image from '../../Components/List/Image'
 import Select from '../../Components/List/Select'
+import Toggle from '../../Components/List/Toggle'
 
 export default {
     string: {
@@ -19,7 +20,7 @@ export default {
         form: TextInput,
     },
     toggle: {
-        list: Simple,
+        list: Toggle,
         form: ToggleInput,
     },
     select: {

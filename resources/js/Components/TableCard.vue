@@ -16,7 +16,7 @@
                 </span>
             </div>
         </div>
-        <table v-else class="w-full table-fixed">
+        <table v-else class="w-full table-auto" :class="auto ? 'table-auto' : 'table-fixed'">
             <thead>
             <tr class="table__column-group">
                 <slot name="columns"/>
@@ -41,14 +41,18 @@
 
 <script>
 
-    export default {
-        name: 'TableCard',
+export default {
+    name: 'TableCard',
 
-        props: {
-            items: {
-                type: Array,
-                required: true,
-            }
+    props: {
+        items: {
+            type: Array,
+            required: true,
         },
-    }
+        auto: {
+            type: Boolean,
+            default: false,
+        }
+    },
+}
 </script>

@@ -5,6 +5,7 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 class ToggleField extends BaseSchemaField
 {
     protected $default = true;
+    protected int $listWidth = 80;
 
     public function getType(): string
     {

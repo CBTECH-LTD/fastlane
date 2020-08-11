@@ -1094,6 +1094,38 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/List/Toggle.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Components/List/Toggle.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Mixins_ListRenderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Mixins/ListRenderer */ "./resources/js/Components/Mixins/ListRenderer.js");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'ListSimple',
+  mixins: [_Mixins_ListRenderer__WEBPACK_IMPORTED_MODULE_0__["default"]],
+  methods: {
+    onToggle: function onToggle(value) {
+      this.$emit('input', value);
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/ListCard.vue?vue&type=script&lang=js&":
 /*!*******************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Components/ListCard.vue?vue&type=script&lang=js& ***!
@@ -1471,6 +1503,10 @@ __webpack_require__.r(__webpack_exports__);
     items: {
       type: Array,
       required: true
+    },
+    auto: {
+      type: Boolean,
+      "default": false
     }
   }
 });
@@ -2179,13 +2215,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Support_ListSchema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Support/ListSchema */ "./resources/js/Support/ListSchema.js");
 
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-//
-//
-//
 //
 //
 //
@@ -2244,12 +2279,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   data: function data() {
     return {
-      isUpdatingActivationStateFor: {},
+      isPerformingActionFor: {},
       listSchema: new _Support_ListSchema__WEBPACK_IMPORTED_MODULE_1__["default"](this.entryType.schema)
     };
   },
   methods: {
-    toggleItemActivation: function toggleItemActivation(item, state) {
+    onInput: function onInput(item, field, value) {
       var _this = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
@@ -2257,18 +2292,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (_this.isUpdatingActivationStateFor[item.id]) {
+                if (_this.isPerformingActionFor[item.id]) {
                   _context.next = 10;
                   break;
                 }
 
-                _this.$set(_this.isUpdatingActivationStateFor, item.id, true);
+                _this.$set(_this.isPerformingActionFor, item.id, true);
 
                 _context.prev = 2;
                 _context.next = 5;
-                return _this.$inertia.patch(item.links.self, {
-                  is_active: state
-                });
+                return _this.$inertia.patch(item.links.self, _defineProperty({}, field.name, value));
 
               case 5:
                 _context.next = 9;
@@ -2279,7 +2312,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _context.t0 = _context["catch"](2);
 
               case 9:
-                _this.$set(_this.isUpdatingActivationStateFor, item.id, false);
+                _this.$set(_this.isPerformingActionFor, item.id, false);
 
               case 10:
               case "end":
@@ -30528,6 +30561,65 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/List/Toggle.vue?vue&type=template&id=7753968a&":
+/*!**************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Components/List/Toggle.vue?vue&type=template&id=7753968a& ***!
+  \**************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("span", [
+    _c(
+      "div",
+      { staticClass: "w-full flex items-center my-2" },
+      [
+        _vm.value === true
+          ? _c("f-list-item-action", {
+              attrs: {
+                icon: "toggle-on",
+                color: "green",
+                title: "Click to turn off",
+                loading: _vm.loading
+              },
+              on: {
+                click: function() {
+                  return _vm.onToggle(false)
+                }
+              }
+            })
+          : _c("f-list-item-action", {
+              attrs: {
+                icon: "toggle-off",
+                color: "black",
+                title: "Click to turn on",
+                loading: _vm.loading
+              },
+              on: {
+                click: function() {
+                  return _vm.onToggle(true)
+                }
+              }
+            })
+      ],
+      1
+    )
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/ListCard.vue?vue&type=template&id=1417f719&":
 /*!***********************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/Components/ListCard.vue?vue&type=template&id=1417f719& ***!
@@ -30996,38 +31088,45 @@ var render = function() {
               ])
             ]
           )
-        : _c("table", { staticClass: "w-full table-fixed" }, [
-            _c("thead", [
-              _c(
-                "tr",
-                { staticClass: "table__column-group" },
-                [_vm._t("columns")],
-                2
-              )
-            ]),
-            _vm._v(" "),
-            _c(
-              "tbody",
-              _vm._l(_vm.items, function(item) {
-                return _c(
+        : _c(
+            "table",
+            {
+              staticClass: "w-full table-auto",
+              class: _vm.auto ? "table-auto" : "table-fixed"
+            },
+            [
+              _c("thead", [
+                _c(
                   "tr",
-                  { key: item.id, staticClass: "table__row" },
-                  [_vm._t("item", null, { item: item })],
+                  { staticClass: "table__column-group" },
+                  [_vm._t("columns")],
                   2
                 )
-              }),
-              0
-            ),
-            _vm._v(" "),
-            _c("tfoot", [
+              ]),
+              _vm._v(" "),
               _c(
-                "tr",
-                { staticClass: "table__column-group" },
-                [_vm._t("columns")],
-                2
-              )
-            ])
-          ])
+                "tbody",
+                _vm._l(_vm.items, function(item) {
+                  return _c(
+                    "tr",
+                    { key: item.id, staticClass: "table__row" },
+                    [_vm._t("item", null, { item: item })],
+                    2
+                  )
+                }),
+                0
+              ),
+              _vm._v(" "),
+              _c("tfoot", [
+                _c(
+                  "tr",
+                  { staticClass: "table__column-group" },
+                  [_vm._t("columns")],
+                  2
+                )
+              ])
+            ]
+          )
     ]
   )
 }
@@ -31064,7 +31163,7 @@ var render = function() {
         _c("div", [
           _c("img", {
             staticClass: "h-20",
-            attrs: { src: _vm.$asset("img/app-logo.png"), alt: "" }
+            attrs: { src: _vm.$asset(_vm.$page.app.assets.logoImage), alt: "" }
           })
         ]),
         _vm._v(" "),
@@ -31298,7 +31397,10 @@ var render = function() {
             [
               _c("img", {
                 staticClass: "w-20 mb-8",
-                attrs: { src: _vm.$asset("img/app-logo.png"), alt: "" }
+                attrs: {
+                  src: _vm.$asset(_vm.$page.app.assets.logoImage),
+                  alt: ""
+                }
               }),
               _vm._v(" "),
               _c(
@@ -31477,7 +31579,9 @@ var render = function() {
     _c("div", {
       staticClass: "hidden md:block flex-grow h-full bg-white right-panel",
       style:
-        "background-image: url(" + _vm.$asset("img/login-bg-black.jpg") + ")"
+        "background-image: url(" +
+        _vm.$asset(_vm.$page.app.assets.logoBackground) +
+        ")"
     })
   ])
 }
@@ -31854,7 +31958,7 @@ var render = function() {
       _vm._v(" "),
       _vm._v(" "),
       _c("f-table-card", {
-        attrs: { items: _vm.items.data },
+        attrs: { items: _vm.items.data, auto: "" },
         scopedSlots: _vm._u(
           [
             {
@@ -31879,7 +31983,7 @@ var render = function() {
                     )
                   }),
                   _vm._v(" "),
-                  _c("th", { attrs: { width: "160" } })
+                  _c("th", { attrs: { width: "80" } })
                 ]
               },
               proxy: true
@@ -31904,7 +32008,13 @@ var render = function() {
                                 name: field.name,
                                 label: field.label,
                                 config: field.config,
-                                value: item.attributes[field.name]
+                                value: item.attributes[field.name],
+                                loading: _vm.isPerformingActionFor[item.id]
+                              },
+                              on: {
+                                input: function(value) {
+                                  return _vm.onInput(item, field, value)
+                                }
                               }
                             })
                           ],
@@ -31927,50 +32037,6 @@ var render = function() {
                           "w-full h-full flex items-center justify-end"
                       },
                       [
-                        item.attributes.hasOwnProperty("is_active")
-                          ? [
-                              item.attributes.is_active
-                                ? _c("f-list-item-action", {
-                                    attrs: {
-                                      icon: "toggle-on",
-                                      color: "green",
-                                      title: "Click to deactivate",
-                                      loading:
-                                        _vm.isUpdatingActivationStateFor[
-                                          item.id
-                                        ]
-                                    },
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.toggleItemActivation(
-                                          item,
-                                          false
-                                        )
-                                      }
-                                    }
-                                  })
-                                : _c("f-list-item-action", {
-                                    attrs: {
-                                      icon: "toggle-off",
-                                      color: "black",
-                                      title: "Click to activate",
-                                      loading:
-                                        _vm.isUpdatingActivationStateFor[
-                                          item.id
-                                        ]
-                                    },
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.toggleItemActivation(
-                                          item,
-                                          true
-                                        )
-                                      }
-                                    }
-                                  })
-                            ]
-                          : _vm._e(),
-                        _vm._v(" "),
                         item.links.self
                           ? _c("f-list-item-action", {
                               attrs: {
@@ -31981,7 +32047,7 @@ var render = function() {
                             })
                           : _vm._e()
                       ],
-                      2
+                      1
                     )
                   ])
                 ]
@@ -33492,6 +33558,75 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/Components/List/Toggle.vue":
+/*!*************************************************!*\
+  !*** ./resources/js/Components/List/Toggle.vue ***!
+  \*************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _Toggle_vue_vue_type_template_id_7753968a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Toggle.vue?vue&type=template&id=7753968a& */ "./resources/js/Components/List/Toggle.vue?vue&type=template&id=7753968a&");
+/* harmony import */ var _Toggle_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Toggle.vue?vue&type=script&lang=js& */ "./resources/js/Components/List/Toggle.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _Toggle_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Toggle_vue_vue_type_template_id_7753968a___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Toggle_vue_vue_type_template_id_7753968a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/Components/List/Toggle.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/Components/List/Toggle.vue?vue&type=script&lang=js&":
+/*!**************************************************************************!*\
+  !*** ./resources/js/Components/List/Toggle.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Toggle_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./Toggle.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/List/Toggle.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Toggle_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/Components/List/Toggle.vue?vue&type=template&id=7753968a&":
+/*!********************************************************************************!*\
+  !*** ./resources/js/Components/List/Toggle.vue?vue&type=template&id=7753968a& ***!
+  \********************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Toggle_vue_vue_type_template_id_7753968a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./Toggle.vue?vue&type=template&id=7753968a& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/Components/List/Toggle.vue?vue&type=template&id=7753968a&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Toggle_vue_vue_type_template_id_7753968a___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Toggle_vue_vue_type_template_id_7753968a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
 /***/ "./resources/js/Components/ListCard.vue":
 /*!**********************************************!*\
   !*** ./resources/js/Components/ListCard.vue ***!
@@ -33840,6 +33975,10 @@ __webpack_require__.r(__webpack_exports__);
     config: {
       type: Object | Array,
       required: true
+    },
+    loading: {
+      type: Boolean,
+      "default": false
     }
   }
 });
@@ -34713,7 +34852,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   install: function install(Vue) {
     Vue.prototype.$asset = function (path) {
-      return "".concat(this.$page.app.baseUrl, "/vendor/fastlane/").concat(path);
+      return "".concat(this.$page.app.baseUrl, "/").concat(path);
     };
   }
 });
@@ -35070,6 +35209,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Components_List_Simple__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../Components/List/Simple */ "./resources/js/Components/List/Simple.vue");
 /* harmony import */ var _Components_List_Image__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../Components/List/Image */ "./resources/js/Components/List/Image.vue");
 /* harmony import */ var _Components_List_Select__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../Components/List/Select */ "./resources/js/Components/List/Select.vue");
+/* harmony import */ var _Components_List_Toggle__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../Components/List/Toggle */ "./resources/js/Components/List/Toggle.vue");
+
 
 
 
@@ -35090,7 +35231,7 @@ __webpack_require__.r(__webpack_exports__);
     form: _Components_Form_TextInput__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   toggle: {
-    list: _Components_List_Simple__WEBPACK_IMPORTED_MODULE_7__["default"],
+    list: _Components_List_Toggle__WEBPACK_IMPORTED_MODULE_10__["default"],
     form: _Components_Form_ToggleInput__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   select: {
@@ -35280,8 +35421,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /app/packages/fastlane/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /app/packages/fastlane/resources/css/app.css */"./resources/css/app.css");
+__webpack_require__(/*! /home/vanderlei/code/hewitsons/packages/fastlane/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /home/vanderlei/code/hewitsons/packages/fastlane/resources/css/app.css */"./resources/css/app.css");
 
 
 /***/ })

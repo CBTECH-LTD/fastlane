@@ -3,7 +3,7 @@
         <div class="fixed top-0 w-full h-20 bg-white shadow-lg z-40 flex justify-between">
             <!-- App logo -->
             <div>
-                <img :src="$asset('img/app-logo.png')" alt="" class="h-20">
+                <img :src="$asset($page.app.assets.logoImage)" alt="" class="h-20">
             </div>
 
             <!-- User / Sign out -->

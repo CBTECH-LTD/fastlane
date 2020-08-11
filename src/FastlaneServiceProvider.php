@@ -130,6 +130,10 @@ class FastlaneServiceProvider extends ServiceProvider
         Inertia::share('app.name', Config::get('app.name'));
         Inertia::share('app.baseUrl', Config::get('app.url'));
         Inertia::share('app.requestUrl', request()->path());
+        Inertia::share('app.assets', [
+            'logoImage'       => config('fastlane.asset_logo_img'),
+            'loginBackground' => config('fastlane.asset_login_bg'),
+        ]);
 
         Inertia::share('auth.user', function () {
             if (Auth::user()) {

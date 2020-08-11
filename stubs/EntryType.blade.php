@@ -14,8 +14,17 @@ class {{ $class }} extends EntryType
                 ->setRules('max:255')
                 ->showOnIndex(),
 
-            ToggleField::make('is_active', 'Active')
-                ->required(),
+            FieldPanel::make('Related Content')->withIcon('project-diagram')
+                ->withFields([
+                    // Related entry types...
+                ]),
+
+            FieldPanel::make('Settings')->withIcon('tools')
+                ->withFields([
+                    ToggleField::make('is_active', 'Active')
+                        ->required()
+                        ->showOnIndex(),
+                ]),
         ];
     }
 }

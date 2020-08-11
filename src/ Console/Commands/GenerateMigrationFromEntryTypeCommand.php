@@ -5,7 +5,10 @@ namespace CbtechLtd\Fastlane\Console\Commands;
 use Carbon\Carbon;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable;
+use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\View;
@@ -90,7 +93,14 @@ class GenerateMigrationFromEntryTypeCommand extends Command
         $className = 'Create' . $entryType->pluralName() . 'Table';
         $table = Str::plural(Str::snake($entryType->identifier(), '_'));
 
-        $fields = Collection::make($entryType->schema()->getFields())
+        $fields = Collection::make($entryType->fields())
+            ->flatMap(function ($field) {
+                if ($field instanceof FieldPanel) {
+                    return $field->getFields();
+                }
+
+                return Arr::wrap($field);
+            })
             ->filter(function (SchemaField $field) {
                 return $field->getName() !== 'is_active';
             });

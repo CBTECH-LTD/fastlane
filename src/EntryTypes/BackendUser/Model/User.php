@@ -65,9 +65,9 @@ class User extends BaseModel implements
         return $this->roles->first()->name;
     }
 
-    public function setPasswordAttribute(string $value): self
+    public function setPasswordAttribute(string $value, bool $hash = true): self
     {
-        $this->attributes['password'] = Hash::make($value);
+        $this->attributes['password'] = $hash ? Hash::make($value) : $value;
         return $this;
     }
 }
