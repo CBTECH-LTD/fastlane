@@ -3,10 +3,13 @@
 namespace CbtechLtd\Fastlane;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
+use CbtechLtd\Fastlane\Exceptions\EntryTypeNotRegisteredException;
 use CbtechLtd\Fastlane\Http\Controllers;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuManager as MenuManagerContract;
 use CbtechLtd\Fastlane\Support\Menu\MenuManager;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -20,10 +23,47 @@ class Fastlane
     protected array $flashMessages = [];
     protected MenuManagerContract $menuManager;
 
+    protected Request $request;
+    protected ?EntryType $requestEntryType = null;
+    protected ?Model $requestEntry = null;
+
     public function __construct()
     {
         $this->registerEntryTypes();
         $this->registerMenuManager();
+    }
+
+    public function setRequest(Request $request): self
+    {
+        $this->request = $request;
+        return $this;
+    }
+
+    public function getRequest(): Request
+    {
+        return $this->request;
+    }
+
+    public function setRequestEntryType(EntryType $entryType): self
+    {
+        $this->requestEntryType = $entryType;
+        return $this;
+    }
+
+    public function setRequestEntry(Model $model): self
+    {
+        $this->requestEntry = $model;
+        return $this;
+    }
+
+    public function getRequestEntryType(): ?EntryType
+    {
+        return $this->requestEntryType;
+    }
+
+    public function getRequestEntry(): ?Model
+    {
+        return $this->requestEntry;
     }
 
     public function flashSuccess(string $message, ?string $icon = null): void
@@ -89,8 +129,13 @@ class Fastlane
 
     public function registerControlPanelRoutes(Router $router): void
     {
-        $this->entryTypes->each(function (EntryType $contentType) use ($router) {
-            $router->fastlaneControlPanel($contentType->identifier(), Controllers\EntriesController::class);
+        $this->entryTypes->each(function (EntryType $entryType) use ($router) {
+            $router
+                ->middleware('fastlane.resolve:control_panel')
+                ->group(fn() => $router->fastlaneControlPanel(
+                    $entryType->identifier(),
+                    Controllers\EntriesController::class)
+                );
         });
     }
 
@@ -108,9 +153,15 @@ class Fastlane
 
     public function getEntryTypeByIdentifier(string $identifier): EntryType
     {
-        return $this->entryTypes->first(
+        $item = $this->entryTypes->first(
             fn(EntryType $entryType) => $entryType->identifier() === $identifier
         );
+
+        if (! $item) {
+            throw new EntryTypeNotRegisteredException;
+        }
+
+        return $item;
     }
 
     public function getEntryTypeByClass(string $class): EntryType

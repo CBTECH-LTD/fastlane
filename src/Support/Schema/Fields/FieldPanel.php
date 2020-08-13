@@ -2,12 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Makeable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Panelizable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -62,7 +62,7 @@ class FieldPanel implements SchemaField, Resolvable
         ];
     }
 
-    public function resolve(EntryTypeContract $entryType, EntryRequest $request): array
+    public function resolve(EntryTypeContract $entryType, Request $request): array
     {
         return Collection::make($this->fields)
             ->mapWithKeys(function (SchemaField $field) use ($entryType, $request) {

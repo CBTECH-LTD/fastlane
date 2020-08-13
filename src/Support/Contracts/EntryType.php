@@ -2,15 +2,15 @@
 
 namespace CbtechLtd\Fastlane\Support\Contracts;
 
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Schema\Contracts\EntrySchema;
 use Closure;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 interface EntryType extends Hookable
 {
-    public function resolveForRequest(EntryRequest $request): EntryType;
+    public function resolve(): EntryType;
 
     public function identifier(): string;
 
@@ -40,9 +40,9 @@ interface EntryType extends Hookable
 
     public function findItem(string $hashid, ?Closure $queryCallback = null): Model;
 
-    public function store(EntryRequest $request): Model;
+    public function store(Request $request): Model;
 
-    public function update(EntryRequest $request, string $hashid): Model;
+    public function update(Request $request, string $hashid): Model;
 
     public function delete(string $hashid): Model;
 

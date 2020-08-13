@@ -2,12 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\ImageUploader;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class ImageField extends FileField implements ExportsToApiAttributeContract
 {
@@ -34,11 +34,11 @@ class ImageField extends FileField implements ExportsToApiAttributeContract
         return $this;
     }
 
-    public function processUpload(EntryRequest $request): string
+    public function processUpload(Request $request): string
     {
         return $this->uploader->processImageUpload(
             $request->file($this->getName()),
-            $request->entryType()
+            app('fastlane')->getRequestEntryType()
         );
     }
 
@@ -49,12 +49,12 @@ class ImageField extends FileField implements ExportsToApiAttributeContract
         ];
     }
 
-    public function fillModel($model, $value, EntryRequest $request): void
+    public function fillModel($model, $value, array $requestData): void
     {
         parent::fillModel(
             $model,
-            $this->uploader->prepareValueToFill($request, $value),
-            $request
+            $this->uploader->prepareValueToFill($value, $requestData),
+            $requestData
         );
     }
 
@@ -69,7 +69,7 @@ class ImageField extends FileField implements ExportsToApiAttributeContract
         ];
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
+    protected function resolveConfig(EntryTypeContract $entryType, Request $request): array
     {
         return [
             'uploadUrl' => route("cp.{$entryType->identifier()}.images", $this->getName()),

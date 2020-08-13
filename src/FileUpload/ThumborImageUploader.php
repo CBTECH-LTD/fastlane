@@ -2,7 +2,6 @@
 
 namespace CbtechLtd\Fastlane\FileUpload;
 
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Contracts\ImageUploader;
 use GuzzleHttp\Client;
@@ -39,7 +38,7 @@ class ThumborImageUploader implements ImageUploader
         ];
     }
 
-    public function prepareValueToFill(EntryRequest $request, $value): string
+    public function prepareValueToFill($value, array $requestData): string
     {
         return Str::replaceFirst($this->getBaseImageUrl(), '', $value);
     }

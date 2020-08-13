@@ -4,12 +4,12 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
 use CbtechLtd\Fastlane\FileAttachment\StoreDraftAttachment;
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
@@ -39,10 +39,10 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
         return $this;
     }
 
-    public function fillModel($model, $value, EntryRequest $request): void
+    public function fillModel($model, $value, array $requestData): void
     {
         if (is_callable($this->fillValueCallback)) {
-            call_user_func($this->fillValueCallback, $request, $value, $model);
+            call_user_func($this->fillValueCallback, $model, $value, $requestData);
             return;
         }
 
@@ -50,7 +50,7 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
 
         // Check whether files are accepted in the rich editor instance,
         // then persist all draft attachment files.
-        if ($this->isAcceptingFiles() && $draftId = $request->input($this->getName() . '__draft_id')) {
+        if ($this->isAcceptingFiles() && $draftId = Arr::get($requestData, $this->getName() . '__draft_id')) {
             DraftAttachment::persistAllDraft(
                 $draftId,
                 $this,
@@ -78,7 +78,7 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
         )->all();
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
+    protected function resolveConfig(EntryTypeContract $entryType, Request $request): array
     {
         return [
             'acceptFiles' => $this->acceptFiles,
