@@ -4,11 +4,9 @@ namespace CbtechLtd\Fastlane\Http\Controllers;
 
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\FastlaneFacade;
-use CbtechLtd\Fastlane\Http\Requests\EntryEditRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
-use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -88,7 +86,7 @@ class EntriesController extends Controller
     public function edit()
     {
         return $this->render('Entries/Edit', [
-            'item' => new ApiResource((new EntryResource($this->entry(), $this->entryType()))->toUpdate()),
+            'item' => (new EntryResource($this->entry(), $this->entryType()))->toUpdate()->transform(),
         ]);
     }
 

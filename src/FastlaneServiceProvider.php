@@ -163,7 +163,6 @@ class FastlaneServiceProvider extends ServiceProvider
         Inertia::share('auth.user', function () {
             if (Auth::user()) {
                 return [
-                    'id'         => Auth::user()->id,
                     'attributes' => Auth::user()->toArray(),
                 ];
             }
@@ -224,7 +223,7 @@ class FastlaneServiceProvider extends ServiceProvider
 
         // Add a macro to generate Control Panel routes
         Router::macro('fastlaneControlPanel', function (string $prefix, string $controller) {
-            $this->group(['prefix' => $prefix,], function () use ($prefix, $controller) {
+            $this->group(['prefix' => '/entry-types/' . $prefix], function () use ($prefix, $controller) {
                 $this->get('/', [$controller, 'index'])->name("{$prefix}.index");
                 $this->get('/new', [$controller, 'create'])->name("{$prefix}.create");
                 $this->post('/', [$controller, 'store'])->name("{$prefix}.store");

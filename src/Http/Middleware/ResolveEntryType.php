@@ -27,10 +27,10 @@ class ResolveEntryType
     protected function resolveEntryType(Request $request, $routeGroup): void
     {
         $groupUrl = config("fastlane.${routeGroup}.url_prefix") . '/';
-        $urlPrefix = Str::replaceFirst('/', '', $groupUrl);
+        $urlPrefix = Str::replaceLast('/', '/entry-types/', $groupUrl);
 
         $entryType = $this->fastlane->getEntryTypeByIdentifier(
-            explode('/', Str::replaceFirst($urlPrefix, '', $request->path()))[0]
+            explode('/', Str::replaceFirst($urlPrefix, '', '/' . $request->path()))[0]
         );
 
         $this->fastlane->setRequestEntryType($entryType->resolve());

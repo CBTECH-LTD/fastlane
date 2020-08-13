@@ -134,15 +134,20 @@ class Fastlane
                 ->middleware('fastlane.resolve:control_panel')
                 ->group(fn() => $router->fastlaneControlPanel(
                     $entryType->identifier(),
-                    Controllers\EntriesController::class)
-                );
+                    Controllers\EntriesController::class
+                ));
         });
     }
 
     public function registerApiRoutes(Router $router): void
     {
         $this->entryTypes->each(function (EntryType $entryType) use ($router) {
-            $router->fastlaneContentApi($entryType->identifier(), Controllers\API\EntriesController::class);
+            $router
+                ->middleware('fastlane.resolve:api')
+                ->group(fn() => $router->fastlaneContentApi(
+                    $entryType->identifier(),
+                    Controllers\API\EntriesController::class
+                ));
         });
     }
 

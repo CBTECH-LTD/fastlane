@@ -2,25 +2,59 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers\API;
 
+use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Http\Controllers\Controller;
-use CbtechLtd\Fastlane\Http\Requests\API\EntryRequest;
+use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceBuilder;
+use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollectionBuilder;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class EntriesController extends Controller
 {
-    public function collection(EntryRequest $request)
+    protected Fastlane $fastlane;
+
+    public function __construct()
     {
-        $items = $request->entryType()->getItems(function (Builder $query) {
+        $this->fastlane = app('fastlane');
+    }
+
+    public function collection(Request $request)
+    {
+        $items = $this->entryType()->getItems(function (Builder $query) {
             $query->where('is_active', true);
         });
 
-        $resource = $request->entryType()->apiResource();
-        $resourceCollection = $request->entryType()->apiResourceCollection();
+        $collection = new EntryResourceCollectionBuilder(
+            $this->entryType(),
+            $items,
+            $request
+        );
 
-        $collection = $resourceCollection::make(
-            $items->map(fn($item) => new $resource($item, $request))->all()
-        )->forEntryType($request->entryType());
+        return response()->json($collection->build());
+    }
 
-        return response()->json($collection->transform());
+    public function single(Request $request)
+    {
+        abort_unless($this->entry()->is_active, 404);
+
+        $item = new EntryResourceBuilder(
+            $this->entryType(),
+            $this->entry(),
+            $request
+        );
+
+        return response()->json($item->build());
+    }
+
+    protected function entryType(): EntryType
+    {
+        return $this->fastlane->getRequestEntryType();
+    }
+
+    protected function entry(): ?Model
+    {
+        return $this->fastlane->getRequestEntry();
     }
 }

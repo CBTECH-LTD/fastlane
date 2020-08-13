@@ -7,6 +7,7 @@ use CbtechLtd\Fastlane\EntryTypes\Hooks\BeforeHydratingHook;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\FastlaneFacade;
+use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollection;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
@@ -105,7 +106,7 @@ abstract class EntryType implements EntryTypeContract
         $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'Resource';
 
         if (! class_exists($name)) {
-            ClassDoesNotExistException::model($name);
+            return EntryResource::class;
         }
 
         return $name;
@@ -116,11 +117,11 @@ abstract class EntryType implements EntryTypeContract
         /** @var ResourceType $name */
         $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'ResourceCollection';
 
-        if (class_exists($name)) {
-            return $name;
+        if (! class_exists($name)) {
+            return EntryResourceCollection::class;
         }
 
-        return EntryResourceCollection::class;
+        return $name;
     }
 
     public function policy(): ?string
