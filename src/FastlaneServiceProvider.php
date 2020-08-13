@@ -7,7 +7,6 @@ use CbtechLtd\Fastlane\Console\Commands\GeneratePivotTableCommand;
 use CbtechLtd\Fastlane\Console\Commands\InstallEntryTypesCommand;
 use CbtechLtd\Fastlane\Console\Commands\MakeEntryTypeCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
-use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserResource;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Commands\CreateSystemAdminCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use CbtechLtd\Fastlane\Http\Controllers\EntryAttachmentsController;
@@ -15,6 +14,8 @@ use CbtechLtd\Fastlane\Http\Controllers\EntryImagesController;
 use CbtechLtd\Fastlane\Http\Middleware\Authenticate;
 use CbtechLtd\Fastlane\Http\Middleware\RedirectIfAuthenticated;
 use CbtechLtd\Fastlane\Http\Middleware\SetInertiaRootTemplate;
+use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
+use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
@@ -173,7 +174,10 @@ class FastlaneServiceProvider extends ServiceProvider
 
         Inertia::share('auth.user', function () {
             if (Auth::user()) {
-                return BackendUserResource::transformToSingle(Auth::user());
+                return [
+                    'id'         => Auth::user()->id,
+                    'attributes' => Auth::user()->toArray(),
+                ];
             }
 
             return null;
