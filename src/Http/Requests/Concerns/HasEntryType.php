@@ -5,26 +5,22 @@ namespace CbtechLtd\Fastlane\Http\Requests\Concerns;
 use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 trait HasEntryType
 {
-    protected ?EntryType $entryType = null;
-    protected ?Model $entry = null;
-
     public function entryType(): EntryType
     {
-        return $this->entryType;
+        return FastlaneFacade::getRequestEntryType();
     }
 
     public function hasEntry(): bool
     {
-        return $this->entry instanceof Model;
+        return $this->entry() instanceof Model;
     }
 
     public function entry(): ?Model
     {
-        return $this->entry;
+        return FastlaneFacade::getRequestEntry();
     }
 
     public function authorize()
@@ -34,30 +30,5 @@ trait HasEntryType
         }
 
         return true;
-    }
-
-    protected function getUrlPrefix(): string
-    {
-        throw new \Exception('Not implemented');
-    }
-
-    private function resolveEntryType(): void
-    {
-        $urlPrefix = Str::replaceFirst('/', '', $this->getUrlPrefix() . '/');
-
-        $entryType = FastlaneFacade::getEntryTypeByIdentifier(
-            explode('/', Str::replaceFirst($urlPrefix, '', $this->path()))[0]
-        );
-
-        $this->resolveEntry($entryType);
-
-        $this->entryType = $entryType->resolveForRequest($this);
-    }
-
-    private function resolveEntry(EntryType $entryType): void
-    {
-        if (! is_null($this->id)) {
-            $this->entry = $entryType->findItem($this->id);
-        }
     }
 }

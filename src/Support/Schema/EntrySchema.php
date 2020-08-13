@@ -2,12 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema;
 
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -15,19 +15,14 @@ use Illuminate\Support\Str;
 class EntrySchema implements Contracts\EntrySchema
 {
     private EntryTypeContract $entryType;
-    private EntryRequest $request;
+    private Request $request;
     private Collection $cache;
 
-    public function __construct(EntryTypeContract $entryType)
+    public function __construct(EntryTypeContract $entryType, Request $request)
     {
         $this->entryType = $entryType;
-        $this->cache = new Collection;
-    }
-
-    public function resolve(EntryRequest $request): self
-    {
         $this->request = $request;
-        return $this;
+        $this->cache = new Collection;
     }
 
     public function getFields(): array

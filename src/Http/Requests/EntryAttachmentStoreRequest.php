@@ -5,7 +5,7 @@ namespace CbtechLtd\Fastlane\Http\Requests;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 
-class EntryAttachmentStoreRequest extends EntryRequest
+class EntryAttachmentStoreRequest extends FormRequest
 {
     protected bool $hasLoadedField = false;
     protected ?SchemaField $field = null;
@@ -31,5 +31,10 @@ class EntryAttachmentStoreRequest extends EntryRequest
         $this->hasLoadedField = true;
 
         return $this->field;
+    }
+
+    public function rules()
+    {
+        return [];
     }
 }

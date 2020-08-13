@@ -2,12 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
@@ -107,7 +107,7 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
         return [$this->getName() => 'in:' . $values->implode(',')];
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
+    protected function resolveConfig(EntryTypeContract $entryType, Request $request): array
     {
         return [
             'options'  => $this->resolveOptions($request),
@@ -116,7 +116,7 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
         ];
     }
 
-    protected function resolveOptions(EntryRequest $request): Collection
+    protected function resolveOptions(Request $request): Collection
     {
         $options = is_callable($this->options)
             ? call_user_func($this->options, $request)

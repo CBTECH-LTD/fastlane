@@ -3,8 +3,8 @@
 namespace CbtechLtd\Fastlane\Support\ControlPanelResources;
 
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithValue;
+use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
@@ -26,6 +26,11 @@ class EntryResource extends ResourceType
     public function type(): string
     {
         return 'fastlane-entry';
+    }
+
+    public function transform(): ApiResource
+    {
+        return new ApiResource($this);
     }
 
     public function toIndex(): self

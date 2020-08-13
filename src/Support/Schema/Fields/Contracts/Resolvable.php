@@ -2,16 +2,16 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields\Contracts;
 
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
+use Illuminate\Http\Request;
 
 interface Resolvable
 {
     /**
      * @param EntryTypeContract $entryType
-     * @param EntryRequest      $request
+     * @param Request           $request
      * @return SchemaField[]
      */
-    public function resolve(EntryTypeContract $entryType, EntryRequest $request): array;
+    public function resolve(EntryTypeContract $entryType, Request $request): array;
 }

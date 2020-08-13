@@ -2,15 +2,13 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers;
 
+use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\FastlaneFacade;
-use CbtechLtd\Fastlane\Http\Requests\EntryEditRequest;
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
-use CbtechLtd\Fastlane\Http\Requests\EntryStoreRequest;
-use CbtechLtd\Fastlane\Http\Requests\EntryUpdateRequest;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
-use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
@@ -18,80 +16,98 @@ use Illuminate\Support\Str;
 
 class EntriesController extends Controller
 {
-    public function index(EntryRequest $request)
+    protected Fastlane $fastlane;
+
+    public function __construct()
+    {
+        $this->fastlane = app('fastlane');
+    }
+
+    protected function entryType(): EntryType
+    {
+        return $this->fastlane->getRequestEntryType();
+    }
+
+    protected function entry(): ?Model
+    {
+        return $this->fastlane->getRequestEntry();
+    }
+
+    public function index()
     {
         $collection = EntryResourceCollection::make(
-            $request->entryType()->getItems()->map(
-                fn(Model $m) => (new EntryResource($m, $request->entryType()))->toIndex()
+            $this->entryType()->getItems()->map(
+                fn(Model $m) => (new EntryResource($m, $this->entryType()))->toIndex()
             )->all()
-        )->forEntryType($request->entryType());
+        )->forEntryType($this->entryType());
 
         return $this->render('Entries/Index', [
             'items'     => $collection->transform(),
             'entryType' => [
-                'schema'        => $request->entryType()->schema()->getIndexFields(),
-                'singular_name' => $request->entryType()->name(),
-                'plural_name'   => Str::plural($request->entryType()->name()),
+                'schema'        => $this->entryType()->schema()->getIndexFields(),
+                'singular_name' => $this->entryType()->name(),
+                'plural_name'   => Str::plural($this->entryType()->name()),
             ],
             'links'     => [
-                'create' => URL::relative("cp.{$request->entryType()->identifier()}.create"),
+                'create' => URL::relative("cp.{$this->entryType()->identifier()}.create"),
             ],
         ]);
     }
 
-    public function create(EntryRequest $request)
+    public function create()
     {
-        // TODO: Add authorization
+        if ($this->entryType()->policy()) {
+            $this->authorize('create', $this->entryType()->model());
+        }
 
         return $this->render('Entries/Create', [
             'entryType' => [
-                'schema'        => $request->entryType()->schema()->getCreateFields(),
-                'panels'        => Collection::make($request->entryType()->schema()->getPanels()),
-                'singular_name' => $request->entryType()->name(),
-                'plural_name'   => Str::plural($request->entryType()->name()),
+                'schema'        => $this->entryType()->schema()->getCreateFields(),
+                'panels'        => Collection::make($this->entryType()->schema()->getPanels()),
+                'singular_name' => $this->entryType()->name(),
+                'plural_name'   => Str::plural($this->entryType()->name()),
             ],
             'links'     => [
-                'form'   => URL::relative("cp.{$request->entryType()->identifier()}.store"),
-                'parent' => URL::relative("cp.{$request->entryType()->identifier()}.index"),
+                'form'   => URL::relative("cp.{$this->entryType()->identifier()}.store"),
+                'parent' => URL::relative("cp.{$this->entryType()->identifier()}.index"),
             ],
         ]);
     }
 
-    public function store(EntryStoreRequest $request)
+    public function store(Request $request)
     {
-        $entry = $request
-            ->entryType()
-            ->store($request);
+        $entry = $this->entryType()->store($request);
 
-        FastlaneFacade::flashSuccess($request->entryType()->name() . ' created successfully.', 'thumbs-up');
+        FastlaneFacade::flashSuccess($this->entryType()->name() . ' created successfully.', 'thumbs-up');
 
-        return Redirect::route("cp.{$request->entryType()->identifier()}.edit", [$entry]);
+        return Redirect::route("cp.{$this->entryType()->identifier()}.edit", [$entry]);
     }
 
-    public function edit(EntryEditRequest $request)
+    public function edit()
     {
-        $entry = $request->entry();
-
         return $this->render('Entries/Edit', [
-            'item' => new ApiResource((new EntryResource($entry, $request->entryType()))->toUpdate()),
+            'item' => (new EntryResource($this->entry(), $this->entryType()))->toUpdate()->transform(),
         ]);
     }
 
-    public function update(EntryUpdateRequest $request, string $id)
+    public function update(Request $request, string $id)
     {
-        $request->entryType()->update($request, $id);
+        $this->entryType()->update($request, $id);
 
-        FastlaneFacade::flashSuccess($request->entryType()->name() . ' updated successfully.', 'thumbs-up');
+        $this->fastlane->flashSuccess(
+            $this->entryType()->name() . ' updated successfully.',
+            'thumbs-up'
+        );
 
         return Redirect::back();
     }
 
-    public function delete(EntryRequest $request, string $id)
+    public function delete(Request $request, string $id)
     {
-        $request->entryType()->delete($id);
+        $this->entryType()->delete($id);
 
-        FastlaneFacade::flashSuccess($request->entryType()->name() . ' deleted successfully.', 'trash');
+        FastlaneFacade::flashSuccess($this->entryType()->name() . ' deleted successfully.', 'trash');
 
-        return Redirect::route("cp.{$request->entryType()->identifier()}.index");
+        return Redirect::route("cp.{$this->entryType()->identifier()}.index");
     }
 }

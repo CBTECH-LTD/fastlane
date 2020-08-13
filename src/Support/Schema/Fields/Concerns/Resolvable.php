@@ -2,9 +2,9 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields\Concerns;
 
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 trait Resolvable
@@ -12,7 +12,7 @@ trait Resolvable
     protected $resolveValueCallback;
     protected ?Collection $resolvedConfig = null;
 
-    public function resolve(EntryTypeContract $entryType, EntryRequest $request): array
+    public function resolve(EntryTypeContract $entryType, Request $request): array
     {
         $this->resolvedConfig = Collection::make();
 
@@ -40,7 +40,7 @@ trait Resolvable
         ];
     }
 
-    protected function resolveCreateRules(EntryTypeContract $entryType, EntryRequest $request): array
+    protected function resolveCreateRules(EntryTypeContract $entryType, Request $request): array
     {
         $baseRules = $this->getBaseRules();
 
@@ -51,7 +51,7 @@ trait Resolvable
         ];
     }
 
-    protected function resolveUpdateRules(EntryTypeContract $entryType, EntryRequest $request): array
+    protected function resolveUpdateRules(EntryTypeContract $entryType, Request $request): array
     {
         $baseRules = $this->getBaseRules();
 
@@ -62,7 +62,7 @@ trait Resolvable
         ];
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
+    protected function resolveConfig(EntryTypeContract $entryType, Request $request): array
     {
         return [];
     }

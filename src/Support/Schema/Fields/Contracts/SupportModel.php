@@ -2,11 +2,9 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields\Contracts;
 
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
-
 interface SupportModel
 {
-    public function fillModel($model, $value, EntryRequest $request): void;
+    public function fillModel($model, $value, array $requestData): void;
 
     public function fillModelUsing($callback): self;
 

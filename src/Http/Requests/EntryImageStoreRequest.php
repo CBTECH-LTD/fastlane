@@ -4,13 +4,18 @@ namespace CbtechLtd\Fastlane\Http\Requests;
 
 use CbtechLtd\Fastlane\Support\Schema\Fields\ImageField;
 
-class EntryImageStoreRequest extends EntryRequest
+class EntryImageStoreRequest extends FormRequest
 {
     protected ?ImageField $field = null;
 
     public function authorizeRequest()
     {
         return $this->field() instanceof ImageField;
+    }
+
+    public function rules()
+    {
+        return [];
     }
 
     public function field(): ImageField

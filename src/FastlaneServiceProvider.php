@@ -12,10 +12,9 @@ use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use CbtechLtd\Fastlane\Http\Controllers\EntryAttachmentsController;
 use CbtechLtd\Fastlane\Http\Controllers\EntryImagesController;
 use CbtechLtd\Fastlane\Http\Middleware\Authenticate;
+use CbtechLtd\Fastlane\Http\Middleware\ResolveEntryType;
 use CbtechLtd\Fastlane\Http\Middleware\RedirectIfAuthenticated;
 use CbtechLtd\Fastlane\Http\Middleware\SetInertiaRootTemplate;
-use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
-use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
@@ -126,17 +125,6 @@ class FastlaneServiceProvider extends ServiceProvider
             'expire'   => 60,
             'throttle' => 60,
         ]);
-
-        /** @var Router $router */
-        $router = $this->app['router'];
-
-        if (! in_array('fastlane.auth', $router->getMiddleware())) {
-            $router->aliasMiddleware('fastlane.auth', Authenticate::class);
-        }
-
-        if (! in_array('fastlane.guest', $router->getMiddleware())) {
-            $router->aliasMiddleware('fastlane.guest', RedirectIfAuthenticated::class);
-        }
     }
 
     protected function bootBlueprintMacro(): void
@@ -175,7 +163,6 @@ class FastlaneServiceProvider extends ServiceProvider
         Inertia::share('auth.user', function () {
             if (Auth::user()) {
                 return [
-                    'id'         => Auth::user()->id,
                     'attributes' => Auth::user()->toArray(),
                 ];
             }
@@ -219,9 +206,24 @@ class FastlaneServiceProvider extends ServiceProvider
 
     protected function bootRoutes(): void
     {
+        /** @var Router $router */
+        $router = $this->app['router'];
+
+        if (! in_array('fastlane.auth', $router->getMiddleware())) {
+            $router->aliasMiddleware('fastlane.auth', Authenticate::class);
+        }
+
+        if (! in_array('fastlane.guest', $router->getMiddleware())) {
+            $router->aliasMiddleware('fastlane.guest', RedirectIfAuthenticated::class);
+        }
+
+        if (! in_array('fastlane.resolve', $router->getMiddleware())) {
+            $router->aliasMiddleware('fastlane.resolve', ResolveEntryType::class);
+        }
+
         // Add a macro to generate Control Panel routes
         Router::macro('fastlaneControlPanel', function (string $prefix, string $controller) {
-            $this->group(['prefix' => $prefix,], function () use ($prefix, $controller) {
+            $this->group(['prefix' => '/entry-types/' . $prefix], function () use ($prefix, $controller) {
                 $this->get('/', [$controller, 'index'])->name("{$prefix}.index");
                 $this->get('/new', [$controller, 'create'])->name("{$prefix}.create");
                 $this->post('/', [$controller, 'store'])->name("{$prefix}.store");
@@ -262,7 +264,8 @@ class FastlaneServiceProvider extends ServiceProvider
 
     protected function setupControlPanelRoutes(): void
     {
-        $middleware = array_merge(config('fastlane.control_panel.middleware'), ['inertia:fastlane']);
+        $middleware = array_merge(
+            config('fastlane.control_panel.middleware'), ['inertia:fastlane']);
 
         Route::middleware($middleware)
             ->prefix(config('fastlane.control_panel.url_prefix'))

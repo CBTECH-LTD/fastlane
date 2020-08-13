@@ -2,13 +2,13 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiRelationship;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiRelationship as ExportsToApiRelationshipContract;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 abstract class RelationField extends AbstractBaseField implements ExportsToApiRelationshipContract
@@ -38,7 +38,7 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
      */
     abstract public function getRelationshipMethod(): Closure;
 
-    abstract protected function hydrateRelation($model, $value, EntryRequest $request): void;
+    abstract protected function hydrateRelation($model, $value, array $requestData): void;
 
     public function __construct(string $relatedEntryType, ?string $label = null)
     {
@@ -70,14 +70,14 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
         return 'select';
     }
 
-    public function fillModel($model, $value, EntryRequest $request): void
+    public function fillModel($model, $value, array $requestData): void
     {
         if (is_callable($this->fillValueCallback)) {
-            call_user_func($this->fillValueCallback, $model, $value, $request);
+            call_user_func($this->fillValueCallback, $model, $value, $requestData);
             return;
         }
 
-        $this->hydrateRelation($model, $value, $request);
+        $this->hydrateRelation($model, $value, $requestData);
     }
 
     public function getRelatedEntryType(): EntryTypeContract
@@ -119,7 +119,7 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
         return '';
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
+    protected function resolveConfig(EntryTypeContract $entryType, Request $request): array
     {
         return [
             'options'  => $this->resolveOptions($entryType, $request),
@@ -127,7 +127,7 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
         ];
     }
 
-    protected function resolveOptions(EntryTypeContract $entryType, EntryRequest $request): Collection
+    protected function resolveOptions(EntryTypeContract $entryType, Request $request): Collection
     {
         return $this->relatedEntryType->getItems()->map(function (Model $model) use ($entryType) {
             return SelectOption::make(

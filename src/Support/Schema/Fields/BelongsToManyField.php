@@ -4,7 +4,6 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
@@ -50,12 +49,14 @@ class BelongsToManyField extends RelationField
         };
     }
 
-    protected function hydrateRelation($model, $value, EntryRequest $request): void
+    protected function hydrateRelation($model, $value, array $requestData): void
     {
-        $request->entryType()->addHook(EntryType::HOOK_AFTER_SAVING, function (OnSavingHook $hook, Closure $next) use ($value) {
-            $hook->model()->{$this->getRelationshipName()}()->sync($value);
-
-            $next($hook);
-        });
+        app('fastlane')
+            ->getRequestEntryType()
+            ->addHook(EntryType::HOOK_AFTER_SAVING, function (OnSavingHook $hook, Closure $next) use ($value) {
+                $hook->model()->{$this->getRelationshipName()}()->sync($value);
+    
+                $next($hook);
+            });
     }
 }

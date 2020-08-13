@@ -3,7 +3,6 @@
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Exceptions\UnresolvedException;
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Makeable;
@@ -149,13 +148,13 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
         return $this->showOnUpdate;
     }
 
-    public function fillModel($model, $value, EntryRequest $request): void
+    public function fillModel($model, $value, array $requestData): void
     {
         $beforeHook = new OnFillingHook($this, $model, $value);
         $this->executeHooks(static::HOOK_BEFORE_FILLING, $beforeHook);
 
         if (is_callable($this->fillValueCallback)) {
-            call_user_func($this->fillValueCallback, $model, $value, $request);
+            call_user_func($this->fillValueCallback, $model, $value, $requestData);
             return;
         }
 

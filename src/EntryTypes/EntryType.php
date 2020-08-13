@@ -7,21 +7,22 @@ use CbtechLtd\Fastlane\EntryTypes\Hooks\BeforeHydratingHook;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\FastlaneFacade;
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
+use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollection;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
-use CbtechLtd\JsonApiTransformer\ApiResources\AnonymousResourceTypeCollection;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use ReflectionClass;
 
@@ -105,7 +106,7 @@ abstract class EntryType implements EntryTypeContract
         $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'Resource';
 
         if (! class_exists($name)) {
-            ClassDoesNotExistException::model($name);
+            return EntryResource::class;
         }
 
         return $name;
@@ -116,11 +117,11 @@ abstract class EntryType implements EntryTypeContract
         /** @var ResourceType $name */
         $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'ResourceCollection';
 
-        if (class_exists($name)) {
-            return $name;
+        if (! class_exists($name)) {
+            return EntryResourceCollection::class;
         }
 
-        return EntryResourceCollection::class;
+        return $name;
     }
 
     public function policy(): ?string
@@ -128,7 +129,7 @@ abstract class EntryType implements EntryTypeContract
         $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'Policy';
 
         if (! class_exists($name)) {
-            ClassDoesNotExistException::model($name);
+            return null;
         }
 
         return $name;
@@ -196,52 +197,78 @@ abstract class EntryType implements EntryTypeContract
         return $entry;
     }
 
-    public function store(EntryRequest $request): Model
+    public function store(Request $request): Model
     {
         $this->gate->authorize('create', $this->model());
         $entry = $this->newModelInstance();
         $fields = $this->schema()->getCreateFields();
 
-        $this->hydrateFields(
-            $request,
-            $entry,
-            $fields,
-        );
+        // Check whether the authenticated user can update
+        // the given entry instance.
+        if ($this->policy()) {
+            $this->gate->authorize('create', $entry);
+        }
 
-        $beforeHook = new OnSavingHook($this, $entry, $request->validated());
+        // Validate the request data against the update fields
+        // and save the validated data in a new variable.
+        $fields = $this->schema()->getCreateFields();
+
+        $rules = Collection::make($fields)
+            ->mapWithKeys(fn(SchemaField $fieldType) => $fieldType->getCreateRules())
+            ->all();
+
+        $data = Validator::make($request->all(), $rules)->validated();
+
+        // Pass the validated date through all fields, call hooks before saving,
+        // then call more hooks after model has been saved.
+        $this->hydrateFields($entry, $fields, $data);
+
+        $beforeHook = new OnSavingHook($this, $entry, $data);
         $this->executeHooks(static::HOOK_BEFORE_CREATING, $beforeHook);
         $this->executeHooks(static::HOOK_BEFORE_SAVING, $beforeHook);
 
         $beforeHook->model()->save();
 
-        $afterHook = new OnSavingHook($this, $beforeHook->model(), $request->validated());
+        $afterHook = new OnSavingHook($this, $beforeHook->model(), $data);
         $this->executeHooks(static::HOOK_AFTER_CREATING, $afterHook);
         $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
 
         return $afterHook->model();
     }
 
-    public function update(EntryRequest $request, string $hashid): Model
+    public function update(Request $request, string $hashid): Model
     {
         $query = $this->newModelInstance()->newModelQuery();
         $this->querySingleItem($query, $hashid);
         $entry = $query->whereHashid($hashid)->firstOrFail();
 
-        $this->gate->authorize('update', $entry);
+        // Check whether the authenticated user can update
+        // the given entry instance.
+        if ($this->policy()) {
+            $this->gate->authorize('update', $entry);
+        }
 
-        $this->hydrateFields(
-            $request,
-            $entry,
-            $this->schema()->getUpdateFields(),
-        );
+        // Validate the request data against the update fields
+        // and save the validated data in a new variable.
+        $fields = $this->schema()->getUpdateFields();
 
-        $beforeHook = new OnSavingHook($this, $entry, $request->validated());
+        $rules = Collection::make($fields)
+            ->mapWithKeys(fn(SchemaField $fieldType) => $fieldType->getUpdateRules())
+            ->all();
+
+        $data = Validator::make($request->all(), $rules)->validated();
+
+        // Pass the validated date through all fields, call hooks before saving,
+        // then call more hooks after model has been saved.
+        $this->hydrateFields($entry, $fields, $data);
+
+        $beforeHook = new OnSavingHook($this, $entry, $data);
         $this->executeHooks(static::HOOK_BEFORE_UPDATING, $beforeHook);
         $this->executeHooks(static::HOOK_BEFORE_SAVING, $beforeHook);
 
         $beforeHook->model()->save();
 
-        $afterHook = new OnSavingHook($this, $beforeHook->model(), $request->validated());
+        $afterHook = new OnSavingHook($this, $beforeHook->model(), $data);
         $this->executeHooks(static::HOOK_AFTER_UPDATING, $afterHook);
         $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
 
@@ -254,7 +281,9 @@ abstract class EntryType implements EntryTypeContract
         $this->querySingleItem($query, $hashid);
         $entry = $query->whereHashid($hashid)->firstOrFail();
 
-        $this->gate->authorize('delete', $entry);
+        if ($this->policy()) {
+            $this->gate->authorize('delete', $entry);
+        }
 
         $entry->delete();
 
@@ -316,13 +345,13 @@ abstract class EntryType implements EntryTypeContract
     }
 
     /**
-     * @param EntryRequest  $request
      * @param Model         $model
      * @param SchemaField[] $fields
+     * @param array         $data
      */
-    protected function hydrateFields(EntryRequest $request, Model $model, array $fields): void
+    protected function hydrateFields(Model $model, array $fields, array $data): void
     {
-        $hookClass = new BeforeHydratingHook($this, $request, $model, $fields, $request->validated());
+        $hookClass = new BeforeHydratingHook($this, $model, $fields, $data);
 
         $this->executeHooks(
             static::HOOK_BEFORE_HYDRATING,
@@ -331,7 +360,7 @@ abstract class EntryType implements EntryTypeContract
 
         foreach ($fields as $field) {
             if (Arr::has($hookClass->data, $field->getName())) {
-                $field->fillModel($model, Arr::get($hookClass->data, $field->getName()), $request);
+                $field->fillModel($model, Arr::get($hookClass->data, $field->getName()), $data);
             }
         }
     }
