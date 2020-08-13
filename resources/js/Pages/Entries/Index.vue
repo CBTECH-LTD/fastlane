@@ -1,8 +1,8 @@
 <template>
     <f-the-app-layout>
-        <template v-slot:title>{{ entryType.plural_name }}</template>
+        <template v-slot:title>{{ items.meta.entry_type.plural_name }}</template>
         <template v-slot:actions>
-            <f-button v-if="links.create" :href="links.create" left-icon="plus" size="lg">Add {{ entryType.singular_name }}</f-button>
+            <f-button v-if="items.links.create" :href="items.links.create" left-icon="plus" size="lg">Add {{ items.meta.entry_type.singular_name }}</f-button>
         </template>
 
         <f-table-card :items="items.data" auto>
@@ -45,24 +45,16 @@ export default {
     name: 'Entries.Index',
 
     props: {
-        links: {
-            required: true,
-            type: Object,
-        },
         items: {
             required: true,
             type: Object,
         },
-        entryType: {
-            required: true,
-            type: Object,
-        }
     },
 
     data () {
         return {
             isPerformingActionFor: {},
-            listSchema: new ListSchema(this.entryType.schema),
+            listSchema: new ListSchema(this.items.meta.entry_type.schema),
         }
     },
 

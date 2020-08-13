@@ -18,17 +18,20 @@
             </div>
         </div>
         <div class="mt-20 w-full flex-grow flex">
-            <div class="flex flex-col border-r border-gray-300 bg-gray-200 h-screen sticky top-0 overflow-hidden" style="width: 320px">
+            <div class="flex flex-col border-r border-gray-400 bg-gray-300 h-screen sticky top-0 overflow-hidden" style="width: 320px">
                 <!-- Navigation items -->
                 <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scroll">
-                    <f-navigation-list @click="onNavigationItemClicked"/>
+                    <f-navigation-list :items="this.$page.menu"/>
                 </div>
             </div>
 
             <!-- Main area -->
-            <div class="flex-1 flex flex-col">
-                <div class="flex-1">
-                    <div ref="sticky" class="title-bar-wrapper" :class="stickyBarClass">
+            <div class="flex-1 flex flex-row">
+                <div v-if="$slots.hasOwnProperty('page-sidebar')">
+                    <slot name="page-sidebar"/>
+                </div>
+                <div class="flex-grow">
+                    <div v-if="$slots.hasOwnProperty('title')" ref="sticky" class="title-bar-wrapper" :class="stickyBarClass">
                         <div class="title-bar">
                             <div class="div">
                                 <h1 class="title-bar__title">
@@ -66,119 +69,99 @@
 
 <script>
 
-    export default {
-        name: 'AppLayout',
+export default {
+    name: 'AppLayout',
 
-        data () {
-            return {
-                isSigningOut: false,
-                stickyBarClass: '',
-                sidebar: {
-                    show: false,
-                    title: '',
-                    icon: '',
-                    description: null,
-                    items: [],
-                }
-            }
+    data () {
+        return {
+            isSigningOut: false,
+            stickyBarClass: '',
+        }
+    },
+
+    methods: {
+        async signOut () {
+            this.isSigningOut = true
+            await this.$inertia.post('/cp/logout')
+            this.isSigningOut = false
         },
 
-        methods: {
-            onNavigationItemClicked ({ item }) {
-                if (item.type === 'group') {
-                    this.sidebar.title = item.label
-                    this.sidebar.icon = item.icon
-                    this.sidebar.items = item.children
-                    this.sidebar.show = true
-                    return
-                }
+        observeStickyTitleBar ($observable) {
+            let observer = new IntersectionObserver(entries => {
+                this.stickyBarClass = (!entries[0].isIntersecting)
+                    ? 'is-floating'
+                    : ''
+            }, {
+                rootMargin: '-20px 0px',
+                threshold: 1
+            })
 
-                this.sidebar.show = false
-                this.sidebar.title = ''
-                this.sidebar.icon = ''
-                this.sidebar.items = []
-            },
+            observer.observe($observable)
+        }
+    },
 
-            async signOut () {
-                this.isSigningOut = true
-                await this.$inertia.post('/cp/logout')
-                this.isSigningOut = false
-            },
-
-            observeStickyTitleBar ($observable) {
-                let observer = new IntersectionObserver(entries => {
-                    this.stickyBarClass = (! entries[0].isIntersecting)
-                        ? 'is-floating'
-                        : ''
-                }, {
-                    rootMargin: '-20px 0px',
-                    threshold: 1
-                })
-
-                observer.observe($observable)
-            }
-        },
-
-        mounted () {
+    mounted () {
+        if (this.$refs.sticky) {
             this.observeStickyTitleBar(this.$refs.sticky)
-        },
-    }
+        }
+    },
+}
 </script>
 
 <style scoped>
-    .title-bar-wrapper {
-        @apply sticky top-0 pt-12 mx-4 z-30 bg-transparent transition-all duration-300;
-    }
+.title-bar-wrapper {
+    @apply sticky top-0 pt-12 mx-4 z-30 bg-transparent transition-all duration-300;
+}
 
-    .title-bar {
-        @apply flex items-center justify-between px-8 py-8 z-30 transition-all duration-300;
-        height: 72px;
-        transform: translateY(0);
-        top: 80px;
-    }
+.title-bar {
+    @apply flex items-center justify-between px-8 py-8 z-30 transition-all duration-300;
+    height: 72px;
+    transform: translateY(0);
+    top: 80px;
+}
 
-    .title-bar__title {
-        @apply text-3xl text-gray-700 font-extrabold;
-    }
+.title-bar__title {
+    @apply text-3xl text-gray-700 font-extrabold;
+}
 
-    .title-bar__subtitle {
-        @apply text-lg text-gray-500 font-semibold;
-    }
+.title-bar__subtitle {
+    @apply text-lg text-gray-500 font-semibold;
+}
 
-    .title-bar-wrapper.is-floating {
-        @apply bg-indigo-200 rounded-t-none rounded-b-lg border border-indigo-300 shadow-lg;
-    }
+.title-bar-wrapper.is-floating {
+    @apply bg-indigo-200 rounded-t-none rounded-b-lg border border-indigo-300 shadow-lg;
+}
 
-    .title-bar-wrapper.is-floating .title-bar {
-        @apply py-4 mb-12;
-        transform: translateY(40px);
-    }
+.title-bar-wrapper.is-floating .title-bar {
+    @apply py-4 mb-12;
+    transform: translateY(40px);
+}
 
-    .title-bar-wrapper.is-floating .title-bar__title {
-        @apply text-xl;
-    }
+.title-bar-wrapper.is-floating .title-bar__title {
+    @apply text-xl;
+}
 
-    .title-bar-wrapper.is-floating .title-bar__subtitle {
-        @apply text-sm;
-    }
+.title-bar-wrapper.is-floating .title-bar__subtitle {
+    @apply text-sm;
+}
 
-    .flash-message {
-        @apply mb-2 p-2 border-l-4 flex items-start;
-    }
+.flash-message {
+    @apply mb-2 p-2 border-l-4 flex items-start;
+}
 
-    .flash-message--type-success {
-        @apply text-green-700 bg-green-200 border-green-700;
-    }
+.flash-message--type-success {
+    @apply text-green-700 bg-green-200 border-green-700;
+}
 
-    .flash-message--type-alert {
-        @apply text-yellow-700 bg-yellow-200 border-yellow-700;
-    }
+.flash-message--type-alert {
+    @apply text-yellow-700 bg-yellow-200 border-yellow-700;
+}
 
-    .flash-message--type-danger {
-        @apply text-red-700 bg-red-200 border-red-700;
-    }
+.flash-message--type-danger {
+    @apply text-red-700 bg-red-200 border-red-700;
+}
 
-    .flash-message--type-info {
-        @apply text-purple-700 bg-purple-200 border-purple-300;
-    }
+.flash-message--type-info {
+    @apply text-purple-700 bg-purple-200 border-purple-300;
+}
 </style>

@@ -2,101 +2,102 @@
 
 namespace CbtechLtd\Fastlane\Support\ApiResources;
 
+use CbtechLtd\Fastlane\FastlaneFacade;
+use CbtechLtd\Fastlane\Http\Requests\API\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiRelationship;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
-class EntryResource extends ResourceType
+abstract class EntryResource extends ResourceType
 {
-    protected EntryType $entryType;
-    protected string $destination;
+    private EntryRequest $request;
+    protected array $options = [];
 
-    public function __construct(Model $model, EntryType $entryType)
+    public function __construct(Model $model, EntryRequest $request)
     {
         parent::__construct($model);
-        $this->entryType = $entryType;
+        $this->request = $request;
     }
 
     public function type(): string
     {
-        return 'fastlane-entry';
+        return $this->getEntryType()->identifier();
     }
 
-    public function toIndex(): self
+    public function withOptions(array $options): self
     {
-        $this->destination = 'index';
-        return $this;
-    }
-
-    public function toCreate(): self
-    {
-        $this->destination = 'create';
-        return $this;
-    }
-
-    public function toUpdate(): self
-    {
-        $this->destination = 'update';
+        $this->options = $options;
         return $this;
     }
 
     public function attributes(Request $request): array
     {
-        $fields = $this->getSchemaFields();
+        return $this->getSchemaFields()
+            ->filter(fn(SchemaField $f) => $f instanceof ExportsToApiAttribute)
+            ->mapWithKeys(fn(ExportsToApiAttribute $f) => $f->toApiAttribute($this->model, $this->options))
+            ->all();
+    }
 
-        return Collection::make($fields)
-            ->mapWithKeys(
-                fn(SchemaField $field) => $field->resolveValue($this->model)
-            )->all();
+    protected function relationships(): array
+    {
+        return $this->getSchemaFields()
+            ->filter(fn(SchemaField $f) => $f instanceof ExportsToApiRelationship)
+            ->mapWithKeys(fn(ExportsToApiRelationship $f) => $f->toApiRelationship($this->model, $this->options))
+            ->filter()
+            ->all();
     }
 
     protected function meta(): array
     {
         return [
-            ResourceMeta::make('item_label', $this->entryType->makeModelTitle($this->model)),
             ResourceMeta::make('entry_type', [
-                'schema'        => Collection::make($this->getSchemaFields()),
-                'panels'        => Collection::make($this->getSchemaPanels()),
-                'singular_name' => $this->entryType->name(),
-                'plural_name'   => $this->entryType->pluralName(),
-                'identifier'    => $this->entryType->identifier(),
-                'icon'          => $this->entryType->icon(),
+                'singular_name' => $this->getEntryType()->name(),
+                'plural_name'   => $this->getEntryType()->pluralName(),
+                'identifier'    => $this->getEntryType()->identifier(),
             ]),
         ];
     }
 
     protected function links(): array
     {
+        $identifier = $this->getEntryType()->identifier();
+
         return [
-            ResourceLink::make('self', ["cp.{$this->entryType->identifier()}.edit", $this->model]),
-            ResourceLink::make('parent', ["cp.{$this->entryType->identifier()}.index"]),
+            ResourceLink::make('self', ["fastlane.api.{$identifier}.single", $this->model]),
+            ResourceLink::make('top', ["fastlane.api.{$identifier}.collection"]),
         ];
     }
 
-    private function getSchemaFields()
+    protected function getEntryType(): EntryType
     {
-        if ($this->destination === 'update') {
-            return $this->entryType->schema()->getUpdateFields();
-        }
-
-        if ($this->destination === 'create') {
-            return $this->entryType->schema()->getCreateFields();
-        }
-
-        return $this->entryType->schema()->getIndexFields();
+        return FastlaneFacade::getEntryTypeByClass($this->getEntryTypeClass());
     }
 
-    private function getSchemaPanels()
+    protected function getEntryTypeClass(): string
     {
-        if ($this->destination === 'index') {
-            return [];
+        $class = Str::replaceLast(
+            'Resource',
+            'EntryType',
+            (new \ReflectionClass($this))->getName()
+        );
+
+        if (! class_exists($class)) {
+            throw new \Exception($class . ' does not exist.');
         }
 
-        return $this->entryType->schema()->getPanels();
+        return $class;
+    }
+
+    protected function getSchemaFields(): Collection
+    {
+        return Collection::make($this->request->entryType()->schema()->getFields());
     }
 }

@@ -4,13 +4,17 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiRelationship;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiRelationship as ExportsToApiRelationshipContract;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-abstract class RelationField extends BaseSchemaField
+abstract class RelationField extends AbstractBaseField implements ExportsToApiRelationshipContract
 {
+    use ExportsToApiRelationship;
+
     protected $default = null;
     protected bool $multiple = false;
     protected bool $withTimestamps = true;

@@ -2,10 +2,10 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers\Auth;
 
-use App\Providers\RouteServiceProvider;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
@@ -24,18 +24,16 @@ class RegisterController extends Controller
     use RegistersUsers;
 
     /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::ADMIN_HOME;
-
-    /**
      * Create a new controller instance.
      */
     public function __construct()
     {
-        $this->middleware('guest:cp');
+        $this->middleware('fastlane.guest:fastlane-cp');
+    }
+
+    public function redirectPath()
+    {
+        return route('cp.dashboard');
     }
 
     /**
@@ -66,5 +64,10 @@ class RegisterController extends Controller
             'email'    => $data['email'],
             'password' => $data['password'],
         ]);
+    }
+
+    protected function guard()
+    {
+        return Auth::guard('fastlane-cp');
     }
 }

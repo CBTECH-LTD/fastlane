@@ -1,5 +1,5 @@
 <template>
-    <form @submit="e => $emit('submit', e)">
+    <form @submit.prevent="e => $emit('submit', e)">
         <div v-for="panel in panelSlots" :key="panel.name" class="w-full my-6">
             <f-form-field-panel :name="panel.name" :label="panel.label" :icon="panel.icon">
                 <template v-for="field in panel.fields">

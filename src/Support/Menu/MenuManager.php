@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Auth;
 
 class MenuManager implements Contracts\MenuManager
 {
-    public function build(): array
+    public function build(Contracts\Menu $menu): array
     {
         $user = Auth::user();
 
-        return Collection::make(app()->make(config('fastlane.menu'))->items())->map(function (MenuItem $item) use ($user) {
+        return Collection::make($menu->items())->map(function (MenuItem $item) use ($user) {
             return $item->build($user);
         })->filter()->all();
     }

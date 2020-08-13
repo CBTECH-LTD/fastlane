@@ -6,7 +6,6 @@ use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\RandomPasswordPipe;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\UpdateRolePipe;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
 use CbtechLtd\Fastlane\Support\Schema\Fields\SelectField;
@@ -14,13 +13,14 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\NewAccessToken;
 use Spatie\Permission\Models\Role;
 
 class BackendUserEntryType extends EntryType
 {
     const PERM_MANAGE_SYSTEM_ADMINS = 'manage admins';
+    const PERM_MANAGE_ACCESS_TOKENS = 'manage personal access tokens';
     const ROLE_SYSTEM_ADMIN = 'system admin';
 
     public function __construct(Gate $gate)
@@ -73,6 +73,19 @@ class BackendUserEntryType extends EntryType
                 ->required()
                 ->setDefault(true),
         ];
+    }
+
+    public function createToken(string $userHashid, string $name, array $abilities): NewAccessToken
+    {
+        /** @var User $user */
+        $user = $this->newModelInstance()
+            ->newModelQuery()
+            ->whereHashid($userHashid)
+            ->firstOrFail();
+
+        $this->gate->authorize('createToken', $user);
+
+        return $user->createToken($name, $abilities);
     }
 
     protected function queryItems(Builder $query): void

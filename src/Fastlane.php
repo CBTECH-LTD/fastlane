@@ -3,8 +3,7 @@
 namespace CbtechLtd\Fastlane;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
-use CbtechLtd\Fastlane\Http\Controllers\EntriesController;
-use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
+use CbtechLtd\Fastlane\Http\Controllers;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuManager as MenuManagerContract;
 use CbtechLtd\Fastlane\Support\Menu\MenuManager;
@@ -65,29 +64,40 @@ class Fastlane
         return $this->flashMessages;
     }
 
-    public function createPermission(string $name): void
+    public function createPermission(string $name, string $guard = 'fastlane-cp'): void
     {
-        Permission::firstOrCreate(compact('name'));
+        Permission::firstOrCreate([
+            'name'       => $name,
+            'guard_name' => $guard,
+        ]);
     }
 
-    public function createRole(string $name, array $permissions = ['*']): void
+    public function createRole(string $name, array $permissions = ['*'], $guard = 'fastlane-cp'): void
     {
         /** @var Role $role */
-        $role = \Spatie\Permission\Models\Role::firstOrCreate([
-            'name' => $name,
+        $role = Role::firstOrCreate([
+            'name'       => $name,
+            'guard_name' => $guard,
         ]);
 
         $role->syncPermissions(
             $permissions[0] === '*'
-                ? Permission::all()
+                ? Permission::where('guard_name', $guard)->get()
                 : $permissions
         );
     }
 
-    public function registerRoutes(Router $router): void
+    public function registerControlPanelRoutes(Router $router): void
     {
         $this->entryTypes->each(function (EntryType $contentType) use ($router) {
-            $router->fastlane($contentType->identifier(), EntriesController::class);
+            $router->fastlaneControlPanel($contentType->identifier(), Controllers\EntriesController::class);
+        });
+    }
+
+    public function registerApiRoutes(Router $router): void
+    {
+        $this->entryTypes->each(function (EntryType $entryType) use ($router) {
+            $router->fastlaneContentApi($entryType->identifier(), Controllers\API\EntriesController::class);
         });
     }
 
@@ -108,6 +118,14 @@ class Fastlane
         return $this->entryTypes->first(
             fn(EntryType $entryType) => $entryType instanceof $class
         );
+    }
+
+    public function getAccessTokenAbilities(): array
+    {
+        return [
+            'entries:read',
+            'test:hey',
+        ];
     }
 
     public function getMenuManager(): MenuManagerContract

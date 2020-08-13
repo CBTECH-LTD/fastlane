@@ -5,6 +5,7 @@ namespace CbtechLtd\Fastlane\EntryTypes\BackendUser\Commands;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 
 class CreateSystemAdminCommand extends Command
 {
@@ -39,17 +40,17 @@ class CreateSystemAdminCommand extends Command
      */
     public function handle()
     {
-        if (! $name = $this->ask('Name: ', null)) {
+        if (! $name = $this->ask('Name', null)) {
             $this->error('No name provided.');
             return false;
         }
 
-        if (! $email = $this->ask('Email: ', null)) {
+        if (! $email = $this->ask('Email', null)) {
             $this->error('No email provided.');
             return false;
         }
 
-        if (! $password = $this->secret('Password: ', null)) {
+        if (! $password = $this->ask('Password', Str::random(16))) {
             $this->error('No password provided.');
             return false;
         }

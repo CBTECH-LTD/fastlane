@@ -12,6 +12,8 @@ interface ModelPolicy
 
     public function create($user);
 
+    public function show($user, Model $model);
+
     public function update($user, Model $model);
 
     public function delete($user, Model $office);

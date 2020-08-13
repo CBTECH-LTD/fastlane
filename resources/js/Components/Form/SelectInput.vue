@@ -2,13 +2,26 @@
     <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
         <template v-if="field.label" v-slot:label>{{ field.label }}</template>
         <div class="w-full">
+            <!-- Render checkboxes or radios instead of select if type is set for checkbox -->
+            <div v-if="field.config.type === 'checkbox'" v-for="opt in field.config.options" class="flex items-center mb-2">
+                <template v-if="field.config.multiple">
+                    <input type="checkbox" class="form-checkbox" :value="opt" v-model="field.value">
+                </template>
+                <template v-else>
+                    <input type="radio" class="form-radio" :value="opt" v-model="field.value">
+                </template>
+                <span>{{ opt.label }}</span>
+            </div>
+            <!-- Otherwise just render a select -->
             <v-select
+                v-else
                 class="form-input"
                 :clearable="false"
                 :options="field.config.options"
                 :multiple="field.config.multiple"
                 v-model="field.value">
             </v-select>
+
         </div>
     </f-form-field>
 </template>
@@ -19,6 +32,7 @@ import 'vue-select/dist/vue-select.css'
 import FormInput from '../Mixins/FormInput'
 import { FormField, FormFieldFactory } from '../../Support/FormField'
 import filter from 'lodash/filter'
+import find from 'lodash/find'
 import map from 'lodash/map'
 
 export default {
@@ -36,14 +50,24 @@ export default {
                 return null
             }
 
-            if (this.field.config.multiple === true) {
+            if (this.field.config.multiple) {
                 return map(this.field.value, v => {
                     return v.value
                 })
             }
 
             return this.field.value.value
-        }
+        },
+
+        isSelected (option) {
+            if (this.field.config.multiple) {
+                return !!find(this.field.value, v => {
+                    return v.value === option.value
+                })
+            }
+
+            return this.field.value && this.field.value.value === option.value
+        },
     },
 
     buildForSchema ({ field, component, value }) {

@@ -2,8 +2,13 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-class TextField extends BaseSchemaField
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
+
+class TextField extends AbstractBaseField implements ExportsToApiAttributeContract
 {
+    use ExportsToApiAttribute;
+
     public function getType(): string
     {
         return 'text';

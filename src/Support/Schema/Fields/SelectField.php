@@ -4,16 +4,21 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 
-class SelectField extends BaseSchemaField
+class SelectField extends AbstractBaseField implements ExportsToApiAttributeContract
 {
+    use ExportsToApiAttribute;
+
     protected $default = null;
     protected bool $multiple = false;
+    protected bool $renderAsCheckbox = false;
     protected $options;
 
     protected function __construct(string $name, string $label, array $options = [])
@@ -56,6 +61,12 @@ class SelectField extends BaseSchemaField
         return $this->getResolvedConfig('config')['options']->toArray();
     }
 
+    public function asCheckboxes(bool $state = true): self
+    {
+        $this->renderAsCheckbox = $state;
+        return $this;
+    }
+
     public function resolveValue(Model $model): array
     {
         $value = Arr::wrap($model->{$this->getName()});
@@ -67,6 +78,15 @@ class SelectField extends BaseSchemaField
                 fn(SelectOption $opt) => $opt->isSelected() || in_array($opt->getValue(), $value)
             )->toArray(),
         ];
+    }
+
+    public function toApiAttribute(Model $model, array $options = [])
+    {
+        if ($this->toApiAttributeCallback) {
+            return call_user_func($this->toApiAttributeCallback, $model);
+        }
+
+        return $this->resolveValue($model);
     }
 
     protected function getTypeRules(): array
@@ -92,6 +112,7 @@ class SelectField extends BaseSchemaField
         return [
             'options'  => $this->resolveOptions($request),
             'multiple' => $this->isMultiple(),
+            'type'     => $this->renderAsCheckbox ? 'checkbox' : 'select',
         ];
     }
 

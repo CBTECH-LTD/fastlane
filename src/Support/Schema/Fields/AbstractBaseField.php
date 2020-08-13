@@ -2,13 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\EntryTypes\Concerns\Resolvable;
 use CbtechLtd\Fastlane\Exceptions\UnresolvedException;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Makeable;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Resolvable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Migratable as MigratableContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Panelizable as PanelizableContract;
@@ -18,10 +17,9 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules as WithRulesCon
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithValue as WithValueContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility as WithVisibilityContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Hooks\OnFillingHook;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithValueContract, WithRulesContract, MigratableContract, SupportModelContract, WithVisibilityContract, PanelizableContract
+abstract class AbstractBaseField implements SchemaField, ResolvableContract, WithValueContract, WithRulesContract, MigratableContract, SupportModelContract, WithVisibilityContract, PanelizableContract
 {
     use HandlesHooks, Makeable, Resolvable;
 
@@ -46,10 +44,7 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
     protected $default = null;
     protected ?string $panel = null;
     protected int $listWidth = 0;
-    protected $resolveValueCallback;
     protected $fillValueCallback;
-
-    protected ?Collection $resolvedConfig = null;
 
     protected function __construct(string $name, string $label)
     {
@@ -60,34 +55,6 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function resolveValueUsing($callback): self
-    {
-        $this->resolveValueCallback = $callback;
-        return $this;
-    }
-
-    public function resolveValue(Model $model): array
-    {
-        if ($this->resolveValueCallback) {
-            return call_user_func($this->resolveValueCallback, $model);
-        }
-
-        return [
-            $this->getName() => $model->{$this->getName()},
-        ];
-    }
-
-    public function resolve(EntryTypeContract $entryType, EntryRequest $request): array
-    {
-        $this->resolvedConfig = Collection::make();
-
-        $this->resolvedConfig->put('config', $this->resolveConfig($entryType, $request));
-        $this->resolvedConfig->put('createRules', $this->resolveCreateRules($entryType, $request));
-        $this->resolvedConfig->put('updateRules', $this->resolveUpdateRules($entryType, $request));
-
-        return [$this];
     }
 
     public function setPlaceholder(string $placeholder): self
@@ -298,33 +265,6 @@ abstract class BaseSchemaField implements SchemaField, ResolvableContract, WithV
         }
 
         return $this->resolvedConfig->get($config, $default);
-    }
-
-    protected function resolveCreateRules(EntryTypeContract $entryType, EntryRequest $request): array
-    {
-        $baseRules = $this->getBaseRules();
-
-        $rules = array_merge([$baseRules], $this->getTypeRules(), [$this->createRules]);
-
-        return [
-            $this->getName() => Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|'),
-        ];
-    }
-
-    protected function resolveUpdateRules(EntryTypeContract $entryType, EntryRequest $request): array
-    {
-        $baseRules = $this->getBaseRules();
-
-        $rules = array_merge(['sometimes', $baseRules], $this->getTypeRules(), [$this->updateRules]);
-
-        return [
-            $this->getName() => Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|'),
-        ];
-    }
-
-    protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array
-    {
-        return [];
     }
 
     private function escapeString($str): string

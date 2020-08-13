@@ -20,17 +20,10 @@
         name: 'NavigationList',
         components: { CBIcon, CBMenuLink, CBMenuGroup },
 
-        data () {
-            return {
-                items: this.$page.menu,
-                label: {
-                    state: false,
-                    content: '',
-                    position: {
-                        top: '100px',
-                        left: 400,
-                    }
-                }
+        props: {
+            items: {
+                type: Array,
+                required: true,
             }
         },
 

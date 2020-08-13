@@ -65,12 +65,16 @@ class FieldPanel implements SchemaField, Resolvable
     public function resolve(EntryTypeContract $entryType, EntryRequest $request): array
     {
         return Collection::make($this->fields)
-            ->filter(function (SchemaField $field) {
-                if ($field instanceof Panelizable) {
-                    return $field->inPanel($this);
+            ->mapWithKeys(function (SchemaField $field) use ($entryType, $request) {
+                if (! $field instanceof Resolvable) {
+                    return false;
                 }
 
-                return false;
+                if ($field instanceof Panelizable) {
+                    $field->inPanel($this);
+                }
+
+                return $field->resolve($entryType, $request);
             })
             ->all();
     }
