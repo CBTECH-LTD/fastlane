@@ -6,12 +6,17 @@ use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
 use CbtechLtd\Fastlane\FileAttachment\StoreDraftAttachment;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 
-class RichEditorField extends BaseSchemaField
+class RichEditorField extends AbstractBaseField implements ExportsToApiAttributeContract
 {
-    use HandlesAttachments;
+    use HandlesAttachments, ExportsToApiAttribute;
 
     protected bool $acceptFiles = false;
 
@@ -52,6 +57,25 @@ class RichEditorField extends BaseSchemaField
                 $model,
             );
         }
+    }
+
+    public function toApiAttribute(Model $model, array $options = [])
+    {
+        if ($this->toApiAttributeCallback) {
+            return call_user_func($this->toApiAttributeCallback, $model);
+        }
+
+        if (Arr::get($options, 'output', 'collection') === 'collection') {
+            return [];
+        }
+
+        return Collection::make($this->resolveValue($model))->mapWithKeys(
+            fn($value, $key) => [
+                $key => Arr::get($options, 'output', 'collection') === 'collection'
+                    ? null
+                    : $value,
+            ]
+        )->all();
     }
 
     protected function resolveConfig(EntryTypeContract $entryType, EntryRequest $request): array

@@ -81,6 +81,18 @@ module.exports = {
                 danger: colors.red,
                 warning: colors.yellow,
                 info: colors.blue,
+                gray: {
+                    100: '#f7fcfd',
+                    200: '#f2f5fa',
+                    300: '#edf2f7',
+                    // 400: '#e2e8f0',
+                    400: '#cbd5e0',
+                    500: '#a0aec0',
+                    600: '#718096',
+                    700: '#4a5568',
+                    800: '#2d3748',
+                    900: '#1a202c',
+                },
                 brand: {
                     100: '#EAEBED',
                     200: '#CBCDD1',

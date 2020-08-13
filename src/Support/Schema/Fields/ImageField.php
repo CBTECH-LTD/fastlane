@@ -5,10 +5,14 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\ImageUploader;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
 use Illuminate\Database\Eloquent\Model;
 
-class ImageField extends FileField
+class ImageField extends FileField implements ExportsToApiAttributeContract
 {
+    use ExportsToApiAttribute;
+
     protected ImageUploader $uploader;
 
     protected int $listWidth = 150;

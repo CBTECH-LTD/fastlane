@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static MenuManager getMenuManager()
  * @method static EntryType getEntryTypeByIdentifier(string $identifier)
  * @method static EntryType getEntryTypeByClass(string $class)
+ * @method static array getAccessTokenAbilities()
  */
 class FastlaneFacade extends Facade
 {

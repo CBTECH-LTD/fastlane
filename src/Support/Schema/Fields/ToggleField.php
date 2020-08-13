@@ -2,8 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-class ToggleField extends BaseSchemaField
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
+
+class ToggleField extends AbstractBaseField implements Contracts\ExportsToApiAttribute
 {
+    use ExportsToApiAttribute;
+
     protected $default = true;
     protected int $listWidth = 80;
 

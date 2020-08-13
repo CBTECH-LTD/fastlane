@@ -37,7 +37,9 @@ class MenuBuilder implements Menu
                 ->when(function ($user) use ($entryType) {
                     return $user->can('list', $entryType->model());
                 });
-        })->filter();
+        })
+            ->filter()
+            ->push(MenuLink::make(route('cp.account'), 'Account Settings')->icon('user-cog'));
 
         return array_merge($baseLinks, $typeLinks->all());
     }

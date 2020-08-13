@@ -36,10 +36,17 @@ trait HasEntryType
         return true;
     }
 
+    protected function getUrlPrefix(): string
+    {
+        throw new \Exception('Not implemented');
+    }
+
     private function resolveEntryType(): void
     {
+        $urlPrefix = Str::replaceFirst('/', '', $this->getUrlPrefix() . '/');
+
         $entryType = FastlaneFacade::getEntryTypeByIdentifier(
-            explode('/', Str::replaceFirst('cp/', '', $this->path()))[0]
+            explode('/', Str::replaceFirst($urlPrefix, '', $this->path()))[0]
         );
 
         $this->resolveEntry($entryType);

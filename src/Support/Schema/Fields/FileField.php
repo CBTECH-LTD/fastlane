@@ -2,8 +2,13 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-class FileField extends BaseSchemaField
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
+
+class FileField extends AbstractBaseField implements ExportsToApiAttributeContract
 {
+    use ExportsToApiAttribute;
+
     protected array $accept = [];
 
     public function getType(): string
@@ -25,7 +30,7 @@ class FileField extends BaseSchemaField
     protected function getTypeRules(): array
     {
         return [
-            $this->getName() => 'file'
+            $this->getName() => 'file',
         ];
     }
 }

@@ -2,11 +2,13 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes\BackendUser;
 
+use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
-use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
-class BackendUserResource extends ResourceType
+class BackendUserResource extends EntryResource
 {
     public function type(): string
     {
@@ -30,10 +32,18 @@ class BackendUserResource extends ResourceType
 
     protected function links(): array
     {
-        return [
+        $links = Collection::make([
             ResourceLink::make('self', ['cp.backend-users.edit', $this->model]),
             ResourceLink::make('parent', ['cp.backend-users.index']),
-        ];
+        ]);
+
+        return tap($links, function (Collection $l) {
+            if (Auth::user()->is($this->model)) {
+                $l->push(ResourceLink::make('profile', ['cp.account.profile']));
+                $l->push(ResourceLink::make('security', ['cp.account.security']));
+                $l->push(ResourceLink::make('user', ['cp.account.tokens.index']));
+            }
+        })->all();
     }
 
     protected function meta(): array

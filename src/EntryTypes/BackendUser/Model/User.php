@@ -12,6 +12,7 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends BaseModel implements
@@ -22,7 +23,7 @@ class User extends BaseModel implements
     protected bool $attributesFromSchema = false;
     protected bool $relationsFromSchema = false;
 
-    use Notifiable, Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasRoles;
+    use Notifiable, Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasRoles, HasApiTokens;
 
     protected $fillable = [
         'name',

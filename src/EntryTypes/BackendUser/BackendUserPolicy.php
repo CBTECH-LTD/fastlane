@@ -2,13 +2,21 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes\BackendUser;
 
-use CbtechLtd\Fastlane\Support\AccessControl\ModelPolicy;
+use CbtechLtd\Fastlane\Support\Contracts\ModelPolicy;
+use Illuminate\Database\Eloquent\Model;
 
-class BackendUserPolicy extends ModelPolicy
+class BackendUserPolicy implements ModelPolicy
 {
+    public function before($user, $ability)
+    {
+        if ($user->can(BackendUserEntryType::PERM_MANAGE_SYSTEM_ADMINS)) {
+            return true;
+        }
+    }
+
     public function list($user)
     {
-        return $user->can(BackendUserEntryType::PERM_MANAGE_SYSTEM_ADMINS);
+        return false;
     }
 
     public function create($user)
@@ -16,13 +24,23 @@ class BackendUserPolicy extends ModelPolicy
         return false;
     }
 
-    public function update($user, $model)
+    public function show($user, Model $model)
     {
         return false;
     }
 
-    public function delete($user, $model)
+    public function update($user, Model $model)
     {
         return false;
+    }
+
+    public function delete($user, Model $model)
+    {
+        return false;
+    }
+
+    public function createToken($user, Model $model)
+    {
+        return $user->is($model) && $user->can(BackendUserEntryType::PERM_MANAGE_ACCESS_TOKENS);
     }
 }

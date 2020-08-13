@@ -7,9 +7,9 @@ use CbtechLtd\Fastlane\Http\Requests\EntryEditRequest;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
 use CbtechLtd\Fastlane\Http\Requests\EntryStoreRequest;
 use CbtechLtd\Fastlane\Http\Requests\EntryUpdateRequest;
-use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
+use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
+use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
-use CbtechLtd\JsonApiTransformer\ApiResources\ApiResourceCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redirect;
@@ -20,14 +20,14 @@ class EntriesController extends Controller
 {
     public function index(EntryRequest $request)
     {
-        $collection = new ApiResourceCollection(
+        $collection = EntryResourceCollection::make(
             $request->entryType()->getItems()->map(
                 fn(Model $m) => (new EntryResource($m, $request->entryType()))->toIndex()
-            )
-        );
+            )->all()
+        )->forEntryType($request->entryType());
 
         return $this->render('Entries/Index', [
-            'items'     => $collection,
+            'items'     => $collection->transform(),
             'entryType' => [
                 'schema'        => $request->entryType()->schema()->getIndexFields(),
                 'singular_name' => $request->entryType()->name(),

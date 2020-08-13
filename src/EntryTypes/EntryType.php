@@ -8,11 +8,14 @@ use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Http\Requests\EntryRequest;
+use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollection;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
+use CbtechLtd\JsonApiTransformer\ApiResources\AnonymousResourceTypeCollection;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
+use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -108,6 +111,18 @@ abstract class EntryType implements EntryTypeContract
         return $name;
     }
 
+    public function apiResourceCollection(): string
+    {
+        /** @var ResourceType $name */
+        $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'ResourceCollection';
+
+        if (class_exists($name)) {
+            return $name;
+        }
+
+        return EntryResourceCollection::class;
+    }
+
     public function policy(): ?string
     {
         $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'Policy';
@@ -147,7 +162,7 @@ abstract class EntryType implements EntryTypeContract
         return true;
     }
 
-    public function getItems(): EloquentCollection
+    public function getItems(?Closure $queryCallback = null): EloquentCollection
     {
         $this->gate->authorize('list', $this->model());
 
@@ -158,13 +173,22 @@ abstract class EntryType implements EntryTypeContract
 
         $this->queryItems($query);
 
+        if ($queryCallback) {
+            call_user_func($queryCallback, $query);
+        }
+
         return $query->get();
     }
 
-    public function findItem(string $hashid): Model
+    public function findItem(string $hashid, ?Closure $queryCallback = null): Model
     {
         $query = $this->newModelInstance()->newModelQuery();
         $this->querySingleItem($query, $hashid);
+
+        if ($queryCallback) {
+            call_user_func($queryCallback, $query);
+        }
+
         $entry = $query->whereHashid($hashid)->firstOrFail();
 
         $this->gate->authorize('show', $entry);

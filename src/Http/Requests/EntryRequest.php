@@ -17,4 +17,9 @@ class EntryRequest extends FormRequest
     {
         $this->resolveEntryType();
     }
+
+    protected function getUrlPrefix(): string
+    {
+        return config('fastlane.control_panel.url_prefix');
+    }
 }

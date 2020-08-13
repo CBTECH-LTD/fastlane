@@ -2,10 +2,10 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers\Auth;
 
-use App\Providers\RouteServiceProvider;
 use CbtechLtd\Fastlane\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 
 class LoginController extends Controller
@@ -24,20 +24,13 @@ class LoginController extends Controller
     use AuthenticatesUsers;
 
     /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::ADMIN_HOME;
-
-    /**
      * Create a new controller instance.
      *
      * @return void
      */
     public function __construct()
     {
-        $this->middleware('guest:cp')->except('logout');
+        $this->middleware('fastlane.guest:fastlane-cp')->except('logout');
     }
 
     public function showLoginForm()
@@ -54,9 +47,18 @@ class LoginController extends Controller
         ]);
     }
 
+    public function redirectPath()
+    {
+        return route('cp.dashboard');
+    }
 
     protected function loggedOut(Request $request)
     {
         return Redirect::route('cp.login');
+    }
+
+    protected function guard()
+    {
+        return Auth::guard('fastlane-cp');
     }
 }

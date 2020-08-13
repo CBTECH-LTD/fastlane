@@ -4,5 +4,5 @@ namespace CbtechLtd\Fastlane\Support\Menu\Contracts;
 
 interface MenuManager
 {
-    public function build(): array;
+    public function build(Menu $menu): array;
 }

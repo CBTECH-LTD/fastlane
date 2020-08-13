@@ -2,8 +2,13 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-class DateField extends BaseSchemaField
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
+
+class DateField extends AbstractBaseField implements ExportsToApiAttributeContract
 {
+    use ExportsToApiAttribute;
+
     protected ?string $displayFormat = null;
     protected bool $enableTime = false;
     protected bool $enableSeconds = false;
@@ -71,7 +76,7 @@ class DateField extends BaseSchemaField
     protected function getTypeRules(): array
     {
         return [
-            $this->getName() => 'date_format:' . $this->getSaveFormat()
+            $this->getName() => 'date_format:' . $this->getSaveFormat(),
         ];
     }
 

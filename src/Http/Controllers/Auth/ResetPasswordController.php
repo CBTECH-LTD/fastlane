@@ -2,9 +2,9 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers\Auth;
 
-use App\Providers\RouteServiceProvider;
 use CbtechLtd\Fastlane\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Support\Facades\Auth;
 
 class ResetPasswordController extends Controller
 {
@@ -21,10 +21,13 @@ class ResetPasswordController extends Controller
 
     use ResetsPasswords;
 
-    /**
-     * Where to redirect users after resetting their password.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::ADMIN_HOME;
+    public function redirectPath()
+    {
+        return route('cp.dashboard');
+    }
+
+    protected function guard()
+    {
+        return Auth::guard('fastlane-cp');
+    }
 }

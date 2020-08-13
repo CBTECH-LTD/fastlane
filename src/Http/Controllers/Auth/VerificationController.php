@@ -2,7 +2,6 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers\Auth;
 
-use App\Providers\RouteServiceProvider;
 use CbtechLtd\Fastlane\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 
@@ -22,21 +21,19 @@ class VerificationController extends Controller
     use VerifiesEmails;
 
     /**
-     * Where to redirect users after verification.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::ADMIN_HOME;
-
-    /**
      * Create a new controller instance.
      *
      * @return void
      */
     public function __construct()
     {
-        $this->middleware('auth:cp');
+        $this->middleware('fastlane.auth:fastlane-cp');
         $this->middleware('signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
+    }
+
+    public function redirectPath()
+    {
+        return route('cp.dashboard');
     }
 }

@@ -1,13 +1,13 @@
 <template>
-    <div :style="containerStyle" class="min-h-screen bg-gray-200 border-r border-gray-300 py-12 px-8">
+    <div :style="containerStyle" class="min-h-screen bg-gray-200 border-r border-gray-300 py-12">
         <div class="h-screen overflow-y-auto">
-            <div class="font-semibold text-gray-900 text-2xl tracking-tight">
+            <div class="font-semibold text-gray-900 text-2xl tracking-tight px-8">
                 <slot name="title"/>
             </div>
-            <div v-if="shouldRenderDescription" class="font-normal text-gray-600 text-xs py-4">
+            <div v-if="shouldRenderDescription" class="font-normal text-gray-600 text-xs pt-4  px-8">
                 <slot name="description"/>
             </div>
-            <div class="my-8">
+            <div class="my-4">
                 <slot/>
             </div>
         </div>
