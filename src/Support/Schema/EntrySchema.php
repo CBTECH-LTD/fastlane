@@ -2,12 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema;
 
+use CbtechLtd\Fastlane\Http\Requests\FastlaneRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -15,13 +15,13 @@ use Illuminate\Support\Str;
 class EntrySchema implements Contracts\EntrySchema
 {
     private EntryTypeContract $entryType;
-    private Request $request;
+    private array $requestData;
     private Collection $cache;
 
-    public function __construct(EntryTypeContract $entryType, Request $request)
+    public function __construct(EntryTypeContract $entryType, array $requestData)
     {
         $this->entryType = $entryType;
-        $this->request = $request;
+        $this->requestData = $requestData;
         $this->cache = new Collection;
     }
 
@@ -76,7 +76,7 @@ class EntrySchema implements Contracts\EntrySchema
     {
         return $fields->flatMap(function ($field) {
             if ($field instanceof Resolvable) {
-                return Arr::wrap($field->resolve($this->entryType, $this->request));
+                return Arr::wrap($field->resolve($this->entryType, $this->requestData));
             }
 
             return null;

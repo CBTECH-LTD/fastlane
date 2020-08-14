@@ -25,12 +25,12 @@ class EntriesController extends Controller
 
     protected function entryType(): EntryType
     {
-        return $this->fastlane->getRequestEntryType();
+        return $this->fastlane->getRequest()->getEntryType();
     }
 
     protected function entry(): ?Model
     {
-        return $this->fastlane->getRequestEntry();
+        return $this->fastlane->getRequest()->getEntryInstance();
     }
 
     public function index()

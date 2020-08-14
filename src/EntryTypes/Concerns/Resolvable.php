@@ -10,10 +10,10 @@ trait Resolvable
 {
     protected EntrySchemaContract $schema;
 
-    public function resolve(): EntryTypeContract
+    public function resolve(array $requestData): EntryTypeContract
     {
-        return tap(clone $this, function ($instance) {
-            $instance->schema = new EntrySchema($this, app('fastlane')->getRequest());
+        return tap(clone $this, function ($instance) use ($requestData) {
+            $instance->schema = new EntrySchema($this, $requestData);
         });
     }
 

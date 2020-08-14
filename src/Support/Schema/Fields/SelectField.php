@@ -107,19 +107,19 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
         return [$this->getName() => 'in:' . $values->implode(',')];
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, Request $request): array
+    protected function resolveConfig(EntryTypeContract $entryType, array $data): array
     {
         return [
-            'options'  => $this->resolveOptions($request),
+            'options'  => $this->resolveOptions($data),
             'multiple' => $this->isMultiple(),
             'type'     => $this->renderAsCheckbox ? 'checkbox' : 'select',
         ];
     }
 
-    protected function resolveOptions(Request $request): Collection
+    protected function resolveOptions(array $data): Collection
     {
         $options = is_callable($this->options)
-            ? call_user_func($this->options, $request)
+            ? call_user_func($this->options, $data)
             : $this->options;
 
         return Collection::make($options);

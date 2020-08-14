@@ -4,7 +4,6 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields\Concerns;
 
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 trait Resolvable
@@ -12,13 +11,13 @@ trait Resolvable
     protected $resolveValueCallback;
     protected ?Collection $resolvedConfig = null;
 
-    public function resolve(EntryTypeContract $entryType, Request $request): array
+    public function resolve(EntryTypeContract $entryType, array $data): array
     {
         $this->resolvedConfig = Collection::make();
 
-        $this->resolvedConfig->put('config', $this->resolveConfig($entryType, $request));
-        $this->resolvedConfig->put('createRules', $this->resolveCreateRules($entryType, $request));
-        $this->resolvedConfig->put('updateRules', $this->resolveUpdateRules($entryType, $request));
+        $this->resolvedConfig->put('config', $this->resolveConfig($entryType, $data));
+        $this->resolvedConfig->put('createRules', $this->resolveCreateRules($entryType, $data));
+        $this->resolvedConfig->put('updateRules', $this->resolveUpdateRules($entryType, $data));
 
         return [$this];
     }
@@ -40,7 +39,7 @@ trait Resolvable
         ];
     }
 
-    protected function resolveCreateRules(EntryTypeContract $entryType, Request $request): array
+    protected function resolveCreateRules(EntryTypeContract $entryType, array $data): array
     {
         $baseRules = $this->getBaseRules();
 
@@ -51,7 +50,7 @@ trait Resolvable
         ];
     }
 
-    protected function resolveUpdateRules(EntryTypeContract $entryType, Request $request): array
+    protected function resolveUpdateRules(EntryTypeContract $entryType, array $data): array
     {
         $baseRules = $this->getBaseRules();
 
@@ -62,7 +61,7 @@ trait Resolvable
         ];
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, Request $request): array
+    protected function resolveConfig(EntryTypeContract $entryType, array $data): array
     {
         return [];
     }

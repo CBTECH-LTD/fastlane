@@ -119,15 +119,15 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
         return '';
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, Request $request): array
+    protected function resolveConfig(EntryTypeContract $entryType, array $data): array
     {
         return [
-            'options'  => $this->resolveOptions($entryType, $request),
+            'options'  => $this->resolveOptions($entryType, $data),
             'multiple' => $this->isMultiple(),
         ];
     }
 
-    protected function resolveOptions(EntryTypeContract $entryType, Request $request): Collection
+    protected function resolveOptions(EntryTypeContract $entryType, array $data): Collection
     {
         return $this->relatedEntryType->getItems()->map(function (Model $model) use ($entryType) {
             return SelectOption::make(

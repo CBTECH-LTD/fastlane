@@ -69,7 +69,7 @@ class ImageField extends FileField implements ExportsToApiAttributeContract
         ];
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, Request $request): array
+    protected function resolveConfig(EntryTypeContract $entryType, array $data): array
     {
         return [
             'uploadUrl' => route("cp.{$entryType->identifier()}.images", $this->getName()),
