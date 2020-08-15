@@ -1,0 +1,80 @@
+<template>
+    <f-the-app-layout>
+        <template v-slot:title>New {{ entryType.singular_name }}</template>
+        <template v-slot:actions>
+            <f-button :href="links.parent" variant="outline" left-icon="arrow-left">
+                Back to list
+            </f-button>
+            <f-button submit form="createForm"
+                      class="ml-4"
+                      color="success"
+                      size="lg"
+                      left-icon="save"
+                      :disabled="isFormDisabled"
+                      :aria-disabled="isFormDisabled"
+                      :loading="isCreating">
+                Save
+            </f-button>
+        </template>
+
+        <f-form-root id="createForm"
+                     @submit.prevent="submitForm"
+                     :form="form"
+                     :panels="entryType.panels">
+        </f-form-root>
+    </f-the-app-layout>
+</template>
+
+<script>
+    import { FormSchemaFactory } from '../../Support/FormSchema'
+
+    export default {
+        name: 'Entries.Create',
+
+        props: {
+            links: {
+                required: true,
+                type: Object,
+            },
+            entryType: {
+                required: true,
+                type: Object,
+            },
+        },
+
+        remember: ['form'],
+
+        data () {
+            return {
+                isCreating: false,
+                form: new FormSchemaFactory({}, this.entryType.schema),
+            }
+        },
+
+        computed: {
+            isFormDisabled () {
+                return this.isCreating || !this.form.isDirty()
+            }
+        },
+
+        methods: {
+            getFieldSlot (field) {
+                return field.panel
+                    ? `${field.panel}____${field.name}`
+                    : `default_panel____${field.name}`
+            },
+
+            async submitForm () {
+                if (this.form.isDirty() && !this.isCreating) {
+                    this.isCreating = true
+
+                    try {
+                        await this.$inertia.post(this.links.form, this.form.toFormObject(false).all())
+                    } catch {}
+
+                    this.isCreating = false
+                }
+            }
+        }
+    }
+</script>
