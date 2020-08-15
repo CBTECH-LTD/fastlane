@@ -23,7 +23,6 @@
         "altek/eventually": "^1.0",
         "cbtech-ltd/laravel-json-api-transformer": "dev-master",
         "spatie/laravel-permission": "^3.13",
-        "fruitcake/laravel-cors": "^1.0",
         "hashids/hashids": "^4.0",
         "laravel/sanctum": "^2.4",
         "league/flysystem-aws-s3-v3": "~1.0",

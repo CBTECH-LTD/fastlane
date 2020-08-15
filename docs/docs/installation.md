@@ -6,18 +6,23 @@ sidebar_label: Installation
 
 ...
 
-## Creating a new project
+## New project?
 
-First step:
+Create a Laravel project as you are used to do:
 
 ```shell
-$ composer create-project --prefer-dist cbtech-ltd/fastlane-project {PROJECT_NAME}
+$ composer create-project --prefer-dist laravel/laravel {PROJECT_NAME}
 ``` 
 
-Second step:
-
+Follow the next steps.
 
 
 ## Adding to an existing Laravel app
+
+Run the following command to add Fastlane to your composer requirements:
+
+```shell
+$ composer require cbtech-ltd/fastlane
+```
 
 ## Next steps
