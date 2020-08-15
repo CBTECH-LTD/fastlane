@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Exceptions\UnresolvedException;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
+use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Makeable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Resolvable;
@@ -39,10 +40,11 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
     protected bool $showOnIndex = false;
     protected bool $showOnCreate = true;
     protected bool $showOnUpdate = true;
-    protected ?string $placeholder;
     protected $default = null;
     protected ?string $panel = null;
     protected int $listWidth = 0;
+    protected EntryType $entryType;
+    protected ?string $placeholder;
     protected $fillValueCallback;
 
     protected function __construct(string $name, string $label)
@@ -59,6 +61,12 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
     public function setPlaceholder(string $placeholder): self
     {
         $this->placeholder = $placeholder;
+        return $this;
+    }
+
+    public function setEntryType(EntryType $entryType): self
+    {
+        $this->entryType = $entryType;
         return $this;
     }
 

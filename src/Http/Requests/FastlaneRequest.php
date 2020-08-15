@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 class FastlaneRequest extends Request
 {
     private EntryTypeContract $entryType;
-    private ?Model $entryInstance = null;
 
     /**
      * @return EntryTypeContract
@@ -32,23 +31,8 @@ class FastlaneRequest extends Request
     /**
      * @return Model|null
      */
-    public function getEntryInstance(): ?Model
+    public function getEntryInstance(): Model
     {
-        return $this->entryInstance;
-    }
-
-    /**
-     * @param Model|null $entryInstance
-     * @return FastlaneRequest
-     */
-    public function setEntryInstance(?Model $entryInstance): self
-    {
-        $this->entryInstance = $entryInstance;
-        return $this;
-    }
-
-    public function hasEntryInstance(): bool
-    {
-        return $this->entryInstance instanceof Model;
+        return $this->entryType->modelInstance();
     }
 }

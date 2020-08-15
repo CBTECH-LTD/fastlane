@@ -24,7 +24,7 @@ class ResolveFastlaneRequest
         $entryInstance = $this->getEntryInstance($request, $entryType);
 
         $newRequest = tap(FastlaneRequest::createFrom($request), function (FastlaneRequest $req) use ($entryType, $entryInstance) {
-            $req->setEntryType($entryType)->setEntryInstance($entryInstance);
+            $req->setEntryType($entryType->new($entryInstance));
         });
 
         $this->fastlane->setRequest($newRequest);

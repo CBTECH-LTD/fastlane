@@ -9,8 +9,6 @@ use CbtechLtd\Fastlane\Http\Requests\FastlaneRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuManager as MenuManagerContract;
 use CbtechLtd\Fastlane\Support\Menu\MenuManager;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -26,6 +24,11 @@ class Fastlane
     protected FastlaneRequest $request;
 
     public function __construct()
+    {
+        $this->initialize();
+    }
+
+    public function initialize(): void
     {
         $this->registerEntryTypes();
         $this->registerMenuManager();

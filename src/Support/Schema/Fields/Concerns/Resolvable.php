@@ -13,6 +13,7 @@ trait Resolvable
 
     public function resolve(EntryTypeContract $entryType, array $data): array
     {
+        $this->entryType = $entryType;
         $this->resolvedConfig = Collection::make();
 
         $this->resolvedConfig->put('config', $this->resolveConfig($entryType, $data));

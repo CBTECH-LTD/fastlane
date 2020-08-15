@@ -3,15 +3,17 @@
         <template v-if="field.label" v-slot:label>{{ field.label }}</template>
         <div class="w-full">
             <!-- Render checkboxes or radios instead of select if type is set for checkbox -->
-            <div v-if="field.config.type === 'checkbox'" v-for="opt in field.config.options" class="flex items-center mb-2">
-                <template v-if="field.config.multiple">
-                    <input type="checkbox" class="form-checkbox" :value="opt" v-model="field.value">
-                </template>
-                <template v-else>
-                    <input type="radio" class="form-radio" :value="opt" v-model="field.value">
-                </template>
-                <span>{{ opt.label }}</span>
-            </div>
+            <template v-if="field.config.type === 'checkbox'">
+                <div v-for="opt in field.config.options" class="flex items-center mb-2">
+                    <template v-if="field.config.multiple">
+                        <input type="checkbox" class="form-checkbox" :value="opt" v-model="field.value">
+                    </template>
+                    <template v-else>
+                        <input type="radio" class="form-radio" :value="opt" v-model="field.value">
+                    </template>
+                    <span>{{ opt.label }}</span>
+                </div>
+            </template>
             <!-- Otherwise just render a select -->
             <v-select
                 v-else
@@ -21,7 +23,6 @@
                 :multiple="field.config.multiple"
                 v-model="field.value">
             </v-select>
-
         </div>
     </f-form-field>
 </template>

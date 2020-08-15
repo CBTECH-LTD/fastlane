@@ -38,8 +38,7 @@ class BelongsToManyField extends RelationField
     public function getRelationshipMethod(): Closure
     {
         return function (Model $model) {
-            $rel = $model
-                ->belongsToMany($this->relatedEntryType->model());
+            $rel = $model->belongsToMany($this->relatedEntryType->model());
 
             if ($this->withTimestamps) {
                 $rel->withTimestamps();
@@ -51,11 +50,10 @@ class BelongsToManyField extends RelationField
 
     protected function hydrateRelation($model, $value, array $requestData): void
     {
-        app('fastlane')
-            ->getRequestEntryType()
+        $this->entryType
             ->addHook(EntryType::HOOK_AFTER_SAVING, function (OnSavingHook $hook, Closure $next) use ($value) {
                 $hook->model()->{$this->getRelationshipName()}()->sync($value);
-    
+
                 $next($hook);
             });
     }

@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 
 interface EntryType extends Hookable
 {
+    public function new(?Model $model): EntryType;
+
     public function resolve(array $requestData): EntryType;
 
     public function identifier(): string;
@@ -20,6 +22,8 @@ interface EntryType extends Hookable
     public function icon(): string;
 
     public function model(): string;
+
+    public function modelInstance(): Model;
 
     public function newModelInstance(): Model;
 

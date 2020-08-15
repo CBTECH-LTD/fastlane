@@ -35,8 +35,8 @@ class FastlaneServiceProvider extends ServiceProvider
     {
         $this->bootAccessControl();
         $this->bootInertia();
-        $this->bootUrlMacro();
         $this->bootBlueprintMacro();
+        $this->bootUrlMacro();
         $this->bootRoutes();
 
         /*
