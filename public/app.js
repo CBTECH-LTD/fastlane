@@ -797,6 +797,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 
@@ -30389,91 +30390,93 @@ var render = function() {
       _c(
         "div",
         { staticClass: "w-full" },
-        _vm._l(_vm.field.config.options, function(opt) {
-          return _vm.field.config.type === "checkbox"
-            ? _c(
-                "div",
-                { staticClass: "flex items-center mb-2" },
-                [
-                  _vm.field.config.multiple
-                    ? [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.field.value,
-                              expression: "field.value"
-                            }
-                          ],
-                          staticClass: "form-checkbox",
-                          attrs: { type: "checkbox" },
-                          domProps: {
-                            value: opt,
-                            checked: Array.isArray(_vm.field.value)
-                              ? _vm._i(_vm.field.value, opt) > -1
-                              : _vm.field.value
-                          },
-                          on: {
-                            change: function($event) {
-                              var $$a = _vm.field.value,
-                                $$el = $event.target,
-                                $$c = $$el.checked ? true : false
-                              if (Array.isArray($$a)) {
-                                var $$v = opt,
-                                  $$i = _vm._i($$a, $$v)
-                                if ($$el.checked) {
-                                  $$i < 0 &&
-                                    _vm.$set(
-                                      _vm.field,
-                                      "value",
-                                      $$a.concat([$$v])
-                                    )
+        [
+          _vm.field.config.type === "checkbox"
+            ? _vm._l(_vm.field.config.options, function(opt) {
+                return _c(
+                  "div",
+                  { staticClass: "flex items-center mb-2" },
+                  [
+                    _vm.field.config.multiple
+                      ? [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.field.value,
+                                expression: "field.value"
+                              }
+                            ],
+                            staticClass: "form-checkbox",
+                            attrs: { type: "checkbox" },
+                            domProps: {
+                              value: opt,
+                              checked: Array.isArray(_vm.field.value)
+                                ? _vm._i(_vm.field.value, opt) > -1
+                                : _vm.field.value
+                            },
+                            on: {
+                              change: function($event) {
+                                var $$a = _vm.field.value,
+                                  $$el = $event.target,
+                                  $$c = $$el.checked ? true : false
+                                if (Array.isArray($$a)) {
+                                  var $$v = opt,
+                                    $$i = _vm._i($$a, $$v)
+                                  if ($$el.checked) {
+                                    $$i < 0 &&
+                                      _vm.$set(
+                                        _vm.field,
+                                        "value",
+                                        $$a.concat([$$v])
+                                      )
+                                  } else {
+                                    $$i > -1 &&
+                                      _vm.$set(
+                                        _vm.field,
+                                        "value",
+                                        $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1))
+                                      )
+                                  }
                                 } else {
-                                  $$i > -1 &&
-                                    _vm.$set(
-                                      _vm.field,
-                                      "value",
-                                      $$a
-                                        .slice(0, $$i)
-                                        .concat($$a.slice($$i + 1))
-                                    )
+                                  _vm.$set(_vm.field, "value", $$c)
                                 }
-                              } else {
-                                _vm.$set(_vm.field, "value", $$c)
                               }
                             }
-                          }
-                        })
-                      ]
-                    : [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.field.value,
-                              expression: "field.value"
+                          })
+                        ]
+                      : [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.field.value,
+                                expression: "field.value"
+                              }
+                            ],
+                            staticClass: "form-radio",
+                            attrs: { type: "radio" },
+                            domProps: {
+                              value: opt,
+                              checked: _vm._q(_vm.field.value, opt)
+                            },
+                            on: {
+                              change: function($event) {
+                                return _vm.$set(_vm.field, "value", opt)
+                              }
                             }
-                          ],
-                          staticClass: "form-radio",
-                          attrs: { type: "radio" },
-                          domProps: {
-                            value: opt,
-                            checked: _vm._q(_vm.field.value, opt)
-                          },
-                          on: {
-                            change: function($event) {
-                              return _vm.$set(_vm.field, "value", opt)
-                            }
-                          }
-                        })
-                      ],
-                  _vm._v(" "),
-                  _c("span", [_vm._v(_vm._s(opt.label))])
-                ],
-                2
-              )
+                          })
+                        ],
+                    _vm._v(" "),
+                    _c("span", [_vm._v(_vm._s(opt.label))])
+                  ],
+                  2
+                )
+              })
             : _c("v-select", {
                 staticClass: "form-input",
                 attrs: {
@@ -30489,8 +30492,8 @@ var render = function() {
                   expression: "field.value"
                 }
               })
-        }),
-        0
+        ],
+        2
       )
     ]
   )

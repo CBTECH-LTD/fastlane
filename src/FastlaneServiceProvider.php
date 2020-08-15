@@ -12,7 +12,7 @@ use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use CbtechLtd\Fastlane\Http\Controllers\EntryAttachmentsController;
 use CbtechLtd\Fastlane\Http\Controllers\EntryImagesController;
 use CbtechLtd\Fastlane\Http\Middleware\Authenticate;
-use CbtechLtd\Fastlane\Http\Middleware\ResolveEntryType;
+use CbtechLtd\Fastlane\Http\Middleware\ResolveFastlaneRequest;
 use CbtechLtd\Fastlane\Http\Middleware\RedirectIfAuthenticated;
 use CbtechLtd\Fastlane\Http\Middleware\SetInertiaRootTemplate;
 use Illuminate\Database\Schema\Blueprint;
@@ -35,8 +35,8 @@ class FastlaneServiceProvider extends ServiceProvider
     {
         $this->bootAccessControl();
         $this->bootInertia();
-        $this->bootUrlMacro();
         $this->bootBlueprintMacro();
+        $this->bootUrlMacro();
         $this->bootRoutes();
 
         /*
@@ -218,7 +218,7 @@ class FastlaneServiceProvider extends ServiceProvider
         }
 
         if (! in_array('fastlane.resolve', $router->getMiddleware())) {
-            $router->aliasMiddleware('fastlane.resolve', ResolveEntryType::class);
+            $router->aliasMiddleware('fastlane.resolve', ResolveFastlaneRequest::class);
         }
 
         // Add a macro to generate Control Panel routes

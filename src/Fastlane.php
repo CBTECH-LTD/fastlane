@@ -5,11 +5,10 @@ namespace CbtechLtd\Fastlane;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\Exceptions\EntryTypeNotRegisteredException;
 use CbtechLtd\Fastlane\Http\Controllers;
+use CbtechLtd\Fastlane\Http\Requests\FastlaneRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuManager as MenuManagerContract;
 use CbtechLtd\Fastlane\Support\Menu\MenuManager;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -22,48 +21,28 @@ class Fastlane
     protected Collection $routes;
     protected array $flashMessages = [];
     protected MenuManagerContract $menuManager;
-
-    protected Request $request;
-    protected ?EntryType $requestEntryType = null;
-    protected ?Model $requestEntry = null;
+    protected FastlaneRequest $request;
 
     public function __construct()
+    {
+        $this->initialize();
+    }
+
+    public function initialize(): void
     {
         $this->registerEntryTypes();
         $this->registerMenuManager();
     }
 
-    public function setRequest(Request $request): self
+    public function setRequest(FastlaneRequest $request): self
     {
         $this->request = $request;
         return $this;
     }
 
-    public function getRequest(): Request
+    public function getRequest(): FastlaneRequest
     {
         return $this->request;
-    }
-
-    public function setRequestEntryType(EntryType $entryType): self
-    {
-        $this->requestEntryType = $entryType;
-        return $this;
-    }
-
-    public function setRequestEntry(Model $model): self
-    {
-        $this->requestEntry = $model;
-        return $this;
-    }
-
-    public function getRequestEntryType(): ?EntryType
-    {
-        return $this->requestEntryType;
-    }
-
-    public function getRequestEntry(): ?Model
-    {
-        return $this->requestEntry;
     }
 
     public function flashSuccess(string $message, ?string $icon = null): void

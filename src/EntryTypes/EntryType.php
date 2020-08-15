@@ -14,7 +14,6 @@ use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
-use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -56,10 +55,21 @@ abstract class EntryType implements EntryTypeContract
     ];
 
     protected Gate $gate;
+    protected Model $modelInstance;
 
     public function __construct(Gate $gate)
     {
         $this->gate = $gate;
+        $this->modelInstance = $this->newModelInstance();
+    }
+
+    public function new(?Model $model): EntryTypeContract
+    {
+        return tap(app()->make(static::class), function ($instance) use ($model) {
+            if ($model) {
+                $instance->modelInstance = $model;
+            }
+        });
     }
 
     public function name(): string
@@ -98,6 +108,11 @@ abstract class EntryType implements EntryTypeContract
         }
 
         return $name;
+    }
+
+    public function modelInstance(): Model
+    {
+        return $this->modelInstance;
     }
 
     public function apiResource(): string
@@ -163,7 +178,7 @@ abstract class EntryType implements EntryTypeContract
         return true;
     }
 
-    public function getItems(?Closure $queryCallback = null): EloquentCollection
+    public function getItems(): EloquentCollection
     {
         $this->gate->authorize('list', $this->model());
 
@@ -173,25 +188,15 @@ abstract class EntryType implements EntryTypeContract
             ->orderBy('created_at', 'desc');
 
         $this->queryItems($query);
-
-        if ($queryCallback) {
-            call_user_func($queryCallback, $query);
-        }
-
         return $query->get();
     }
 
-    public function findItem(string $hashid, ?Closure $queryCallback = null): Model
+    public function findItem(string $hashid): Model
     {
         $query = $this->newModelInstance()->newModelQuery();
         $this->querySingleItem($query, $hashid);
 
-        if ($queryCallback) {
-            call_user_func($queryCallback, $query);
-        }
-
         $entry = $query->whereHashid($hashid)->firstOrFail();
-
         $this->gate->authorize('show', $entry);
 
         return $entry;
@@ -201,7 +206,6 @@ abstract class EntryType implements EntryTypeContract
     {
         $this->gate->authorize('create', $this->model());
         $entry = $this->newModelInstance();
-        $fields = $this->schema()->getCreateFields();
 
         // Check whether the authenticated user can update
         // the given entry instance.
@@ -337,11 +341,6 @@ abstract class EntryType implements EntryTypeContract
     protected function querySingleItem(Builder $query, string $hashid): void
     {
         //
-    }
-
-    protected function transformModelToSchema(): array
-    {
-
     }
 
     /**

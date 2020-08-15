@@ -19,6 +19,7 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
     protected bool $multiple = false;
     protected bool $withTimestamps = true;
     protected ?Collection $options = null;
+    protected bool $renderAsCheckbox = false;
     protected EntryTypeContract $relatedEntryType;
 
     abstract public function isMultiple(): bool;
@@ -70,6 +71,12 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
         return 'select';
     }
 
+    public function asCheckboxes(bool $state = true): self
+    {
+        $this->renderAsCheckbox = $state;
+        return $this;
+    }
+
     public function fillModel($model, $value, array $requestData): void
     {
         if (is_callable($this->fillValueCallback)) {
@@ -119,15 +126,16 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
         return '';
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, Request $request): array
+    protected function resolveConfig(EntryTypeContract $entryType, array $data): array
     {
         return [
-            'options'  => $this->resolveOptions($entryType, $request),
+            'options'  => $this->resolveOptions($entryType, $data),
             'multiple' => $this->isMultiple(),
+            'type'     => $this->renderAsCheckbox ? 'checkbox' : 'select',
         ];
     }
 
-    protected function resolveOptions(EntryTypeContract $entryType, Request $request): Collection
+    protected function resolveOptions(EntryTypeContract $entryType, array $data): Collection
     {
         return $this->relatedEntryType->getItems()->map(function (Model $model) use ($entryType) {
             return SelectOption::make(

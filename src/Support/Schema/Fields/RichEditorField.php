@@ -9,7 +9,6 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
@@ -78,7 +77,7 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
         )->all();
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, Request $request): array
+    protected function resolveConfig(EntryTypeContract $entryType, array $data): array
     {
         return [
             'acceptFiles' => $this->acceptFiles,

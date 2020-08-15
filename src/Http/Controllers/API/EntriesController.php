@@ -7,7 +7,6 @@ use CbtechLtd\Fastlane\Http\Controllers\Controller;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceBuilder;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollectionBuilder;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -22,9 +21,7 @@ class EntriesController extends Controller
 
     public function collection(Request $request)
     {
-        $items = $this->entryType()->getItems(function (Builder $query) {
-            $query->where('is_active', true);
-        });
+        $items = $this->entryType()->getItems();
 
         $collection = new EntryResourceCollectionBuilder(
             $this->entryType(),
@@ -37,8 +34,6 @@ class EntriesController extends Controller
 
     public function single(Request $request)
     {
-        abort_unless($this->entry()->is_active, 404);
-
         $item = new EntryResourceBuilder(
             $this->entryType(),
             $this->entry(),
