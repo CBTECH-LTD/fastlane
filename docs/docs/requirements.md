@@ -48,10 +48,12 @@ We provide a ready-to-go Docker setup with essential software plus additional pe
 - Minio
 - Chrome driver
 
-If you've installed Fastlane in an existent project, just copy the file:
+After having installed Fastlane in an existent project, just copy the file:
 
 ```shell
-cp vendor/cbtech-ltd/fastlane/docker-compose.yml ./
+mkdir docker
+cp vendor/cbtech-ltd/fastlane/docker/docker-compose.yml ./docker
+cp -r vendor/cbtech-ltd/fastlane/docker/nginx ./docker/nginx
 ```
 
 Head to [Getting Started on Fastlane With Docker](#docker) for more information.
