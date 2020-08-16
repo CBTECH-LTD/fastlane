@@ -4,6 +4,12 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+## 0.1.3 [2020-08-16]
+
+### Added
+
+- fastlane_users table.
+
 ---
 
 ## 0.1.2 [2020-08-16]
