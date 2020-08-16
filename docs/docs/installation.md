@@ -19,10 +19,17 @@ Follow the next steps.
 
 ## Adding to an existing Laravel app
 
-Run the following command to add Fastlane to your composer requirements:
+Run the following command to add Fastlane to your project:
 
 ```shell
 $ composer require cbtech-ltd/fastlane
+```
+
+After the install, publish the configuration file and Fastlane assets:
+
+```shell
+$ php artisan vendor:publish --tag=fastlane-config
+$ php artisan vendor:publish --tag=fastlane-assets
 ```
 
 ## Next steps
