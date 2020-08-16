@@ -4,6 +4,12 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+## 0.1.4 [2020-08-16]
+
+### Fixed
+
+- Class name for Fastlane Users migration. 
+
 ## 0.1.3 [2020-08-16]
 
 ### Added
