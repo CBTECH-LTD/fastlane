@@ -25,6 +25,8 @@ class User extends BaseModel implements
 
     use Notifiable, Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasRoles, HasApiTokens;
 
+    protected $table = 'fastlane_users';
+
     protected $fillable = [
         'name',
         'email',
