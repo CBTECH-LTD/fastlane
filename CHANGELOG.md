@@ -4,6 +4,12 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+## 0.1.6 [2020-08-16]
+
+### Changed
+
+- Dependency version of CBTECH JSON API Tranformer package.
+
 ## 0.1.5 [2020-08-16]
 
 ### Fixed
