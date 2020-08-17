@@ -32,4 +32,11 @@ $ php artisan vendor:publish --tag=fastlane-config
 $ php artisan vendor:publish --tag=fastlane-assets
 ```
 
+Publish configurations of other required packages:
+
+```shell
+$ php artisan vendor:publish --tag="Spatie\Permission\PermissionServiceProvider"
+$ php artisan vendor:publish --tag="Altek\Accountant\AccountantServiceProvider"
+```
+
 ## Next steps
