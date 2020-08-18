@@ -6,6 +6,8 @@ use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\RandomPasswordPipe;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\UpdateRolePipe;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
+use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
+use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
 use CbtechLtd\Fastlane\Support\Schema\Fields\SelectField;
@@ -13,7 +15,10 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\NewAccessToken;
 use Spatie\Permission\Models\Role;
 
@@ -63,6 +68,9 @@ class BackendUserEntryType extends EntryType
                 )
                 ->required()
                 ->showOnIndex()
+                ->hideOnForm(function () {
+                    return Auth::user()->is($this->modelInstance());
+                })
                 ->fillModelUsing(function ($model, $value) {
                     if ($value) {
                         $model->assignRole($value);
@@ -86,6 +94,37 @@ class BackendUserEntryType extends EntryType
         $this->gate->authorize('createToken', $user);
 
         return $user->createToken($name, $abilities);
+    }
+
+    public function updateAuthenticatedUser(Request $request): User
+    {
+        $entry = Auth::user();
+
+        // Validate the request data against the update fields
+        // and save the validated data in a new variable.
+        $fields = $this->schema()->getUpdateFields();
+
+        $rules = Collection::make($fields)
+            ->mapWithKeys(fn(SchemaField $fieldType) => $fieldType->getUpdateRules())
+            ->all();
+
+        $data = Validator::make($request->all(), $rules)->validated();
+
+        // Pass the validated date through all fields, call hooks before saving,
+        // then call more hooks after model has been saved.
+        $this->hydrateFields($entry, $fields, $data);
+
+        $beforeHook = new OnSavingHook($this, $entry, $data);
+        $this->executeHooks(static::HOOK_BEFORE_UPDATING, $beforeHook);
+        $this->executeHooks(static::HOOK_BEFORE_SAVING, $beforeHook);
+
+        $beforeHook->model()->save();
+
+        $afterHook = new OnSavingHook($this, $beforeHook->model(), $data);
+        $this->executeHooks(static::HOOK_AFTER_UPDATING, $afterHook);
+        $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
+
+        return $afterHook->model();
     }
 
     protected function queryItems(Builder $query): void

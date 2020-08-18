@@ -34,4 +34,11 @@ class ConfirmPasswordController extends Controller
     {
         return route('cp.dashboard');
     }
+
+    public function showConfirmForm()
+    {
+        return $this->render('Auth/ConfirmPassword', [
+            'url' => route('cp.password.confirm'),
+        ]);
+    }
 }

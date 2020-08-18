@@ -1,7 +1,8 @@
 <?php
 
 use CbtechLtd\Fastlane\FastlaneFacade;
-use CbtechLtd\Fastlane\Http\Controllers\Account\AccountSettingsController;
+use CbtechLtd\Fastlane\Http\Controllers\Account\AccountProfileController;
+use CbtechLtd\Fastlane\Http\Controllers\Account\AccountSecurityController;
 use CbtechLtd\Fastlane\Http\Controllers\Account\AccountTokensController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\ConfirmPasswordController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\ForgotPasswordController;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::redirect('/', config('fastlane.control_panel.url_prefix').'/dashboard');
+Route::redirect('/', config('fastlane.control_panel.url_prefix') . '/dashboard');
 
 // Authentication Routes...
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -51,13 +52,13 @@ Route::middleware(['fastlane.auth:fastlane-cp', 'verified'])->group(function ($r
     $router->get('account', function () {
         return redirect()->route('cp.account.profile');
     })->name('account');
-    $router->get('account/profile', [AccountSettingsController::class, 'edit'])->name('account.profile');
-    $router->patch('account/profile', [AccountSettingsController::class, 'update']);
-    $router->get('account/security', [AccountSettingsController::class, 'edit'])->name('account.security');
-    $router->patch('account/security', [AccountSettingsController::class, 'update']);
+    $router->get('account/profile', [AccountProfileController::class, 'edit'])->name('account.profile');
+    $router->patch('account/profile', [AccountProfileController::class, 'update']);
+    $router->get('account/security', [AccountSecurityController::class, 'edit'])->name('account.security')->middleware('password.confirm:cp.password.confirm');
+    $router->patch('account/security', [AccountSecurityController::class, 'update']);
 
     $router->get('account/tokens', [AccountTokensController::class, 'index'])->name('account.tokens.index');
-    $router->get('account/tokens/new', [AccountTokensController::class, 'create'])->name('account.tokens.create');
+    $router->get('account/tokens/new', [AccountTokensController::class, 'create'])->name('account.tokens.create')->middleware('password.confirm');
     $router->post('account/tokens', [AccountTokensController::class, 'store'])->name('account.tokens.store');
     $router->delete('account/tokens/{token}', [AccountTokensController::class, 'destroy'])->name('account.tokens.destroy');
 

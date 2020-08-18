@@ -17,6 +17,7 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules as WithRulesCon
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithValue as WithValueContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility as WithVisibilityContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Hooks\OnFillingHook;
+use Closure;
 use Illuminate\Support\Collection;
 
 abstract class AbstractBaseField implements SchemaField, ResolvableContract, WithValueContract, WithRulesContract, MigratableContract, SupportModelContract, WithVisibilityContract, PanelizableContract
@@ -37,15 +38,21 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
     protected string $updateRules = '';
     protected bool $required = false;
     protected ?Unique $unique = null;
-    protected bool $showOnIndex = false;
-    protected bool $showOnCreate = true;
-    protected bool $showOnUpdate = true;
     protected $default = null;
     protected ?string $panel = null;
     protected int $listWidth = 0;
     protected EntryType $entryType;
     protected ?string $placeholder;
     protected $fillValueCallback;
+
+    /** @var bool | Closure */
+    protected $showOnIndex = false;
+
+    /** @var bool | Closure */
+    protected $hideOnCreate = false;
+
+    /** @var bool | Closure */
+    protected $hideOnUpdate = false;
 
     protected function __construct(string $name, string $label)
     {
@@ -117,43 +124,71 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
         return $this;
     }
 
-    public function showOnIndex(bool $state = true): self
+    /**
+     * @param bool | Closure $value
+     * @return $this
+     */
+    public function showOnIndex($value = true): self
     {
-        $this->showOnIndex = $state;
+        $this->showOnIndex = $value;
         return $this;
     }
 
-    public function hideOnCreate(bool $state = true): self
+    /**
+     * @param bool | Closure $value
+     * @return $this
+     */
+    public function hideOnCreate($value = true): self
     {
-        $this->showOnCreate = ! $state;
+        $this->hideOnCreate = $value;
         return $this;
     }
 
-    public function hideOnUpdate(bool $state = true): self
+    /**
+     * @param bool | Closure $value
+     * @return $this
+     */
+    public function hideOnUpdate($value = true): self
     {
-        $this->showOnUpdate = ! $state;
+        $this->hideOnUpdate = $value;
         return $this;
     }
 
-    public function hideOnForm(bool $state = true): self
+    /**
+     * @param bool | Closure $value
+     * @return $this
+     */
+    public function hideOnForm($value): self
     {
-        $this->showOnCreate = $this->showOnUpdate = ! $state;
+        $this->hideOnCreate = $this->hideOnUpdate = $value;
         return $this;
     }
 
     public function isShownOnIndex(): bool
     {
+        if (is_callable($this->showOnIndex)) {
+            return call_user_func($this->showOnIndex);
+        }
+
         return $this->showOnIndex;
     }
 
     public function isShownOnCreate(): bool
     {
-        return $this->showOnCreate;
+        if (is_callable($this->hideOnCreate)) {
+            return ! call_user_func($this->hideOnCreate);
+        }
+
+        return ! $this->hideOnCreate;
     }
 
     public function isShownOnUpdate(): bool
     {
-        return $this->showOnUpdate;
+        if (is_callable($this->hideOnUpdate)) {
+            return ! call_user_func($this->hideOnUpdate);
+        }
+
+        return ! $this->hideOnUpdate;
     }
 
     public function fillModel($model, $value, array $requestData): void

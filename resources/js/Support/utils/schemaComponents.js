@@ -9,11 +9,16 @@ import Simple from '../../Components/List/Simple'
 import Image from '../../Components/List/Image'
 import Select from '../../Components/List/Select'
 import Toggle from '../../Components/List/Toggle'
+import PasswordInput from '../../Components/Form/PasswordInput'
 
 export default {
     string: {
         list: Simple,
         form: StringInput,
+    },
+    password: {
+        list: Simple,
+        form: PasswordInput,
     },
     text: {
         list: Simple,
