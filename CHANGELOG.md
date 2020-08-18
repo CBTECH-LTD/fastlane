@@ -4,8 +4,6 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
-## 0.2.0 [2020-08-18]
-
 ### Added
 - Menu group to admin.
 
