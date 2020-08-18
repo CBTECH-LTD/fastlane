@@ -193,10 +193,11 @@ abstract class EntryType implements EntryTypeContract
 
     public function findItem(string $hashid): Model
     {
-        $query = $this->newModelInstance()->newModelQuery();
+        $model = $this->newModelInstance();
+        $query = $model->newModelQuery();
         $this->querySingleItem($query, $hashid);
-
-        $entry = $query->whereHashid($hashid)->firstOrFail();
+        $entry = $query->where($model->getRouteKeyName(), $hashid)->firstOrFail();
+        
         $this->gate->authorize('show', $entry);
 
         return $entry;
@@ -242,9 +243,10 @@ abstract class EntryType implements EntryTypeContract
 
     public function update(Request $request, string $hashid): Model
     {
-        $query = $this->newModelInstance()->newModelQuery();
+        $model = $this->newModelInstance();
+        $query = $model->newModelQuery();
         $this->querySingleItem($query, $hashid);
-        $entry = $query->whereHashid($hashid)->firstOrFail();
+        $entry = $query->where($model->getRouteKeyName(), $hashid)->firstOrFail();
 
         // Check whether the authenticated user can update
         // the given entry instance.
@@ -281,9 +283,10 @@ abstract class EntryType implements EntryTypeContract
 
     public function delete(string $hashid): Model
     {
-        $query = $this->newModelInstance()->newModelQuery();
+        $model = $this->newModelInstance();
+        $query = $model->newModelQuery();
         $this->querySingleItem($query, $hashid);
-        $entry = $query->whereHashid($hashid)->firstOrFail();
+        $entry = $query->where($model->getRouteKeyName(), $hashid)->firstOrFail();
 
         if ($this->policy()) {
             $this->gate->authorize('delete', $entry);
