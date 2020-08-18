@@ -8,7 +8,7 @@
                 </template>
 
                 <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scroll">
-                    <f-navigation-list :items="sidebarMenu"/>
+                    <f-navigation-list class="my-6" :items="sidebarMenu"/>
                 </div>
             </f-sidebar>
         </template>

@@ -4,43 +4,46 @@ namespace CbtechLtd\Fastlane\Support\Menu;
 
 use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\Menu;
+use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuItem;
+use Illuminate\Support\Collection;
 
 class MenuBuilder implements Menu
 {
-    /**
-     * Determine whether the builder must automatically
-     * include links for entry types.
-     *
-     * @var bool
-     */
-    protected bool $autoIncludeEntryTypes = true;
-
     public function items(): array
     {
-        $baseLinks = [
+        $menu = Collection::make([
             MenuLink::make(route('cp.dashboard'), 'Dashboard')->icon('dashboard'),
-        ];
-
-        if (! $this->autoIncludeEntryTypes) {
-            return $baseLinks;
-        }
+        ]);
 
         // Generate links to entry types.
-        $typeLinks = FastlaneFacade::entryTypes()->map(function (EntryType $entryType) {
-            if (! $entryType->isVisibleOnMenu()) {
-                return null;
+        FastlaneFacade::entryTypes()->each(function (EntryType $entryType) use ($menu) {
+            if (! $entryType instanceof RenderableOnMenu) {
+                return;
             }
 
-            return MenuLink::make(route("cp.{$entryType->identifier()}.index"), $entryType->pluralName())
-                ->icon($entryType->icon())
-                ->when(function ($user) use ($entryType) {
-                    return $user->can('list', $entryType->model());
-                });
-        })
-            ->filter()
-            ->push(MenuLink::make(route('cp.account'), 'Account Settings')->icon('user-cog'));
+            $entryType->renderOnMenu($menu);
+        });
 
-        return array_merge($baseLinks, $typeLinks->all());
+        return $menu
+            ->push(
+                MenuLink::make(route('cp.account'), 'Account Settings')
+                    ->icon('user-cog')
+                    ->group('System')
+            )
+            ->mapToGroups(function (MenuItem $item) {
+                return ($item->getGroup() === '')
+                    ? ['__top' => $item]
+                    : [$item->getGroup() => $item];
+            })
+            ->flatMap(function (Collection $data, $key) {
+                if ($key === '__top') {
+                    return $data->all();
+                }
+
+                return [MenuGroup::make($key)->children($data->all())];
+            })
+            ->all();
     }
 }

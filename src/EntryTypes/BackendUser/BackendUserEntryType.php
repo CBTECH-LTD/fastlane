@@ -7,6 +7,8 @@ use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\RandomPasswordPipe;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\UpdateRolePipe;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
+use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
+use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
@@ -22,8 +24,10 @@ use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\NewAccessToken;
 use Spatie\Permission\Models\Role;
 
-class BackendUserEntryType extends EntryType
+class BackendUserEntryType extends EntryType implements RenderableOnMenu
 {
+    use RendersOnMenu;
+
     const PERM_MANAGE_SYSTEM_ADMINS = 'manage admins';
     const PERM_MANAGE_ACCESS_TOKENS = 'manage personal access tokens';
     const ROLE_SYSTEM_ADMIN = 'system admin';
@@ -135,5 +139,10 @@ class BackendUserEntryType extends EntryType
     protected function querySingleItem(Builder $query, string $hashid): void
     {
         $query->except(Auth::user());
+    }
+
+    protected function menuGroup(): string
+    {
+        return 'System';
     }
 }

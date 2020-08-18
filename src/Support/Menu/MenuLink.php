@@ -8,6 +8,7 @@ class MenuLink implements MenuItem
 {
     private string $href;
     private string $label;
+    private string $group = '';
     private ?string $icon = null;
     private ?\Closure $whenFn = null;
 
@@ -28,6 +29,17 @@ class MenuLink implements MenuItem
         return $this;
     }
 
+    public function group(string $group): self
+    {
+        $this->group = $group;
+        return $this;
+    }
+
+    public function getGroup(): string
+    {
+        return $this->group;
+    }
+
     public function when(\Closure $whenFn): self
     {
         $this->whenFn = $whenFn;
@@ -44,6 +56,7 @@ class MenuLink implements MenuItem
 
         return [
             'type'  => 'link',
+            'group' => $this->group,
             'href'  => $this->href,
             'label' => $this->label,
             'icon'  => $this->icon,

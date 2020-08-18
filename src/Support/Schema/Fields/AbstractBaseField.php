@@ -158,7 +158,7 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
      * @param bool | Closure $value
      * @return $this
      */
-    public function hideOnForm($value): self
+    public function hideOnForm($value = true): self
     {
         $this->hideOnCreate = $this->hideOnUpdate = $value;
         return $this;

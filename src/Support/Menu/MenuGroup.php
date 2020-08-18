@@ -11,11 +11,12 @@ class MenuGroup implements MenuItem
     private string $label;
     private ?string $icon = null;
     private ?\Closure $whenFn = null;
-    private array $children = [];
+    private Collection $children;
 
     public function __construct(string $label)
     {
         $this->label = $label;
+        $this->children = new Collection;
     }
 
     public static function make(string $label): MenuGroup
@@ -29,14 +30,28 @@ class MenuGroup implements MenuItem
         return $this;
     }
 
+    public function getGroup(): string
+    {
+        return '';
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
     public function children(array $children): self
     {
         $interface = MenuItem::class;
         Assert::allImplementsInterface($children, $interface, 'All children must implement ' . $interface);
 
-        $this->children = $children;
-
+        $this->children = Collection::make($children);
         return $this;
+    }
+
+    public function getChildren(): Collection
+    {
+        return $this->children;
     }
 
     public function when(\Closure $whenFn): MenuItem
