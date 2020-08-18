@@ -4,11 +4,27 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+## 0.1.7 [2020-08-17]
+
+### Added
+
+- Page to edit account profile.
+- Page to edit account password.
+- Page to confirm password before an important action.
+
+### Changed
+
+- Some method renaming on Schema Fields.
+
+---
+
 ## 0.1.6 [2020-08-16]
 
 ### Changed
 
 - Dependency version of CBTECH JSON API Tranformer package.
+
+---
 
 ## 0.1.5 [2020-08-16]
 
@@ -16,11 +32,15 @@ All notable changes to `fastlane` will be documented in this file
 
 - Class name for Fastlane Users migration.
 
+---
+
 ## 0.1.4 [2020-08-16]
 
 ### Fixed
 
 - Class name for Fastlane Users migration. 
+
+---
 
 ## 0.1.3 [2020-08-16]
 
