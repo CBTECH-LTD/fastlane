@@ -1,5 +1,5 @@
 <template>
-    <div class="relative my-6">
+    <div class="relative">
         <template v-for="(item, index) in items">
             <div ref="items" :key="`link_${index}`">
                 <component

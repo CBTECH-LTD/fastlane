@@ -4,6 +4,16 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+## 0.2.0 [2020-08-18]
+
+### Added
+- Menu group to admin.
+
+### Changed
+- How entry types links on menu are identified.
+
+---
+
 ## 0.1.7 [2020-08-17]
 
 ### Added

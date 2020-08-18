@@ -21,7 +21,7 @@
             <div class="flex flex-col border-r border-gray-400 bg-gray-300 h-screen sticky top-0 overflow-hidden" style="width: 320px">
                 <!-- Navigation items -->
                 <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scroll">
-                    <f-navigation-list :items="this.$page.menu"/>
+                    <f-navigation-list class="my-6" :items="this.$page.menu"/>
                 </div>
             </div>
 
