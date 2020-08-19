@@ -6,9 +6,13 @@ All notable changes to `fastlane` will be documented in this file
 
 ### Added
 - Menu group to admin.
+- Ability to set label using a callback.
 
 ### Changed
 - How entry types links on menu are identified.
+
+### Fixed
+- Field panel resolution.
 
 ---
 
