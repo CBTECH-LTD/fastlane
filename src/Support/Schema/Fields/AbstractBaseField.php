@@ -33,7 +33,6 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
     ];
 
     protected string $name;
-    protected string $label;
     protected string $createRules = '';
     protected string $updateRules = '';
     protected bool $required = false;
@@ -44,6 +43,9 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
     protected EntryType $entryType;
     protected ?string $placeholder;
     protected $fillValueCallback;
+
+    /** @var string | Closure */
+    protected $label;
 
     /** @var bool | Closure */
     protected $showOnIndex = false;
@@ -74,6 +76,12 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
     public function setEntryType(EntryType $entryType): self
     {
         $this->entryType = $entryType;
+        return $this;
+    }
+
+    public function setLabel($label): self
+    {
+        $this->label = $label;
         return $this;
     }
 
@@ -158,7 +166,7 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
      * @param bool | Closure $value
      * @return $this
      */
-    public function hideOnForm($value): self
+    public function hideOnForm($value = true): self
     {
         $this->hideOnCreate = $this->hideOnUpdate = $value;
         return $this;
@@ -218,8 +226,8 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
         return [
             'name'        => $this->getName(),
             'type'        => $this->getType(),
-            'label'       => $this->label,
-            'placeholder' => $this->placeholder ?? $this->label,
+            'label'       => $this->getLabel(),
+            'placeholder' => $this->placeholder ?? $this->getLabel(),
             'default'     => $this->default,
             'required'    => $this->required,
             'listWidth'   => $this->listWidth,
@@ -326,5 +334,18 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
         return is_string($str)
             ? "'{$str}'"
             : $str;
+    }
+
+    /**
+     * @return Closure|string
+     */
+    protected function getLabel()
+    {
+        if (is_string($this->label)) {
+            return $this->label;
+
+        }
+
+        return call_user_func($this->label);
     }
 }

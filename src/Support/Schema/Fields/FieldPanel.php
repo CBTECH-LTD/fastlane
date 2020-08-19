@@ -7,6 +7,7 @@ use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Makeable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Panelizable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -64,7 +65,7 @@ class FieldPanel implements SchemaField, Resolvable
     public function resolve(EntryTypeContract $entryType, array $data): array
     {
         return Collection::make($this->fields)
-            ->mapWithKeys(function (SchemaField $field) use ($entryType, $data) {
+            ->flatMap(function (SchemaField $field) use ($entryType, $data) {
                 if (! $field instanceof Resolvable) {
                     return false;
                 }
@@ -73,7 +74,7 @@ class FieldPanel implements SchemaField, Resolvable
                     $field->inPanel($this);
                 }
 
-                return $field->resolve($entryType, $data);
+                return Arr::wrap($field->resolve($entryType, $data));
             })
             ->all();
     }

@@ -1,30 +1,31 @@
 <template>
-    <div
-        :href="item.href"
-        @click="() => $emit('click', item)"
-        @mouseenter="ev => $emit('mouseenter', ev)"
-        @mouseleave="ev => $emit('mouseleave', ev)"
-        class="relative w-full py-3 flex items-center font-semibold text-gray-500 hover:text-gray-700 transition-all ease-in-out duration-300 cursor-pointer opacity-75 hover:opacity-100">
-        <span class="flex text-2xl justify-center w-16 opacity-75">
-            <f-icon :name="item.icon"/>
-        </span>
-        <span class="text-sm">{{ item.label }}</span>
+    <div class="border-b border-gray-400 border-dashed pb-4">
+        <div class="relative w-full py-3 flex items-center text-gray-600 opacity-100 menu-group__label">
+            <span class="flex-shrink bg-gray-300 text-sm font-semibold uppercase tracking-wider z-10 ml-12 px-4">{{ item.label }}</span>
+        </div>
+        <f-navigation-list class="transition-all duration-300" :items="item.children" />
     </div>
 </template>
 
 <script>
 
-    export default {
-        name: 'MenuGroup',
-        props: {
-            item: {
-                type: Object,
-                required: true,
-            }
+export default {
+    name: 'MenuGroup',
+    props: {
+        item: {
+            type: Object,
+            required: true,
         }
-    }
+    },
+}
 </script>
 
 <style scoped>
-
+.menu-group__label::before {
+    @apply border-t border-dashed border-gray-400;
+    content: ' ';
+    display: block;
+    position: absolute;
+    width: 100%;
+}
 </style>

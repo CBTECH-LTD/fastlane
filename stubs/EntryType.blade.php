@@ -1,11 +1,16 @@
 namespace {{ $namespace }};
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
+use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
 use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
+use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
+use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
 
-class {{ $class }} extends EntryType
+class {{ $class }} extends EntryType implements RenderableOnMenu
 {
+    use RendersOnMenu;
+
     public function fields(): array
     {
         return [

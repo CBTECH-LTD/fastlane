@@ -20,6 +20,11 @@ class {{ $class }} implements ModelPolicy
         return false;
     }
 
+    public function show($user, Model $model)
+    {
+        return false;
+    }
+
     public function update($user, Model $model)
     {
         return false;
