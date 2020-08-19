@@ -3,8 +3,6 @@
 namespace CbtechLtd\Fastlane\Support\Concerns;
 
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
-use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuItem;
-use CbtechLtd\Fastlane\Support\Menu\MenuGroup;
 use CbtechLtd\Fastlane\Support\Menu\MenuLink;
 use Illuminate\Support\Collection;
 
