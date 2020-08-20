@@ -26,11 +26,11 @@ abstract class FormRequest extends \Illuminate\Foundation\Http\FormRequest
 
     public function entryType(): EntryType
     {
-        return app('fastlane')->getRequestEntryType();
+        return app('fastlane')->getRequest()->getEntryType();
     }
 
-    public function entry(): Model
+    public function entry(): ?Model
     {
-        return app('fastlane')->getRequestEntry();
+        return app('fastlane')->getRequest()->getEntryInstance();
     }
 }

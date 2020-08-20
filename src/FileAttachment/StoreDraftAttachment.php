@@ -3,15 +3,15 @@
 namespace CbtechLtd\Fastlane\FileAttachment;
 
 use CbtechLtd\Fastlane\Http\Requests\EntryAttachmentStoreRequest;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\HasAttachments;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 
 class StoreDraftAttachment
 {
-    protected SchemaField $field;
+    protected HasAttachments $field;
 
-    public function __construct(SchemaField $field)
+    public function __construct(HasAttachments $field)
     {
         $this->field = $field;
     }
@@ -22,7 +22,7 @@ class StoreDraftAttachment
 
         $model = DraftAttachment::create([
             'draft_id' => $request->input('draft_id'),
-            'file'     => $request->file('file')->store($this->field->getStorageDirectory(), $disk),
+            'file'     => $request->file('files.0')->store($this->field->getStorageDirectory(), $disk),
         ]);
 
         return Storage::disk($disk)->url($model->file);

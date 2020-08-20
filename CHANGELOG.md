@@ -4,6 +4,11 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+## 0.3.0 [2020-08-20]
+
+### Added
+- File Field.
+
 ---
 
 ## 0.2.0 [2020-08-18]
