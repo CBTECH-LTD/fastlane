@@ -3,39 +3,23 @@
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
-use CbtechLtd\Fastlane\FileAttachment\StoreDraftAttachment;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\HasAttachments;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 
-class RichEditorField extends AbstractBaseField implements ExportsToApiAttributeContract
+class RichEditorField extends AbstractBaseField implements ExportsToApiAttributeContract, HasAttachments
 {
     use HandlesAttachments, ExportsToApiAttribute;
-
-    protected bool $acceptFiles = false;
 
     public function getType(): string
     {
         return 'richEditor';
-    }
-
-    public function isAcceptingFiles(): bool
-    {
-        return $this->acceptFiles;
-    }
-
-    public function acceptFiles(bool $state = true): self
-    {
-        $this->acceptFiles = $state;
-
-        $this->addFile($state ? new StoreDraftAttachment($this) : null);
-
-        return $this;
     }
 
     public function fillModel($model, $value, array $requestData): void
@@ -49,7 +33,7 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
 
         // Check whether files are accepted in the rich editor instance,
         // then persist all draft attachment files.
-        if ($this->isAcceptingFiles() && $draftId = Arr::get($requestData, $this->getName() . '__draft_id')) {
+        if ($this->isAcceptingAttachments() && $draftId = Arr::get($requestData, $this->getName() . '__draft_id')) {
             DraftAttachment::persistAllDraft(
                 $draftId,
                 $this,

@@ -37,9 +37,9 @@ class ResolveFastlaneRequest
         $groupUrl = config("fastlane.${routeGroup}.url_prefix") . '/';
         $urlPrefix = Str::replaceLast('/', '/entry-types/', $groupUrl);
 
-        return $this->fastlane->getEntryTypeByIdentifier(
-            explode('/', Str::replaceFirst($urlPrefix, '', '/' . $request->path()))[0]
-        );
+        $slug = explode('/', Str::replaceFirst($urlPrefix, '', '/' . $request->path()))[0];
+
+        return $this->fastlane->getEntryTypeByIdentifier($slug);
     }
 
     protected function getEntryInstance(Request $request, EntryType $entryType): ?Model

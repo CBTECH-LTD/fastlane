@@ -13,7 +13,7 @@ class EntryAttachmentsController extends Controller
         $field = $request->field();
 
         return response()->json([
-            'url' => call_user_func($field->getAddFileCallback(), $request),
+            'url' => $field->storeAttachment($request),
         ]);
     }
 }

@@ -16,81 +16,81 @@
 </template>
 
 <script>
-    import axios from 'axios'
-    import { v4 as uuidv4 } from 'uuid'
-    import FormInput from '../Mixins/FormInput'
+import axios from 'axios'
+import { v4 as uuidv4 } from 'uuid'
+import FormInput from '../Mixins/FormInput'
 
-    export default {
-        name: 'RichEditorInput',
-        mixins: [FormInput],
-        inheritAttrs: false,
+export default {
+    name: 'RichEditorInput',
+    mixins: [FormInput],
+    inheritAttrs: false,
 
-        props: {
-            field: {
-                type: Object,
-                required: true,
-            },
+    props: {
+        field: {
+            type: Object,
+            required: true,
+        },
+    },
+
+    data: () => ({
+        draftId: uuidv4(),
+    }),
+
+    methods: {
+        /**
+         * @param {FormObject} formObject
+         */
+        commit (formObject) {
+            formObject.put(this.field.name, this.field.value)
+            formObject.put(`${this.field.name}__draft_id`, this.draftId)
         },
 
-        data: () => ({
-            draftId: uuidv4(),
-        }),
+        onInput (value) {
+            this.field.value = value
 
-        methods: {
-            /**
-             * @param {FormObject} formObject
-             */
-            commit (formObject) {
-                formObject.put(this.field.name, this.field.value)
-                formObject.put(`${this.field.name}__draft_id`, this.draftId)
-            },
+            this.$emit('input', this.field.value)
+        },
 
-            onInput (value) {
-                this.field.value = value
+        async onFileAdded ({ attachment }) {
+            if (attachment.file) {
+                const data = new FormData()
+                data.append('Content-Type', attachment.file.type)
+                data.append('files[]', attachment.file)
+                data.append('draft_id', this.draftId)
 
-                this.$emit('input', this.field.value)
-            },
+                const { data: { url } } = await axios.post(this.field.config.links.self, data, {
+                    onUploadProgress: function (progressEvent) {
+                        attachment.setUploadProgress(
+                            Math.round((progressEvent.loaded * 100) / progressEvent.total)
+                        )
+                    },
+                })
 
-            async onFileAdded ({ attachment }) {
-                if (attachment.file) {
-                    const data = new FormData()
-                    data.append('Content-Type', attachment.file.type)
-                    data.append('file', attachment.file)
-                    data.append('draft_id', this.draftId)
-
-                    const { data: { url } } = await axios.post(this.field.config.links.self, data, {
-                        onUploadProgress: function (progressEvent) {
-                            attachment.setUploadProgress(
-                                Math.round((progressEvent.loaded * 100) / progressEvent.total)
-                            )
-                        },
-                    })
-
-                    return attachment.setAttributes({
-                        url: url,
-                        href: url,
-                    })
-                }
-            },
-
-            onFileRemoved ({ attachment: { attachment } }) {
-                // TODO: Delete file on API...
-                console.log(attachment)
-            },
-
-            cleanUp () {
-                if (this.field.config.acceptFiles) {
-                    // TODO: Delete draft attachments
-                }
+                return attachment.setAttributes({
+                    url: url,
+                    href: url,
+                })
             }
         },
 
-        mounted () {
-            //
+        onFileRemoved ({ attachment: { attachment } }) {
+            // TODO: Delete file on API...
+            console.log(attachment)
         },
 
-        beforeDestroy () {
-            this.cleanUp()
+        cleanUp () {
+            if (this.field.config.acceptFiles) {
+                // TODO: Delete draft attachments
+            }
         }
+    },
+
+    mounted () {
+        //
+    },
+
+    beforeDestroy () {
+        this.cleanUp()
     }
+}
 </script>
