@@ -10,8 +10,14 @@ import Image from '../../Components/List/Image'
 import Select from '../../Components/List/Select'
 import Toggle from '../../Components/List/Toggle'
 import PasswordInput from '../../Components/Form/PasswordInput'
+import FileInput from '../../Components/Form/FileInput'
+import HiddenInput from '../../Components/Form/HiddenInput'
 
 export default {
+    hidden: {
+        list: Simple,
+        form: HiddenInput,
+    },
     string: {
         list: Simple,
         form: StringInput,
@@ -38,7 +44,7 @@ export default {
     },
     file: {
         list: Simple,
-        form: StringInput,
+        form: FileInput,
     },
     date: {
         list: Simple,
