@@ -18890,7 +18890,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, ".title-bar-wrapper[data-v-9ebffbf6] {\n  position: -webkit-sticky;\n  position: sticky;\n  top: 0;\n  padding-top: 3rem;\n  margin-left: 1rem;\n  margin-right: 1rem;\n  z-index: 30;\n  background-color: transparent;\n  transition-property: all;\n  transition-duration: 300ms;\n}\n.title-bar[data-v-9ebffbf6] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding-left: 2rem;\n  padding-right: 2rem;\n  padding-top: 2rem;\n  padding-bottom: 2rem;\n  z-index: 30;\n  transition-property: all;\n  transition-duration: 300ms;\n  height: 72px;\n  transform: translateY(0);\n  top: 80px;\n}\n.title-bar__title[data-v-9ebffbf6] {\n  font-size: 1.875rem;\n  --text-opacity: 1;\n  color: #4a5568;\n  color: rgba(74, 85, 104, var(--text-opacity));\n  font-weight: 800;\n}\n.title-bar__subtitle[data-v-9ebffbf6] {\n  font-size: 1.125rem;\n  --text-opacity: 1;\n  color: #a0aec0;\n  color: rgba(160, 174, 192, var(--text-opacity));\n  font-weight: 600;\n}\n.title-bar-wrapper.is-floating[data-v-9ebffbf6] {\n  --bg-opacity: 1;\n  background-color: #c3dafe;\n  background-color: rgba(195, 218, 254, var(--bg-opacity));\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n  border-bottom-right-radius: 0.5rem;\n  border-bottom-left-radius: 0.5rem;\n  border-width: 1px;\n  --border-opacity: 1;\n  border-color: #a3bffa;\n  border-color: rgba(163, 191, 250, var(--border-opacity));\n  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);\n}\n.title-bar-wrapper.is-floating .title-bar[data-v-9ebffbf6] {\n  padding-top: 1rem;\n  padding-bottom: 1rem;\n  margin-bottom: 3rem;\n  transform: translateY(40px);\n}\n.title-bar-wrapper.is-floating .title-bar__title[data-v-9ebffbf6] {\n  font-size: 1.25rem;\n}\n.title-bar-wrapper.is-floating .title-bar__subtitle[data-v-9ebffbf6] {\n  font-size: 0.875rem;\n}\n.flash-message[data-v-9ebffbf6] {\n  margin-bottom: 0.5rem;\n  padding: 0.5rem;\n  border-left-width: 4px;\n  display: flex;\n  align-items: flex-start;\n}\n.flash-message--type-success[data-v-9ebffbf6] {\n  --text-opacity: 1;\n  color: #2f855a;\n  color: rgba(47, 133, 90, var(--text-opacity));\n  --bg-opacity: 1;\n  background-color: #c6f6d5;\n  background-color: rgba(198, 246, 213, var(--bg-opacity));\n  --border-opacity: 1;\n  border-color: #2f855a;\n  border-color: rgba(47, 133, 90, var(--border-opacity));\n}\n.flash-message--type-alert[data-v-9ebffbf6] {\n  --text-opacity: 1;\n  color: #b7791f;\n  color: rgba(183, 121, 31, var(--text-opacity));\n  --bg-opacity: 1;\n  background-color: #fefcbf;\n  background-color: rgba(254, 252, 191, var(--bg-opacity));\n  --border-opacity: 1;\n  border-color: #b7791f;\n  border-color: rgba(183, 121, 31, var(--border-opacity));\n}\n.flash-message--type-danger[data-v-9ebffbf6] {\n  --text-opacity: 1;\n  color: #c53030;\n  color: rgba(197, 48, 48, var(--text-opacity));\n  --bg-opacity: 1;\n  background-color: #fed7d7;\n  background-color: rgba(254, 215, 215, var(--bg-opacity));\n  --border-opacity: 1;\n  border-color: #c53030;\n  border-color: rgba(197, 48, 48, var(--border-opacity));\n}\n.flash-message--type-info[data-v-9ebffbf6] {\n  --text-opacity: 1;\n  color: #6b46c1;\n  color: rgba(107, 70, 193, var(--text-opacity));\n  --bg-opacity: 1;\n  background-color: #e9d8fd;\n  background-color: rgba(233, 216, 253, var(--bg-opacity));\n  --border-opacity: 1;\n  border-color: #d6bcfa;\n  border-color: rgba(214, 188, 250, var(--border-opacity));\n}\n", ""]);
+exports.push([module.i, ".title-bar-wrapper[data-v-9ebffbf6] {\n  position: -webkit-sticky;\n  position: sticky;\n  top: 0;\n  padding-top: 2rem;\n  padding-bottom: 2rem;\n  z-index: 30;\n  --bg-opacity: 1;\n  background-color: #edf2f7;\n  background-color: rgba(237, 242, 247, var(--bg-opacity));\n  transition-property: all;\n  transition-duration: 300ms;\n  overflow: hidden;\n  border-top-left-radius: 2rem;\n  border-top-right-radius: 2rem;\n}\n.title-bar[data-v-9ebffbf6] {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding-left: 2rem;\n  padding-right: 2rem;\n  padding-top: 2rem;\n  padding-bottom: 2rem;\n  z-index: 30;\n  transition-property: all;\n  transition-duration: 300ms;\n  height: 72px;\n  top: 80px;\n  transform: translateY(0);\n}\n.title-bar__title[data-v-9ebffbf6] {\n  font-size: 1.875rem;\n  --text-opacity: 1;\n  color: #4a5568;\n  color: rgba(74, 85, 104, var(--text-opacity));\n  font-weight: 800;\n}\n.title-bar__subtitle[data-v-9ebffbf6] {\n  font-size: 1.125rem;\n  --text-opacity: 1;\n  color: #a0aec0;\n  color: rgba(160, 174, 192, var(--text-opacity));\n  font-weight: 600;\n}\n.title-bar-wrapper.is-floating[data-v-9ebffbf6] {\n  --bg-opacity: 1;\n  background-color: #edf2f7;\n  background-color: rgba(237, 242, 247, var(--bg-opacity));\n  padding-bottom: 0.25rem;\n  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);\n}\n.title-bar-wrapper.is-floating .title-bar[data-v-9ebffbf6] {\n  padding-top: 1rem;\n  padding-bottom: 1rem;\n  margin-bottom: 3rem;\n  transform: translateY(50px);\n}\n.title-bar-wrapper.is-floating .title-bar__title[data-v-9ebffbf6] {\n  font-size: 1.25rem;\n}\n.title-bar-wrapper.is-floating .title-bar__subtitle[data-v-9ebffbf6] {\n  font-size: 0.875rem;\n}\n.flash-message[data-v-9ebffbf6] {\n  margin-bottom: 0.5rem;\n  padding: 0.5rem;\n  border-left-width: 4px;\n  display: flex;\n  align-items: flex-start;\n}\n.flash-message--type-success[data-v-9ebffbf6] {\n  --text-opacity: 1;\n  color: #2f855a;\n  color: rgba(47, 133, 90, var(--text-opacity));\n  --bg-opacity: 1;\n  background-color: #c6f6d5;\n  background-color: rgba(198, 246, 213, var(--bg-opacity));\n  --border-opacity: 1;\n  border-color: #2f855a;\n  border-color: rgba(47, 133, 90, var(--border-opacity));\n}\n.flash-message--type-alert[data-v-9ebffbf6] {\n  --text-opacity: 1;\n  color: #b7791f;\n  color: rgba(183, 121, 31, var(--text-opacity));\n  --bg-opacity: 1;\n  background-color: #fefcbf;\n  background-color: rgba(254, 252, 191, var(--bg-opacity));\n  --border-opacity: 1;\n  border-color: #b7791f;\n  border-color: rgba(183, 121, 31, var(--border-opacity));\n}\n.flash-message--type-danger[data-v-9ebffbf6] {\n  --text-opacity: 1;\n  color: #c53030;\n  color: rgba(197, 48, 48, var(--text-opacity));\n  --bg-opacity: 1;\n  background-color: #fed7d7;\n  background-color: rgba(254, 215, 215, var(--bg-opacity));\n  --border-opacity: 1;\n  border-color: #c53030;\n  border-color: rgba(197, 48, 48, var(--border-opacity));\n}\n.flash-message--type-info[data-v-9ebffbf6] {\n  --text-opacity: 1;\n  color: #6b46c1;\n  color: rgba(107, 70, 193, var(--text-opacity));\n  --bg-opacity: 1;\n  background-color: #e9d8fd;\n  background-color: rgba(233, 216, 253, var(--bg-opacity));\n  --border-opacity: 1;\n  border-color: #d6bcfa;\n  border-color: rgba(214, 188, 250, var(--border-opacity));\n}\n", ""]);
 
 // exports
 
@@ -51543,7 +51543,7 @@ var render = function() {
             "span",
             {
               staticClass:
-                "flex-shrink bg-gray-300 text-sm font-semibold uppercase tracking-wider z-10 ml-12 px-4"
+                "flex-shrink bg-white border border-gray-400 border-dashed rounded text-sm font-semibold uppercase tracking-wider z-10 ml-12 px-4"
             },
             [_vm._v(_vm._s(_vm.item.label))]
           )
@@ -51902,7 +51902,7 @@ var render = function() {
       "div",
       {
         staticClass:
-          "fixed top-0 w-full h-20 bg-white shadow-lg z-40 flex justify-between"
+          "fixed top-0 w-full h-20 bg-white z-40 flex justify-between"
       },
       [
         _c("div", [
@@ -51954,7 +51954,7 @@ var render = function() {
         "div",
         {
           staticClass:
-            "flex flex-col border-r border-gray-400 bg-gray-300 h-screen sticky top-0 overflow-hidden",
+            "flex flex-col bg-white h-screen sticky top-0 overflow-hidden",
           staticStyle: { width: "320px" }
         },
         [
@@ -51966,7 +51966,7 @@ var render = function() {
             },
             [
               _c("f-navigation-list", {
-                staticClass: "my-6",
+                staticClass: "my-6 px-2",
                 attrs: { items: this.$page.menu }
               })
             ],
@@ -51975,93 +51975,105 @@ var render = function() {
         ]
       ),
       _vm._v(" "),
-      _c("div", { staticClass: "flex-1 flex flex-row" }, [
+      _c("div", { staticClass: "flex-1 flex flex-row px-4" }, [
         _vm.$slots.hasOwnProperty("page-sidebar")
           ? _c("div", [_vm._t("page-sidebar")], 2)
           : _vm._e(),
         _vm._v(" "),
-        _c("div", { staticClass: "flex-grow" }, [
-          _vm.$slots.hasOwnProperty("title")
-            ? _c(
-                "div",
-                {
-                  ref: "sticky",
-                  staticClass: "title-bar-wrapper",
-                  class: _vm.stickyBarClass
-                },
-                [
-                  _c("div", { staticClass: "title-bar" }, [
-                    _c("div", { staticClass: "div" }, [
-                      _c(
-                        "h1",
-                        { staticClass: "title-bar__title" },
-                        [_vm._t("title")],
-                        2
-                      ),
+        _c(
+          "div",
+          {
+            staticClass: "flex-grow bg-gray-200 mb-8",
+            staticStyle: { "border-radius": "2rem" }
+          },
+          [
+            _vm.$slots.hasOwnProperty("title")
+              ? _c(
+                  "div",
+                  {
+                    ref: "sticky",
+                    staticClass: "title-bar-wrapper",
+                    class: _vm.stickyBarClass
+                  },
+                  [
+                    _c("div", { staticClass: "title-bar" }, [
+                      _c("div", { staticClass: "div" }, [
+                        _c(
+                          "h1",
+                          { staticClass: "title-bar__title" },
+                          [_vm._t("title")],
+                          2
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "title-bar__subtitle" },
+                          [_vm._t("subtitle")],
+                          2
+                        )
+                      ]),
                       _vm._v(" "),
                       _c(
                         "div",
-                        { staticClass: "title-bar__subtitle" },
-                        [_vm._t("subtitle")],
+                        { staticClass: "flex items-center" },
+                        [_vm._t("actions")],
                         2
                       )
-                    ]),
-                    _vm._v(" "),
-                    _c(
+                    ])
+                  ]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm.$page.flashMessages && _vm.$page.flashMessages.length
+              ? _c(
+                  "div",
+                  { staticClass: "mt-8 mb-4 px-12" },
+                  _vm._l(_vm.$page.flashMessages, function(msg) {
+                    return _c(
                       "div",
-                      { staticClass: "flex items-center" },
-                      [_vm._t("actions")],
-                      2
+                      {
+                        staticClass: "flash-message",
+                        class: "flash-message--type-" + msg.type
+                      },
+                      [
+                        msg.icon
+                          ? _c(
+                              "div",
+                              { staticClass: "mr-8 text-4xl" },
+                              [_c("f-icon", { attrs: { name: msg.icon } })],
+                              1
+                            )
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          {
+                            staticClass:
+                              "mt-4 text-sm font-normal tracking-wide leading-relaxed"
+                          },
+                          [
+                            _vm._v(
+                              "\n                            " +
+                                _vm._s(msg.message) +
+                                "\n                        "
+                            )
+                          ]
+                        )
+                      ]
                     )
-                  ])
-                ]
-              )
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.$page.flashMessages && _vm.$page.flashMessages.length
-            ? _c(
-                "div",
-                { staticClass: "mt-8 mb-4 px-12" },
-                _vm._l(_vm.$page.flashMessages, function(msg) {
-                  return _c(
-                    "div",
-                    {
-                      staticClass: "flash-message",
-                      class: "flash-message--type-" + msg.type
-                    },
-                    [
-                      msg.icon
-                        ? _c(
-                            "div",
-                            { staticClass: "mr-8 text-4xl" },
-                            [_c("f-icon", { attrs: { name: msg.icon } })],
-                            1
-                          )
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _c(
-                        "div",
-                        {
-                          staticClass:
-                            "mt-4 text-sm font-normal tracking-wide leading-relaxed"
-                        },
-                        [
-                          _vm._v(
-                            "\n                            " +
-                              _vm._s(msg.message) +
-                              "\n                        "
-                          )
-                        ]
-                      )
-                    ]
-                  )
-                }),
-                0
-              )
-            : _vm._e(),
-          _vm._v(" "),
-          _c("div", { staticClass: "mt-4 mb-12 px-12" }, [_vm._t("default")], 2)
-        ])
+                  }),
+                  0
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "mt-4 mb-12 px-12" },
+              [_vm._t("default")],
+              2
+            )
+          ]
+        )
       ])
     ])
   ])

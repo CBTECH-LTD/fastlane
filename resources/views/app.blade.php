@@ -8,7 +8,7 @@
     <link href="{{ asset('/vendor/fastlane/icons/css/line-awesome.min.css') }}" rel="stylesheet"/>
     <link href="{{ mix('app.css', 'vendor/fastlane') }}" rel="stylesheet"/>
 </head>
-<body class="font-sans antialiased h-screen bg-gray-100">
+<body class="font-sans antialiased h-screen bg-white">
 @inertia
 
 <script src="{{ mix('manifest.js', 'vendor/fastlane') }}"></script>
