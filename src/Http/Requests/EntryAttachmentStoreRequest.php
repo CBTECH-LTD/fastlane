@@ -25,9 +25,13 @@ class EntryAttachmentStoreRequest extends FormRequest
         }
 
         /** @var HasAttachments | null field */
-        $this->field = $this->entryType()->schema()->findField($this->fieldName);
-        $this->hasLoadedField = true;
+        $field = $this->entryInstance()->schema()->findField($this->fieldName);
 
+        if ($field instanceof HasAttachments) {
+            $this->field = $field;
+        }
+
+        $this->hasLoadedField = true;
         return $this->field;
     }
 

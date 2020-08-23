@@ -9,6 +9,9 @@ class StringField extends AbstractBaseField implements ExportsToApiAttributeCont
 {
     use ExportsToApiAttribute;
 
+    protected $createRules = 'max:255';
+    protected $updateRules = 'max:255';
+
     public function getType(): string
     {
         return 'string';
@@ -19,5 +22,15 @@ class StringField extends AbstractBaseField implements ExportsToApiAttributeCont
         return [
             $this->getName() => 'string',
         ];
+    }
+
+    public function minLength(int $length): self
+    {
+        return $this->setRule('min', $length);
+    }
+
+    public function maxLength(int $length): self
+    {
+        return $this->setRule('max', $length);
     }
 }

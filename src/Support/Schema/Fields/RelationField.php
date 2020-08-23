@@ -2,13 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiRelationship;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiRelationship as ExportsToApiRelationshipContract;
 use Closure;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 abstract class RelationField extends AbstractBaseField implements ExportsToApiRelationshipContract
@@ -39,7 +38,7 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
      */
     abstract public function getRelationshipMethod(): Closure;
 
-    abstract protected function hydrateRelation($model, $value, array $requestData): void;
+    abstract protected function hydrateRelation(EntryInstanceContract $entryInstance, $value, array $requestData): void;
 
     public function __construct(string $relatedEntryType, ?string $label = null)
     {
@@ -61,7 +60,7 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
         return $this->withTimestamps(false);
     }
 
-    public function resolveValue(Model $model): array
+    public function readValue(EntryInstanceContract $entryInstance): FieldValue
     {
         throw new \Exception('readValue not implemented.');
     }
@@ -77,14 +76,14 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
         return $this;
     }
 
-    public function fillModel($model, $value, array $requestData): void
+    public function writeValue(EntryInstanceContract $entryInstance, $value, array $requestData): void
     {
-        if (is_callable($this->fillValueCallback)) {
-            call_user_func($this->fillValueCallback, $model, $value, $requestData);
+        if (is_callable($this->writeValueCallback)) {
+            call_user_func($this->writeValueCallback, $entryInstance, $value, $requestData);
             return;
         }
 
-        $this->hydrateRelation($model, $value, $requestData);
+        $this->hydrateRelation($entryInstance, $value, $requestData);
     }
 
     public function getRelatedEntryType(): EntryTypeContract
@@ -100,12 +99,12 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
 
     public function getOptions(): array
     {
-        return $this->getResolvedConfig('config')['options']->toArray();
+        return $this->getResolvedConfig('options')->toArray();
     }
 
     protected function getTypeRules(): array
     {
-        $values = $this->getResolvedConfig('config')['options']->map(
+        $values = $this->getResolvedConfig('options')->map(
             fn(SelectOption $option) => $option->getValue()
         );
 
@@ -126,22 +125,24 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
         return '';
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, array $data): array
+    protected function resolveConfig(EntryInstanceContract $entryInstance, string $destination): void
     {
-        return [
-            'options'  => $this->resolveOptions($entryType, $data),
+        $this->resolvedConfig = $this->resolvedConfig->merge([
             'multiple' => $this->isMultiple(),
             'type'     => $this->renderAsCheckbox ? 'checkbox' : 'select',
-        ];
+        ]);
+
+        if ($destination === 'form') {
+            $this->resolveOptions();
+        }
     }
 
-    protected function resolveOptions(EntryTypeContract $entryType, array $data): Collection
+    protected function resolveOptions(): void
     {
-        return $this->relatedEntryType->getItems()->map(function (Model $model) use ($entryType) {
-            return SelectOption::make(
-                $model->getKey(),
-                $entryType->makeModelTitle($model)
-            );
-        });
+        $this->resolvedConfig->put('options', $this->relatedEntryType->getItems()->map(
+            fn(EntryInstanceContract $entryInstance) => SelectOption::make(
+                $entryInstance->id(), $entryInstance->title()
+            )
+        ));
     }
 }

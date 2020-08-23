@@ -12204,11 +12204,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'Entries.Create',
   props: {
-    links: {
+    item: {
       required: true,
       type: Object
     },
-    entryType: {
+    links: {
       required: true,
       type: Object
     }
@@ -12217,7 +12217,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       isCreating: false,
-      form: new _Support_FormSchema__WEBPACK_IMPORTED_MODULE_1__["FormSchemaFactory"]({}, this.entryType.schema)
+      form: new _Support_FormSchema__WEBPACK_IMPORTED_MODULE_1__["FormSchemaFactory"](this.item.attributes, this.item.meta.entry_type.schema)
     };
   },
   computed: {
@@ -52583,7 +52583,9 @@ var render = function() {
         {
           key: "title",
           fn: function() {
-            return [_vm._v("New " + _vm._s(_vm.entryType.singular_name))]
+            return [
+              _vm._v("New " + _vm._s(_vm.item.meta.entry_type.singular_name))
+            ]
           },
           proxy: true
         },
@@ -52633,7 +52635,7 @@ var render = function() {
         attrs: {
           id: "createForm",
           form: _vm.form,
-          panels: _vm.entryType.panels
+          panels: _vm.item.meta.entry_type.panels
         },
         on: {
           submit: function($event) {
