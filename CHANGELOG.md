@@ -4,6 +4,8 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+## 0.4.0 [2020-08-23]
+
 ### Changed
 - How entry types and fields are implemented.
 - Schema usage by entry types / fields.
