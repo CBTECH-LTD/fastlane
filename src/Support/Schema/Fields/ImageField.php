@@ -64,8 +64,12 @@ class ImageField extends FileField implements ExportsToApiAttributeContract
             return call_user_func($this->readValueCallback, $entryInstance);
         }
 
-        $imageUrl = $this->uploader->getImageUrl($entryInstance->model()->{$this->getName()});
-        return new FieldValue($this->getName(), $imageUrl);
+        $modelValue = $entryInstance->model()->{$this->getName()};
+
+        return new FieldValue(
+            $this->getName(),
+            $modelValue ? $this->uploader->getImageUrl($modelValue) : ''
+        );
     }
 
     protected function resolveConfig(EntryInstance $entryInstance, string $destination): void
