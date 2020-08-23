@@ -51530,7 +51530,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    { staticClass: "border-b border-gray-400 border-dashed pb-4" },
+    { staticClass: "pb-4" },
     [
       _c(
         "div",

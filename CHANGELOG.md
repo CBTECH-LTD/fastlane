@@ -7,6 +7,7 @@ All notable changes to `fastlane` will be documented in this file
 ### Changed
 - How entry types and fields are implemented.
 - Schema usage by entry types / fields.
+- Small tweaks on style.
 
 ---
 
