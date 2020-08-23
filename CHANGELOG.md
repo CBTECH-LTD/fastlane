@@ -4,6 +4,10 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+---
+
+## 0.5.0 [2020-08-23]
+
 ### Changed
 - Admin style tweaks.
 
