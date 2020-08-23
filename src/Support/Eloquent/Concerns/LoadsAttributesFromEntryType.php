@@ -2,9 +2,9 @@
 
 namespace CbtechLtd\Fastlane\Support\Eloquent\Concerns;
 
-use CbtechLtd\Fastlane\EntryTypes\EntryType;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\SupportModel;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
@@ -16,11 +16,11 @@ use Illuminate\Support\Collection;
  */
 trait LoadsAttributesFromEntryType
 {
-    public function loadAttributesFromEntryType(EntryType $entryType): void
+    public function loadAttributesFromEntryType(EntryInstance $entryInstance): void
     {
-        $fields = Collection::make($entryType->schema()->getFields())
-            ->filter(fn(SchemaField $field) => $field instanceof SupportModel)
-            ->mapWithKeys(function (SupportModel $ft) {
+        $fields = Collection::make($entryInstance->schema()->getFields())
+            ->filter(fn(SchemaField $field) => $field instanceof WriteValue)
+            ->mapWithKeys(function (WriteValue $ft) {
                 return $ft->toModelAttribute();
             });
 

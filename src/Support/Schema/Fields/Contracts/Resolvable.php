@@ -2,15 +2,9 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields\Contracts;
 
-use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 
 interface Resolvable
 {
-    /**
-     * @param EntryTypeContract $entryType
-     * @param array             $data
-     * @return SchemaField[]
-     */
-    public function resolve(EntryTypeContract $entryType, array $data): array;
+    public function resolve(EntryInstance $entryInstance, string $destination): self;
 }

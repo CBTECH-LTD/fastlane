@@ -3,7 +3,7 @@
 namespace CbtechLtd\Fastlane\Http\Requests;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
-use Illuminate\Database\Eloquent\Model;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 
 abstract class FormRequest extends \Illuminate\Foundation\Http\FormRequest
 {
@@ -29,7 +29,7 @@ abstract class FormRequest extends \Illuminate\Foundation\Http\FormRequest
         return app('fastlane')->getRequest()->getEntryType();
     }
 
-    public function entry(): ?Model
+    public function entryInstance(): EntryInstance
     {
         return app('fastlane')->getRequest()->getEntryInstance();
     }

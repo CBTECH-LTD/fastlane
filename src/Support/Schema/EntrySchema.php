@@ -2,8 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema;
 
-use CbtechLtd\Fastlane\Http\Requests\FastlaneRequest;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility;
@@ -14,14 +13,12 @@ use Illuminate\Support\Str;
 
 class EntrySchema implements Contracts\EntrySchema
 {
-    private EntryTypeContract $entryType;
-    private array $requestData;
+    private EntryInstanceContract $entryInstance;
     private Collection $cache;
 
-    public function __construct(EntryTypeContract $entryType, array $requestData)
+    public function __construct(EntryInstanceContract $entryInstance)
     {
-        $this->entryType = $entryType;
-        $this->requestData = $requestData;
+        $this->entryInstance = $entryInstance;
         $this->cache = new Collection;
     }
 
@@ -47,7 +44,7 @@ class EntrySchema implements Contracts\EntrySchema
 
     public function getPanels(): array
     {
-        return Collection::make($this->entryType->fields())
+        return Collection::make($this->entryInstance->type()->fields())
             ->filter(fn(SchemaField $f) => $f instanceof FieldPanel)
             ->all();
     }
@@ -72,11 +69,17 @@ class EntrySchema implements Contracts\EntrySchema
         return $this->cache->get($cache);
     }
 
-    private function build(Collection $fields): Collection
+    private function build(Collection $fields, string $destination): Collection
     {
-        return $fields->flatMap(function ($field) {
+        return $fields->flatMap(function ($field) use ($destination) {
             if ($field instanceof Resolvable) {
-                return Arr::wrap($field->resolve($this->entryType, $this->requestData));
+                $field->resolve($this->entryInstance, $destination);
+
+                if ($field instanceof FieldPanel) {
+                    return $field->getFields();
+                }
+
+                return Arr::wrap($field);
             }
 
             return null;
@@ -85,7 +88,7 @@ class EntrySchema implements Contracts\EntrySchema
 
     private function buildAll(): Collection
     {
-        return $this->build(Collection::make($this->entryType->fields()));
+        return $this->build(Collection::make($this->entryInstance->type()->fields()), 'index');
     }
 
     private function buildIndex(): Collection
@@ -93,7 +96,7 @@ class EntrySchema implements Contracts\EntrySchema
         return $this->build(
             Collection::make($this->fromCache('all'))->filter(
                 fn($f) => $f instanceof WithVisibility && $f->isShownOnIndex()
-            )
+            ), 'index'
         );
     }
 
@@ -102,7 +105,7 @@ class EntrySchema implements Contracts\EntrySchema
         return $this->build(
             Collection::make($this->fromCache('all'))->filter(
                 fn($f) => $f instanceof WithVisibility && $f->isShownOnCreate()
-            )
+            ), 'form'
         );
     }
 
@@ -111,7 +114,7 @@ class EntrySchema implements Contracts\EntrySchema
         return $this->build(
             Collection::make($this->fromCache('all'))->filter(
                 fn($f) => $f instanceof WithVisibility && $f->isShownOnUpdate()
-            )
+            ), 'form'
         );
     }
 }

@@ -2,7 +2,6 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes;
 
-use CbtechLtd\Fastlane\EntryTypes\Concerns\Resolvable;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\BeforeHydratingHook;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
@@ -10,13 +9,14 @@ use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollection;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
-use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -27,7 +27,7 @@ use ReflectionClass;
 
 abstract class EntryType implements EntryTypeContract
 {
-    use HandlesHooks, Resolvable;
+    use HandlesHooks;
 
     /** @description OnSavingHook */
     const HOOK_BEFORE_HYDRATING = 'beforeHydrating';
@@ -55,21 +55,15 @@ abstract class EntryType implements EntryTypeContract
     ];
 
     protected Gate $gate;
-    protected Model $modelInstance;
 
     public function __construct(Gate $gate)
     {
         $this->gate = $gate;
-        $this->modelInstance = $this->newModelInstance();
     }
 
-    public function new(?Model $model): EntryTypeContract
+    public function newInstance(?Model $model): EntryInstanceContract
     {
-        return tap(app()->make(static::class), function ($instance) use ($model) {
-            if ($model) {
-                $instance->modelInstance = $model;
-            }
-        });
+        return new EntryInstance($this, $model ?? $this->newModelInstance());
     }
 
     public function name(): string
@@ -108,11 +102,6 @@ abstract class EntryType implements EntryTypeContract
         }
 
         return $name;
-    }
-
-    public function modelInstance(): Model
-    {
-        return $this->modelInstance;
     }
 
     public function apiResource(): string
@@ -155,19 +144,6 @@ abstract class EntryType implements EntryTypeContract
         return [];
     }
 
-    public function makeModelTitle(Model $model): string
-    {
-        if (method_exists($model, 'toString')) {
-            return $model->toString();
-        }
-
-        $field = Collection::make($this->fields())->flatMap(
-            fn(SchemaField $f) => $f instanceof FieldPanel ? $f->getFields() : [$f]
-        )->first();
-
-        return $field->resolveValue($model)[$field->getName()];
-    }
-
     public function install(): void
     {
         $this->installRolesAndPermissions();
@@ -178,70 +154,75 @@ abstract class EntryType implements EntryTypeContract
         return true;
     }
 
-    public function getItems(): EloquentCollection
+    public function getItems(): Collection
     {
         $this->gate->authorize('list', $this->model());
 
         $query = $this
             ->newModelInstance()
             ->newModelQuery()
-            ->orderBy('created_at', 'desc');
+            ->orderBy('created_at')
+            ->orderBy('id');
 
         $this->queryItems($query);
-        return $query->get();
+
+        return Collection::make($query->get())->map(function (Model $model) {
+            return $this->newInstance($model);
+        });
     }
 
-    public function findItem(string $hashid): Model
+    public function findItem(string $hashid): EntryInstanceContract
     {
         $model = $this->newModelInstance();
         $query = $model->newModelQuery();
         $this->querySingleItem($query, $hashid);
         $entry = $query->where($model->getRouteKeyName(), $hashid)->firstOrFail();
-        
+
         $this->gate->authorize('show', $entry);
 
-        return $entry;
+        return $this->newInstance($entry);
     }
 
-    public function store(Request $request): Model
+    public function store(Request $request): EntryInstanceContract
     {
         $this->gate->authorize('create', $this->model());
-        $entry = $this->newModelInstance();
+        $entryInstance = $this->newInstance(null);
 
         // Check whether the authenticated user can update
         // the given entry instance.
         if ($this->policy()) {
-            $this->gate->authorize('create', $entry);
+            $this->gate->authorize('create', $this->model());
         }
 
         // Validate the request data against the update fields
         // and save the validated data in a new variable.
-        $fields = $this->schema()->getCreateFields();
+        $fields = $entryInstance->schema()->getCreateFields();
 
         $rules = Collection::make($fields)
-            ->mapWithKeys(fn(SchemaField $fieldType) => $fieldType->getCreateRules())
+            ->filter(fn(SchemaField $f) => $f instanceof WithRules)
+            ->mapWithKeys(fn(WithRules $f) => $f->getCreateRules())
             ->all();
 
         $data = Validator::make($request->all(), $rules)->validated();
-
+        
         // Pass the validated date through all fields, call hooks before saving,
         // then call more hooks after model has been saved.
-        $this->hydrateFields($entry, $fields, $data);
+        $this->hydrateFields($entryInstance, $fields, $data);
 
-        $beforeHook = new OnSavingHook($this, $entry, $data);
+        $beforeHook = new OnSavingHook($entryInstance, $data);
         $this->executeHooks(static::HOOK_BEFORE_CREATING, $beforeHook);
         $this->executeHooks(static::HOOK_BEFORE_SAVING, $beforeHook);
 
-        $beforeHook->model()->save();
+        $beforeHook->entryInstance()->saveModel();
 
-        $afterHook = new OnSavingHook($this, $beforeHook->model(), $data);
+        $afterHook = new OnSavingHook($beforeHook->entryInstance(), $data);
         $this->executeHooks(static::HOOK_AFTER_CREATING, $afterHook);
         $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
 
-        return $afterHook->model();
+        return $afterHook->entryInstance();
     }
 
-    public function update(Request $request, string $hashid): Model
+    public function update(Request $request, string $hashid): EntryInstanceContract
     {
         $model = $this->newModelInstance();
         $query = $model->newModelQuery();
@@ -254,34 +235,39 @@ abstract class EntryType implements EntryTypeContract
             $this->gate->authorize('update', $entry);
         }
 
+        // Create an Entry Instance based in the model we have
+        // just found in the database.
+        $entryInstance = $this->newInstance($entry);
+
         // Validate the request data against the update fields
         // and save the validated data in a new variable.
-        $fields = $this->schema()->getUpdateFields();
+        $fields = $entryInstance->schema()->getUpdateFields();
 
         $rules = Collection::make($fields)
-            ->mapWithKeys(fn(SchemaField $fieldType) => $fieldType->getUpdateRules())
+            ->filter(fn(SchemaField $f) => $f instanceof WithRules)
+            ->mapWithKeys(fn(WithRules $f) => $f->getUpdateRules())
             ->all();
 
         $data = Validator::make($request->all(), $rules)->validated();
 
         // Pass the validated date through all fields, call hooks before saving,
         // then call more hooks after model has been saved.
-        $this->hydrateFields($entry, $fields, $data);
+        $this->hydrateFields($entryInstance, $fields, $data);
 
-        $beforeHook = new OnSavingHook($this, $entry, $data);
+        $beforeHook = new OnSavingHook($entryInstance, $data);
         $this->executeHooks(static::HOOK_BEFORE_UPDATING, $beforeHook);
         $this->executeHooks(static::HOOK_BEFORE_SAVING, $beforeHook);
 
-        $beforeHook->model()->save();
+        $beforeHook->entryInstance()->saveModel();
 
-        $afterHook = new OnSavingHook($this, $beforeHook->model(), $data);
+        $afterHook = new OnSavingHook($beforeHook->entryInstance(), $data);
         $this->executeHooks(static::HOOK_AFTER_UPDATING, $afterHook);
         $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
 
-        return $afterHook->model();
+        return $afterHook->entryInstance();
     }
 
-    public function delete(string $hashid): Model
+    public function delete(string $hashid): EntryInstanceContract
     {
         $model = $this->newModelInstance();
         $query = $model->newModelQuery();
@@ -294,7 +280,7 @@ abstract class EntryType implements EntryTypeContract
 
         $entry->delete();
 
-        return $entry;
+        return $this->newInstance($entry);
     }
 
     public function newModelInstance(): Model
@@ -347,23 +333,26 @@ abstract class EntryType implements EntryTypeContract
     }
 
     /**
-     * @param Model         $model
-     * @param SchemaField[] $fields
-     * @param array         $data
+     * @param EntryInstanceContract $entryInstance
+     * @param SchemaField[]         $fields
+     * @param array                 $data
      */
-    protected function hydrateFields(Model $model, array $fields, array $data): void
+    protected function hydrateFields(EntryInstanceContract $entryInstance, array $fields, array $data): void
     {
-        $hookClass = new BeforeHydratingHook($this, $model, $fields, $data);
+        $hookClass = new BeforeHydratingHook($entryInstance, $fields, $data);
 
         $this->executeHooks(
             static::HOOK_BEFORE_HYDRATING,
             $hookClass
         );
 
-        foreach ($fields as $field) {
-            if (Arr::has($hookClass->data, $field->getName())) {
-                $field->fillModel($model, Arr::get($hookClass->data, $field->getName()), $data);
-            }
-        }
+        Collection::make($fields)
+            ->each(function (SchemaField $field) use ($hookClass, $entryInstance, $data) {
+                if ($field instanceof WriteValue) {
+                    if (Arr::has($hookClass->data, $field->getName())) {
+                        $field->writeValue($entryInstance, Arr::get($hookClass->data, $field->getName()), $data);
+                    }
+                }
+            });
     }
 }

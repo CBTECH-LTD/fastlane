@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Eloquent\Concerns;
 
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\RelationField;
 use Illuminate\Database\Eloquent\Model;
@@ -14,9 +14,9 @@ use Illuminate\Support\Collection;
  */
 trait LoadsRelationsFromEntryType
 {
-    public function loadRelationsFromEntryType(EntryType $entryType): void
+    public function loadRelationsFromEntryType(EntryInstance $entryInstance): void
     {
-        Collection::make($entryType->schema()->getFields())
+        Collection::make($entryInstance->schema()->getFields())
             ->filter(fn(SchemaField $field) => $field instanceof RelationField)
             ->each(function (RelationField $ft) {
                 // We dynamically add a relation to the model if there's no

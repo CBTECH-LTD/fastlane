@@ -16,7 +16,6 @@ class {{ $class }} extends EntryType implements RenderableOnMenu
         return [
             StringField::make('name', 'Name')
                 ->required()
-                ->setRules('max:255')
                 ->showOnIndex(),
 
             FieldPanel::make('Related Content')->withIcon('project-diagram')

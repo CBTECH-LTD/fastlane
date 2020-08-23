@@ -2,12 +2,11 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Makeable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Panelizable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -33,6 +32,11 @@ class FieldPanel implements SchemaField, Resolvable
     public function getName(): string
     {
         return Str::snake($this->label);
+    }
+
+    public function isUsedForTitle(): bool
+    {
+        return false;
     }
 
     public function withIcon(string $icon): self
@@ -62,20 +66,21 @@ class FieldPanel implements SchemaField, Resolvable
         ];
     }
 
-    public function resolve(EntryTypeContract $entryType, array $data): array
+    public function resolve(EntryInstance $entryInstance, string $destination): self
     {
-        return Collection::make($this->fields)
-            ->flatMap(function (SchemaField $field) use ($entryType, $data) {
+        Collection::make($this->fields)
+            ->each(function (SchemaField $field) use ($entryInstance, $destination) {
                 if (! $field instanceof Resolvable) {
-                    return false;
+                    return;
                 }
 
                 if ($field instanceof Panelizable) {
                     $field->inPanel($this);
                 }
 
-                return Arr::wrap($field->resolve($entryType, $data));
-            })
-            ->all();
+                $field->resolve($entryInstance, $destination);
+            });
+
+        return $this;
     }
 }

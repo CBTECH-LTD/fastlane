@@ -4,25 +4,27 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Exceptions\UnresolvedException;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesRules;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Makeable;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Resolvable;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ResolvesField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Migratable as MigratableContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Panelizable as PanelizableContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable as ResolvableContract;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\SupportModel as SupportModelContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue as SupportModelContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules as WithRulesContract;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithValue as WithValueContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ReadValue as ReadValueContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility as WithVisibilityContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Hooks\OnFillingHook;
 use Closure;
 use Illuminate\Support\Collection;
 
-abstract class AbstractBaseField implements SchemaField, ResolvableContract, WithValueContract, WithRulesContract, MigratableContract, SupportModelContract, WithVisibilityContract, PanelizableContract
+abstract class AbstractBaseField implements SchemaField, ResolvableContract, ReadValueContract, WithRulesContract, MigratableContract, SupportModelContract, WithVisibilityContract, PanelizableContract
 {
-    use HandlesHooks, Makeable, Resolvable;
+    use HandlesHooks, HandlesRules, Makeable, ResolvesField;
 
     const HOOK_BEFORE_FILLING = 'beforeFilling';
     const HOOK_AFTER_FILLING = 'afterFilling';
@@ -33,16 +35,14 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
     ];
 
     protected string $name;
-    protected string $createRules = '';
-    protected string $updateRules = '';
-    protected bool $required = false;
     protected ?Unique $unique = null;
     protected $default = null;
     protected ?string $panel = null;
     protected int $listWidth = 0;
     protected EntryType $entryType;
     protected ?string $placeholder;
-    protected $fillValueCallback;
+    protected $writeValueCallback;
+    protected $readValueCallback;
 
     /** @var string | Closure */
     protected $label;
@@ -62,10 +62,52 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
         $this->label = $label;
     }
 
+    /**
+     * Determine the name of the field to be used as the `name` attribute
+     * of HTML input elements.
+     *
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
     }
+
+    /**
+     * Read the value of the model loaded in the given
+     * entry instance.
+     *
+     * @param EntryInstanceContract $entryInstance
+     * @return FieldValue
+     */
+    public function readValue(EntryInstanceContract $entryInstance): FieldValue
+    {
+        if (is_callable($this->readValueCallback)) {
+            return call_user_func($this->readValueCallback, $entryInstance);
+        }
+
+        return new FieldValue($this->getName(), $entryInstance->model()->{$this->getName()});
+    }
+
+    /**
+     * Define a custom callback to be used to read the
+     * value of models. The callback signature must adhere
+     * the following signature:
+     *
+     * function (CbtechLtd\Fastlane\Support\Contracts\EntryInstance): CbtechLtd\Fastlane\Support\Schema\Fields\FieldValue
+     *
+     * @param $callback
+     * @return $this
+     */
+    public function readValueUsing($callback): self
+    {
+        $this->readValueCallback = $callback;
+        return $this;
+    }
+
+    // ============================================================
+    // ============================================================
+    // ============================================================
 
     public function setPlaceholder(string $placeholder): self
     {
@@ -85,50 +127,9 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
         return $this;
     }
 
-    public function required(bool $required = true): self
-    {
-        $this->required = $required;
-        return $this;
-    }
-
-    public function unique(Unique $unique): self
-    {
-        $this->unique = $unique;
-        return $this;
-    }
-
     public function setDefault($default): self
     {
         $this->default = $default;
-        return $this;
-    }
-
-    public function setRules(string $rules): self
-    {
-        $this->createRules = $rules;
-        $this->updateRules = $rules;
-        return $this;
-    }
-
-    public function getCreateRules(): array
-    {
-        return $this->getResolvedConfig('createRules');
-    }
-
-    public function setCreateRules(string $rules): self
-    {
-        $this->createRules = $rules;
-        return $this;
-    }
-
-    public function getUpdateRules(): array
-    {
-        return $this->getResolvedConfig('updateRules');
-    }
-
-    public function setUpdateRules(string $rules): self
-    {
-        $this->updateRules = $rules;
         return $this;
     }
 
@@ -199,25 +200,23 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
         return ! $this->hideOnUpdate;
     }
 
-    public function fillModel($model, $value, array $requestData): void
+    public function writeValue(EntryInstanceContract $entryInstance, $value, array $requestData): void
     {
-        $beforeHook = new OnFillingHook($this, $model, $value);
-        $this->executeHooks(static::HOOK_BEFORE_FILLING, $beforeHook);
+        $fillingHook = new OnFillingHook($entryInstance, $this, $value);
+        $this->executeHooks(static::HOOK_BEFORE_FILLING, $fillingHook);
 
-        if (is_callable($this->fillValueCallback)) {
-            call_user_func($this->fillValueCallback, $model, $value, $requestData);
+        if (is_callable($this->writeValueCallback)) {
+            call_user_func($this->writeValueCallback, $entryInstance, $value, $requestData);
             return;
         }
 
-        $model->{$this->getName()} = $value;
-
-        $afterHook = new OnFillingHook($this, $model, $value);
-        $this->executeHooks(static::HOOK_AFTER_FILLING, $afterHook);
+        $entryInstance->model()->{$this->getName()} = $value;
+        $this->executeHooks(static::HOOK_AFTER_FILLING, $fillingHook);
     }
 
-    public function fillModelUsing($callback): self
+    public function writeValueUsing($callback): self
     {
-        $this->fillValueCallback = $callback;
+        $this->writeValueCallback = $callback;
         return $this;
     }
 
@@ -266,27 +265,9 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
         return $this;
     }
 
-    protected function getBaseRules(): string
-    {
-        $rules = $this->required
-            ? ['required']
-            : ['nullable'];
-
-        if ($this->unique instanceof Unique) {
-            $rules[] = (string)$this->unique;
-        }
-
-        return implode('|', $rules);
-    }
-
-    protected function getTypeRules(): array
-    {
-        return [];
-    }
-
     protected function getConfig(): array
     {
-        return $this->getResolvedConfig('config');
+        return $this->getResolvedConfig()->all();
     }
 
     protected function getMigrationMethod(): array
@@ -308,10 +289,14 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Wit
         return "{$methodName}('{$this->getName()}'{$methodParams})";
     }
 
-    protected function getResolvedConfig(string $config, $default = null)
+    protected function getResolvedConfig(?string $config = null, $default = null)
     {
         if (! $this->resolvedConfig) {
             throw new UnresolvedException;
+        }
+
+        if (! $config) {
+            return $this->resolvedConfig;
         }
 
         return $this->resolvedConfig->get($config, $default);

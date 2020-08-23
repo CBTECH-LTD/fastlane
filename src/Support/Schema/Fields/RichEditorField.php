@@ -3,7 +3,7 @@
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
@@ -22,7 +22,7 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
         return 'richEditor';
     }
 
-    public function fillModel($model, $value, array $requestData): void
+    public function writeValue($model, $value, array $requestData): void
     {
         if (is_callable($this->fillValueCallback)) {
             call_user_func($this->fillValueCallback, $model, $value, $requestData);
@@ -52,7 +52,7 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
             return [];
         }
 
-        return Collection::make($this->resolveValue($model))->mapWithKeys(
+        return Collection::make($this->readValue($model))->mapWithKeys(
             fn($value, $key) => [
                 $key => Arr::get($options, 'output', 'collection') === 'collection'
                     ? null
@@ -61,14 +61,14 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
         )->all();
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, array $data): array
+    protected function resolveConfig(EntryInstance $entryInstance, string $destination): void
     {
-        return [
+        $this->resolvedConfig = $this->resolvedConfig->merge([
             'acceptFiles' => $this->acceptFiles,
             'links'       => [
-                'self' => URL::relative("cp.{$entryType->identifier()}.attachments", $this->getName()),
+                'self' => URL::relative("cp.{$entryInstance->type()->identifier()}.attachments", $this->getName()),
             ],
-        ];
+        ]);
     }
 
     protected function getMigrationMethod(): array

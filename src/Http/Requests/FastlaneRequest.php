@@ -2,13 +2,14 @@
 
 namespace CbtechLtd\Fastlane\Http\Requests;
 
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class FastlaneRequest extends Request
 {
     private EntryTypeContract $entryType;
+    private EntryInstanceContract $entryInstance;
 
     /**
      * @return EntryTypeContract
@@ -24,15 +25,18 @@ class FastlaneRequest extends Request
      */
     public function setEntryType(EntryTypeContract $entryType): self
     {
-        $this->entryType = $entryType->resolve($this->all());
+        $this->entryType = $entryType;
         return $this;
     }
 
-    /**
-     * @return Model|null
-     */
-    public function getEntryInstance(): Model
+    public function setEntryInstance(EntryInstanceContract $entryInstance): self
     {
-        return $this->entryType->modelInstance();
+        $this->entryInstance = $entryInstance;
+        return $this;
+    }
+
+    public function getEntryInstance(): EntryInstanceContract
+    {
+        return $this->entryInstance;
     }
 }

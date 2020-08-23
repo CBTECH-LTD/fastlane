@@ -2,12 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
@@ -19,6 +19,8 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
     protected $default = null;
     protected bool $multiple = false;
     protected bool $renderAsCheckbox = false;
+
+    /** @var Closure | array */
     protected $options;
 
     protected function __construct(string $name, string $label, array $options = [])
@@ -58,7 +60,7 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
 
     public function getOptions(): array
     {
-        return $this->getResolvedConfig('config')['options']->toArray();
+        return $this->getResolvedConfig('options')->toArray();
     }
 
     public function asCheckboxes(bool $state = true): self
@@ -67,17 +69,16 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
         return $this;
     }
 
-    public function resolveValue(Model $model): array
+    public function readValue(EntryInstance $entryInstance): FieldValue
     {
-        $value = Arr::wrap($model->{$this->getName()});
+        $value = Arr::wrap($entryInstance->model()->{$this->getName()});
 
-        $options = $this->resolvedConfig->get('config')['options'];
+        /** @var Collection<SelectOption> $options */
+        $options = $this->resolvedConfig->get('options');
 
-        return [
-            $this->getName() => $options->filter(
-                fn(SelectOption $opt) => $opt->isSelected() || in_array($opt->getValue(), $value)
-            )->toArray(),
-        ];
+        return new FieldValue($this->getName(), $options->filter(
+            fn(SelectOption $opt) => $opt->isSelected() || in_array($opt->getValue(), $value)
+        )->toArray());
     }
 
     public function toApiAttribute(Model $model, array $options = [])
@@ -86,12 +87,12 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
             return call_user_func($this->toApiAttributeCallback, $model);
         }
 
-        return $this->resolveValue($model);
+        return $this->readValue($model);
     }
 
     protected function getTypeRules(): array
     {
-        $values = $this->getResolvedConfig('config')['options']->map(
+        $values = $this->getResolvedConfig('options')->map(
             fn(SelectOption $option) => $option->getValue()
         );
 
@@ -107,21 +108,24 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
         return [$this->getName() => 'in:' . $values->implode(',')];
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, array $data): array
+    protected function resolveConfig(EntryInstance $entryInstance, string $destination): void
     {
-        return [
-            'options'  => $this->resolveOptions($data),
+        $this->resolvedConfig = $this->resolvedConfig->merge([
             'multiple' => $this->isMultiple(),
             'type'     => $this->renderAsCheckbox ? 'checkbox' : 'select',
-        ];
+        ]);
+
+        if ($destination === 'form') {
+            $this->resolveOptions($entryInstance);
+        }
     }
 
-    protected function resolveOptions(array $data): Collection
+    protected function resolveOptions(EntryInstance $entryInstance): void
     {
         $options = is_callable($this->options)
-            ? call_user_func($this->options, $data)
+            ? call_user_func($this->options, $entryInstance)
             : $this->options;
 
-        return Collection::make($options);
+        $this->resolvedConfig->put('options', Collection::make($options));
     }
 }

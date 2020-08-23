@@ -21,6 +21,6 @@ trait ExportsToApiAttribute
             return call_user_func($this->toApiAttributeCallback, $model);
         }
 
-        return $this->resolveValue($model);
+        return $this->readValue($model);
     }
 }

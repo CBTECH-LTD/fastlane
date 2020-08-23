@@ -4,8 +4,8 @@ namespace CbtechLtd\Fastlane\Http\Middleware;
 
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Http\Requests\FastlaneRequest;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -24,7 +24,8 @@ class ResolveFastlaneRequest
         $entryInstance = $this->getEntryInstance($request, $entryType);
 
         $newRequest = tap(FastlaneRequest::createFrom($request), function (FastlaneRequest $req) use ($entryType, $entryInstance) {
-            $req->setEntryType($entryType->new($entryInstance));
+            $req->setEntryType($entryType);
+            $req->setEntryInstance($entryInstance);
         });
 
         $this->fastlane->setRequest($newRequest);
@@ -42,10 +43,10 @@ class ResolveFastlaneRequest
         return $this->fastlane->getEntryTypeByIdentifier($slug);
     }
 
-    protected function getEntryInstance(Request $request, EntryType $entryType): ?Model
+    protected function getEntryInstance(Request $request, EntryType $entryType): ?EntryInstance
     {
         return ! is_null($request->id)
             ? $entryType->findItem($request->id)
-            : null;
+            : $entryType->newInstance(null);
     }
 }
