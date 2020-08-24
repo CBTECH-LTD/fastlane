@@ -8,7 +8,13 @@
         <f-table-card :items="items.data" auto>
             <template v-slot:columns>
                 <th v-for="field in listSchema" :key="field.name" class="table__column" :width="field.listWidth || 'auto'">
-                    {{ field.label }}
+                    <span class="flex items-center">
+                        {{ field.label }}
+                        <f-button v-if="field.sortable" @click="orderBy(field)" variant="minimal" :color="orderField === field.name ? 'black' : 'gray'" class="ml-2">
+                            <f-icon v-if="orderDirection === 'asc'" name="sort-alpha-down" />
+                            <f-icon v-if="orderDirection === 'desc'" name="sort-alpha-down-alt" />
+                        </f-button>
+                    </span>
                 </th>
                 <th width="80"></th>
             </template>
@@ -85,6 +91,18 @@ export default {
             }
 
             return this.items.meta.pageUrls[this.items.meta.pageUrls.length - 1].number < this.items.meta.lastPage
+        },
+
+        orderField () {
+            return this.items.meta.order
+                ? this.items.meta.order.replace(/^-/, '')
+                : ''
+        },
+
+        orderDirection () {
+            return this.items.meta.order && this.items.meta.order.startsWith('-')
+                ? 'desc'
+                : 'asc';
         }
     },
 
@@ -101,6 +119,18 @@ export default {
 
                 this.$set(this.isPerformingActionFor, item.id, false)
             }
+        },
+
+        orderBy (field) {
+            const dir = field.name === this.orderField && this.orderDirection === 'asc'
+                ? '-'
+                : ''
+
+            this.$inertia.visit(this.items.meta.firstPageUrl, {
+                data: {
+                    order: `${dir}${field.name}`,
+                }
+            })
         }
     },
 }

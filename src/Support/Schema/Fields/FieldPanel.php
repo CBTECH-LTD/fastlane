@@ -56,6 +56,11 @@ class FieldPanel implements SchemaField, Resolvable
         return $this->fields;
     }
 
+    public function isSortable(): bool
+    {
+        return false;
+    }
+
     public function toArray()
     {
         return [

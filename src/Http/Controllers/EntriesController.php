@@ -8,6 +8,9 @@ use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
+use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
+use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;
+use CbtechLtd\Support\QueryFilter;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -37,7 +40,9 @@ class EntriesController extends Controller
     public function index()
     {
         /** @var LengthAwarePaginator $paginator */
-        $paginator = $this->entryType()->getItems();
+        $paginator = $this->entryType()->getItems(
+            $this->fastlane->getRequest()->buildQueryFilter()
+        );
 
         // Redirect to the first pagination page if the requested page
         // is bigger than the maximum existent page in the paginator.
@@ -57,20 +62,15 @@ class EntriesController extends Controller
             );
 
         $collection = EntryResourceCollection::makeFromPaginator($paginator)
-            ->forEntryType($this->entryType());
+            ->forEntryType($this->entryType())
+            ->withMeta([
+                ResourceMeta::make('order', $this->fastlane->getRequest()->input('order')),
+            ]);
 
         // Return the transformed collection and some important information like
         // entry type schema, names and links.
         return $this->render('Entries/Index', [
-            'items'     => $collection->transform(),
-            'entryType' => [
-                'schema'        => $this->entryInstance()->schema()->getIndexFields(),
-                'singular_name' => $this->entryType()->name(),
-                'plural_name'   => Str::plural($this->entryType()->name()),
-            ],
-            'links'     => [
-                'create' => URL::relative("cp.{$this->entryType()->identifier()}.create"),
-            ],
+            'items' => $collection->transform(),
         ]);
     }
 

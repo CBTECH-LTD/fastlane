@@ -21,7 +21,7 @@
         "webmozart/assert": "^1.8.0",
         "altek/accountant": "^2.0",
         "altek/eventually": "^1.0",
-        "cbtech-ltd/laravel-json-api-transformer": "0.2.0",
+        "cbtech-ltd/laravel-json-api-transformer": "^0.2.1",
         "spatie/laravel-permission": "^3.13",
         "hashids/hashids": "^4.0",
         "laravel/sanctum": "^2.4",

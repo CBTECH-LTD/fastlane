@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Contracts;
 
+use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -32,7 +33,7 @@ interface EntryType extends Hookable
 
     public function isVisibleOnMenu(): bool;
 
-    public function getItems(): LengthAwarePaginator;
+    public function getItems(?QueryFilterContract $queryFilter = null): LengthAwarePaginator;
 
     public function findItem(string $hashid): EntryInstance;
 

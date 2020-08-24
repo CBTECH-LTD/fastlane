@@ -11,6 +11,7 @@ use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollection;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules;
@@ -155,20 +156,20 @@ abstract class EntryType implements EntryTypeContract
         return true;
     }
 
-    public function getItems(): LengthAwarePaginator
+    public function getItems(?QueryFilterContract $queryFilter = null): LengthAwarePaginator
     {
         $this->gate->authorize('list', $this->model());
 
-        $query = $this
-            ->newModelInstance()
-            ->newModelQuery()
-            ->orderBy('created_at')
-            ->orderBy('id');
+        $query = $queryFilter
+            ->addOrder('created_at')
+            ->addOrder('id')
+            ->pipeThrough(
+                $this->newModelInstance()->newModelQuery()
+            );
 
         $this->queryItems($query);
 
         $pagination = $query->paginate($this->getItemsPerPage());
-
         $pagination->getCollection()->transform(fn(Model $model) => $this->newInstance($model));
 
         return $pagination;

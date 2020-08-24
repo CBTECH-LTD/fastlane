@@ -9,4 +9,6 @@ interface SchemaField extends Arrayable
     public function getType(): string;
 
     public function getName(): string;
+
+    public function isSortable(): bool;
 }

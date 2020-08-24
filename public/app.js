@@ -12647,6 +12647,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -12677,6 +12683,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
 
       return this.items.meta.pageUrls[this.items.meta.pageUrls.length - 1].number < this.items.meta.lastPage;
+    },
+    orderField: function orderField() {
+      return this.items.meta.order ? this.items.meta.order.replace(/^-/, '') : '';
+    },
+    orderDirection: function orderDirection() {
+      return this.items.meta.order && this.items.meta.order.startsWith('-') ? 'desc' : 'asc';
     }
   },
   methods: {
@@ -12717,6 +12729,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         }, _callee, null, [[2, 7]]);
       }))();
+    },
+    orderBy: function orderBy(field) {
+      var dir = field.name === this.orderField && this.orderDirection === 'asc' ? '-' : '';
+      this.$inertia.visit(this.items.meta.firstPageUrl, {
+        data: {
+          order: "".concat(dir).concat(field.name)
+        }
+      });
     }
   }
 });
@@ -53138,10 +53158,51 @@ var render = function() {
                         attrs: { width: field.listWidth || "auto" }
                       },
                       [
-                        _vm._v(
-                          "\n                " +
-                            _vm._s(field.label) +
-                            "\n            "
+                        _c(
+                          "span",
+                          { staticClass: "flex items-center" },
+                          [
+                            _vm._v(
+                              "\n                    " +
+                                _vm._s(field.label) +
+                                "\n                    "
+                            ),
+                            field.sortable
+                              ? _c(
+                                  "f-button",
+                                  {
+                                    staticClass: "ml-2",
+                                    attrs: {
+                                      variant: "minimal",
+                                      color:
+                                        _vm.orderField === field.name
+                                          ? "black"
+                                          : "gray"
+                                    },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.orderBy(field)
+                                      }
+                                    }
+                                  },
+                                  [
+                                    _vm.orderDirection === "asc"
+                                      ? _c("f-icon", {
+                                          attrs: { name: "sort-alpha-down" }
+                                        })
+                                      : _vm._e(),
+                                    _vm._v(" "),
+                                    _vm.orderDirection === "desc"
+                                      ? _c("f-icon", {
+                                          attrs: { name: "sort-alpha-down-alt" }
+                                        })
+                                      : _vm._e()
+                                  ],
+                                  1
+                                )
+                              : _vm._e()
+                          ],
+                          1
                         )
                       ]
                     )

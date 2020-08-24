@@ -6,6 +6,7 @@ All notable changes to `fastlane` will be documented in this file
 
 ### Added
 - Pagination to index pages.
+- Add order and sort to the index pages.
 
 ---
 

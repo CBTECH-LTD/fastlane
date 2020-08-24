@@ -10,6 +10,7 @@ use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesRules;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Makeable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ResolvesField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Sortable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Migratable as MigratableContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Panelizable as PanelizableContract;
@@ -24,7 +25,7 @@ use Illuminate\Support\Collection;
 
 abstract class AbstractBaseField implements SchemaField, ResolvableContract, ReadValueContract, WithRulesContract, MigratableContract, SupportModelContract, WithVisibilityContract, PanelizableContract
 {
-    use HandlesHooks, HandlesRules, Makeable, ResolvesField;
+    use HandlesHooks, HandlesRules, Makeable, ResolvesField, Sortable;
 
     const HOOK_BEFORE_FILLING = 'beforeFilling';
     const HOOK_AFTER_FILLING = 'afterFilling';
@@ -229,6 +230,7 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
             'placeholder' => $this->placeholder ?? $this->getLabel(),
             'default'     => $this->default,
             'required'    => $this->required,
+            'sortable'    => $this->isSortable(),
             'listWidth'   => $this->listWidth,
             'panel'       => $this->panel,
             'config'      => $this->getConfig(),
