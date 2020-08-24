@@ -4,6 +4,10 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+### Added
+- Year field.
+- DateTime renderer on admin panel.
+
 ---
 
 ## 0.5.0 [2020-08-23]
