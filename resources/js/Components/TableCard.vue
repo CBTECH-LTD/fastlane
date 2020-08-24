@@ -16,7 +16,7 @@
                 </span>
             </div>
         </div>
-        <table v-else class="w-full table-auto" :class="auto ? 'table-auto' : 'table-fixed'">
+        <table v-else class="w-full" :class="auto ? 'table-auto' : 'table-fixed'">
             <thead>
             <tr class="table__column-group">
                 <slot name="columns"/>

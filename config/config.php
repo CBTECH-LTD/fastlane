@@ -1,22 +1,32 @@
 <?php
 
 return [
+    /**
+     * Assets used by the Fastlane control panel.
+     * You can customize these values to have a proper
+     * logo and login background image for your project.
+     *
+     * ATTENTION: The value must be a relative path to the
+     * public directory.
+     */
     'asset_logo_img' => 'vendor/fastlane/img/app-logo.png',
     'asset_login_bg' => 'vendor/fastlane/img/login-bg-black.jpg',
 
     /**
-     * Enabled Entry Types.
+     * Configure the Entry Types which must be enabled
+     * in Fastlane.
      */
     'entry_types'    => [
         //
     ],
 
     /**
-     * Middleware use by the Control Panel routes.
+     * Control panel settings.
      */
     'control_panel'  => [
-        'middleware' => ['web'],
-        'url_prefix' => env('FASTLANE_CP_URL_PREFIX', '/cp'),
+        'middleware'          => ['web'],
+        'url_prefix'          => env('FASTLANE_CP_URL_PREFIX', '/cp'),
+        'pagination_per_page' => 20,
     ],
 
     /**

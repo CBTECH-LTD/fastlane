@@ -4,6 +4,11 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+### Added
+- Pagination to index pages.
+
+---
+
 ## 0.6.0 [2020-08-23]
 
 ### Added

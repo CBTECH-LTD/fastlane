@@ -9,6 +9,7 @@ use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
@@ -35,13 +36,31 @@ class EntriesController extends Controller
 
     public function index()
     {
-        $items = $this->entryType()->getItems()
-            ->mapInto(EntryResource::class)
-            ->transform(fn(EntryResource $res) => $res->toIndex());
+        /** @var LengthAwarePaginator $paginator */
+        $paginator = $this->entryType()->getItems();
 
-        $collection = EntryResourceCollection::make($items->all())
+        // Redirect to the first pagination page if the requested page
+        // is bigger than the maximum existent page in the paginator.
+        if ($paginator->currentPage() > $paginator->lastPage()) {
+            return redirect()->route(
+                "cp.{$this->entryType()->identifier()}.index",
+                Collection::make(request()->query())->except(['page'])->all()
+            );
+        }
+
+        // Transform the paginator collection, which is composed of
+        // entry instances, into a collection of entry resources ready
+        // to be transformed to our front-end application.
+        $paginator->getCollection()
+            ->transform(
+                fn(EntryInstance $entry) => (new EntryResource($entry))->toIndex()
+            );
+
+        $collection = EntryResourceCollection::makeFromPaginator($paginator)
             ->forEntryType($this->entryType());
 
+        // Return the transformed collection and some important information like
+        // entry type schema, names and links.
         return $this->render('Entries/Index', [
             'items'     => $collection->transform(),
             'entryType' => [

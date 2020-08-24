@@ -12585,7 +12585,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Support_ListSchema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Support/ListSchema */ "./resources/js/Support/ListSchema.js");
+/* harmony import */ var lodash_map__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/map */ "./node_modules/lodash/map.js");
+/* harmony import */ var lodash_map__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_map__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _Support_ListSchema__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../Support/ListSchema */ "./resources/js/Support/ListSchema.js");
 
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -12633,6 +12635,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'Entries.Index',
@@ -12645,8 +12660,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       isPerformingActionFor: {},
-      listSchema: new _Support_ListSchema__WEBPACK_IMPORTED_MODULE_1__["default"](this.items.meta.entry_type.schema)
+      listSchema: new _Support_ListSchema__WEBPACK_IMPORTED_MODULE_2__["default"](this.items.meta.entry_type.schema)
     };
+  },
+  computed: {
+    hasMoreBefore: function hasMoreBefore() {
+      if (this.items.meta.pageUrls.length === 0) {
+        return false;
+      }
+
+      return this.items.meta.pageUrls[0].number > 1;
+    },
+    hasMoreAfter: function hasMoreAfter() {
+      if (this.items.meta.pageUrls.length === 0) {
+        return false;
+      }
+
+      return this.items.meta.pageUrls[this.items.meta.pageUrls.length - 1].number < this.items.meta.lastPage;
+    }
   },
   methods: {
     onInput: function onInput(item, field, value) {
@@ -52039,7 +52070,7 @@ var render = function() {
         : _c(
             "table",
             {
-              staticClass: "w-full table-auto",
+              staticClass: "w-full",
               class: _vm.auto ? "table-auto" : "table-fixed"
             },
             [
@@ -53185,6 +53216,122 @@ var render = function() {
                   ])
                 ]
               }
+            },
+            {
+              key: "footer",
+              fn: function() {
+                return [
+                  _c(
+                    "div",
+                    {
+                      staticClass: "flex items-center justify-center font-bold"
+                    },
+                    [
+                      _vm.items.meta.currentPage > 1
+                        ? _c(
+                            "f-button",
+                            {
+                              staticClass: "mx-1",
+                              attrs: {
+                                href: _vm.items.meta.firstPageUrl,
+                                color: "brand",
+                                variant: "outline"
+                              }
+                            },
+                            [
+                              _c("f-icon", { attrs: { name: "step-backward" } })
+                            ],
+                            1
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.items.meta.previousPageUrl
+                        ? _c(
+                            "f-button",
+                            {
+                              staticClass: "mx-1",
+                              attrs: {
+                                href: _vm.items.meta.previousPageUrl,
+                                color: "brand",
+                                variant: "outline"
+                              }
+                            },
+                            [_c("f-icon", { attrs: { name: "angle-left" } })],
+                            1
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.hasMoreBefore
+                        ? _c(
+                            "span",
+                            { staticClass: "mx-1 px-1 text-gray-700" },
+                            [_c("f-icon", { attrs: { name: "ellipsis-h" } })],
+                            1
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm._l(_vm.items.meta.pageUrls, function(page) {
+                        return _c(
+                          "f-button",
+                          {
+                            key: page.number,
+                            staticClass: "mx-1",
+                            attrs: {
+                              href: page.url,
+                              color: "brand",
+                              variant: page.isCurrent ? "solid" : "outline"
+                            }
+                          },
+                          [_vm._v(_vm._s(page.number))]
+                        )
+                      }),
+                      _vm._v(" "),
+                      _vm.hasMoreAfter
+                        ? _c(
+                            "span",
+                            { staticClass: "mx-1 px-1 text-gray-700" },
+                            [_c("f-icon", { attrs: { name: "ellipsis-h" } })],
+                            1
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.items.meta.nextPageUrl
+                        ? _c(
+                            "f-button",
+                            {
+                              staticClass: "mx-1",
+                              attrs: {
+                                href: _vm.items.meta.nextPageUrl,
+                                color: "brand",
+                                variant: "outline"
+                              }
+                            },
+                            [_c("f-icon", { attrs: { name: "angle-right" } })],
+                            1
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.items.meta.currentPage < _vm.items.meta.lastPage
+                        ? _c(
+                            "f-button",
+                            {
+                              staticClass: "mx-1",
+                              attrs: {
+                                href: _vm.items.meta.lastPageUrl,
+                                color: "brand",
+                                variant: "outline"
+                              }
+                            },
+                            [_c("f-icon", { attrs: { name: "step-forward" } })],
+                            1
+                          )
+                        : _vm._e()
+                    ],
+                    2
+                  )
+                ]
+              },
+              proxy: true
             }
           ],
           null,

@@ -2,9 +2,9 @@
 
 namespace CbtechLtd\Fastlane\Support\Contracts;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 
 interface EntryType extends Hookable
 {
@@ -32,7 +32,7 @@ interface EntryType extends Hookable
 
     public function isVisibleOnMenu(): bool;
 
-    public function getItems(): Collection;
+    public function getItems(): LengthAwarePaginator;
 
     public function findItem(string $hashid): EntryInstance;
 
