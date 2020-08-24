@@ -4,10 +4,10 @@ namespace CbtechLtd\Fastlane\Http\Controllers;
 
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\FastlaneFacade;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redirect;
@@ -28,23 +28,24 @@ class EntriesController extends Controller
         return $this->fastlane->getRequest()->getEntryType();
     }
 
-    protected function entry(): ?Model
+    protected function entryInstance(): ?EntryInstance
     {
         return $this->fastlane->getRequest()->getEntryInstance();
     }
 
     public function index()
     {
-        $collection = EntryResourceCollection::make(
-            $this->entryType()->getItems()->map(
-                fn(Model $m) => (new EntryResource($m, $this->entryType()))->toIndex()
-            )->all()
-        )->forEntryType($this->entryType());
+        $items = $this->entryType()->getItems()
+            ->mapInto(EntryResource::class)
+            ->transform(fn(EntryResource $res) => $res->toIndex());
+
+        $collection = EntryResourceCollection::make($items->all())
+            ->forEntryType($this->entryType());
 
         return $this->render('Entries/Index', [
             'items'     => $collection->transform(),
             'entryType' => [
-                'schema'        => $this->entryType()->schema()->getIndexFields(),
+                'schema'        => $this->entryInstance()->schema()->getIndexFields(),
                 'singular_name' => $this->entryType()->name(),
                 'plural_name'   => Str::plural($this->entryType()->name()),
             ],
@@ -61,9 +62,10 @@ class EntriesController extends Controller
         }
 
         return $this->render('Entries/Create', [
+            'item'      => (new EntryResource($this->entryInstance()))->toUpdate()->transform(),
             'entryType' => [
-                'schema'        => $this->entryType()->schema()->getCreateFields(),
-                'panels'        => Collection::make($this->entryType()->schema()->getPanels()),
+                'schema'        => $this->entryInstance()->schema()->getCreateFields(),
+                'panels'        => Collection::make($this->entryInstance()->schema()->getPanels()),
                 'singular_name' => $this->entryType()->name(),
                 'plural_name'   => Str::plural($this->entryType()->name()),
             ],
@@ -80,13 +82,17 @@ class EntriesController extends Controller
 
         FastlaneFacade::flashSuccess($this->entryType()->name() . ' created successfully.', 'thumbs-up');
 
-        return Redirect::route("cp.{$this->entryType()->identifier()}.edit", [$entry]);
+        return Redirect::route("cp.{$this->entryType()->identifier()}.edit", [$entry->model()]);
     }
 
     public function edit()
     {
+        if ($this->entryType()->policy()) {
+            $this->authorize('update', $this->entryInstance()->model());
+        }
+
         return $this->render('Entries/Edit', [
-            'item' => (new EntryResource($this->entry(), $this->entryType()))->toUpdate()->transform(),
+            'item' => (new EntryResource($this->entryInstance()))->toUpdate()->transform(),
         ]);
     }
 

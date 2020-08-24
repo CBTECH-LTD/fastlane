@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col">
-        <div class="fixed top-0 w-full h-20 bg-white shadow-lg z-40 flex justify-between">
+        <div class="fixed top-0 w-full h-20 bg-white z-40 flex justify-between">
             <!-- App logo -->
             <div>
                 <img :src="$asset($page.app.assets.logoImage)" alt="" class="h-20">
@@ -18,19 +18,19 @@
             </div>
         </div>
         <div class="mt-20 w-full flex-grow flex">
-            <div class="flex flex-col border-r border-gray-400 bg-gray-300 h-screen sticky top-0 overflow-hidden" style="width: 320px">
+            <div class="flex flex-col bg-white h-screen sticky top-0 overflow-hidden" style="width: 320px">
                 <!-- Navigation items -->
                 <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scroll">
-                    <f-navigation-list class="my-6" :items="this.$page.menu"/>
+                    <f-navigation-list class="my-6 px-2" :items="this.$page.menu"/>
                 </div>
             </div>
 
             <!-- Main area -->
-            <div class="flex-1 flex flex-row">
+            <div class="flex-1 flex flex-row px-4">
                 <div v-if="$slots.hasOwnProperty('page-sidebar')">
                     <slot name="page-sidebar"/>
                 </div>
-                <div class="flex-grow">
+                <div class="flex-grow bg-gray-200 mb-8" style="border-radius: 2rem">
                     <div v-if="$slots.hasOwnProperty('title')" ref="sticky" class="title-bar-wrapper" :class="stickyBarClass">
                         <div class="title-bar">
                             <div class="div">
@@ -110,14 +110,16 @@ export default {
 
 <style scoped>
 .title-bar-wrapper {
-    @apply sticky top-0 pt-12 mx-4 z-30 bg-transparent transition-all duration-300;
+    @apply sticky top-0 py-8 z-30 bg-gray-300 transition-all duration-300 overflow-hidden;
+    border-top-left-radius: 2rem;
+    border-top-right-radius: 2rem;
 }
 
 .title-bar {
     @apply flex items-center justify-between px-8 py-8 z-30 transition-all duration-300;
     height: 72px;
-    transform: translateY(0);
     top: 80px;
+    transform: translateY(0);
 }
 
 .title-bar__title {
@@ -129,12 +131,12 @@ export default {
 }
 
 .title-bar-wrapper.is-floating {
-    @apply bg-indigo-200 rounded-t-none rounded-b-lg border border-indigo-300 shadow-lg;
+    @apply bg-gray-300 pb-1 shadow-lg;
 }
 
 .title-bar-wrapper.is-floating .title-bar {
     @apply py-4 mb-12;
-    transform: translateY(40px);
+    transform: translateY(50px);
 }
 
 .title-bar-wrapper.is-floating .title-bar__title {

@@ -1,6 +1,6 @@
 <template>
     <f-the-app-layout>
-        <template v-slot:title>New {{ entryType.singular_name }}</template>
+        <template v-slot:title>New {{ item.meta.entry_type.singular_name }}</template>
         <template v-slot:actions>
             <f-button :href="links.parent" variant="outline" left-icon="arrow-left">
                 Back to list
@@ -20,7 +20,7 @@
         <f-form-root id="createForm"
                      @submit.prevent="submitForm"
                      :form="form"
-                     :panels="entryType.panels">
+                     :panels="item.meta.entry_type.panels">
         </f-form-root>
     </f-the-app-layout>
 </template>
@@ -32,11 +32,11 @@
         name: 'Entries.Create',
 
         props: {
-            links: {
+            item: {
                 required: true,
                 type: Object,
             },
-            entryType: {
+            links: {
                 required: true,
                 type: Object,
             },
@@ -47,7 +47,7 @@
         data () {
             return {
                 isCreating: false,
-                form: new FormSchemaFactory({}, this.entryType.schema),
+                form: new FormSchemaFactory(this.item.attributes, this.item.meta.entry_type.schema),
             }
         },
 

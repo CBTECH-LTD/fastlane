@@ -24,7 +24,7 @@ trait ExportsToApiRelationship
             return call_user_func($this->toApiRelationshipCallback, $model);
         }
 
-        return Collection::make($this->resolveValue($model))->mapWithKeys(function ($value, $key) {
+        return Collection::make($this->readValue($model))->mapWithKeys(function ($value, $key) {
             $key = Str::replaceFirst('relations__', '', $key);
 
             return [

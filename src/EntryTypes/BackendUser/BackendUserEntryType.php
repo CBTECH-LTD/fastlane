@@ -8,6 +8,7 @@ use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\UpdateRolePipe;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
@@ -55,13 +56,11 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
         return [
             StringField::make('name', 'Name')
                 ->required()
-                ->setRules('max:255')
                 ->showOnIndex(),
 
             StringField::make('email', 'Email')
                 ->required()
                 ->unique(new Unique(User::class, 'email'))
-                ->setRules('max:255')
                 ->showOnIndex(),
 
             SelectField::make('role', 'Role')
@@ -75,9 +74,9 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
                 ->hideOnForm(function () {
                     return Auth::user()->is($this->modelInstance());
                 })
-                ->fillModelUsing(function ($model, $value) {
+                ->writeValueUsing(function (EntryInstance $entryInstance, $value) {
                     if ($value) {
-                        $model->assignRole($value);
+                        $entryInstance->model()->assignRole($value);
                     }
                 }),
 

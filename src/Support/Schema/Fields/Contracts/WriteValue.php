@@ -2,11 +2,13 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields\Contracts;
 
-interface SupportModel
-{
-    public function fillModel($model, $value, array $requestData): void;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 
-    public function fillModelUsing($callback): self;
+interface WriteValue
+{
+    public function writeValue(EntryInstance $entryInstance, $value, array $requestData): void;
+
+    public function writeValueUsing($callback): self;
 
     /**
      * Exports an array to be used by the model to define

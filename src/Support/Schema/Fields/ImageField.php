@@ -2,11 +2,11 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\ImageUploader;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class ImageField extends FileField implements ExportsToApiAttributeContract
@@ -49,30 +49,33 @@ class ImageField extends FileField implements ExportsToApiAttributeContract
         ];
     }
 
-    public function fillModel($model, $value, array $requestData): void
+    public function writeValue($model, $value, array $requestData): void
     {
-        parent::fillModel(
+        parent::writeValue(
             $model,
             $this->uploader->prepareValueToFill($value, $requestData),
             $requestData
         );
     }
 
-    public function resolveValue(Model $model): array
+    public function readValue(EntryInstance $entryInstance): FieldValue
     {
-        if ($this->resolveValueCallback) {
-            return call_user_func($this->resolveValueCallback, $model);
+        if ($this->readValueCallback) {
+            return call_user_func($this->readValueCallback, $entryInstance);
         }
 
-        return [
-            $this->getName() => $this->uploader->getImageUrl($model->{$this->getName()}),
-        ];
+        $modelValue = $entryInstance->model()->{$this->getName()};
+
+        return new FieldValue(
+            $this->getName(),
+            $modelValue ? $this->uploader->getImageUrl($modelValue) : ''
+        );
     }
 
-    protected function resolveConfig(EntryTypeContract $entryType, array $data): array
+    protected function resolveConfig(EntryInstance $entryInstance, string $destination): void
     {
-        return [
-            'uploadUrl' => route("cp.{$entryType->identifier()}.images", $this->getName()),
-        ];
+        $this->resolvedConfig = $this->resolvedConfig->merge([
+            'uploadUrl' => route("cp.{$entryInstance->type()->identifier()}.images", $this->getName()),
+        ]);
     }
 }

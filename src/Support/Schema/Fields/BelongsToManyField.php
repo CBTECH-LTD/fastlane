@@ -2,8 +2,10 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
+use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
@@ -13,16 +15,16 @@ class BelongsToManyField extends RelationField
     protected $default = [];
     protected bool $multiple = true;
 
-    public function resolveValue(Model $model): array
+    public function readValue(EntryInstanceContract $entryInstance): FieldValue
     {
-        $values = $model->{$this->getRelationshipName()}->map(
+        $value = $entryInstance->model()->{$this->getRelationshipName()}->map(
             fn(Model $related) => SelectOption::make(
                 $related->getKey(),
-                $this->relatedEntryType->makeModelTitle($related)
+                (new EntryInstance($this->getRelatedEntryType(), $related))->title(),
             )
         )->toArray();
 
-        return [$this->getName() => $values];
+        return new FieldValue($this->getName(), $value);
     }
 
     public function isMultiple(): bool
@@ -48,13 +50,21 @@ class BelongsToManyField extends RelationField
         };
     }
 
-    protected function hydrateRelation($model, $value, array $requestData): void
+    protected function hydrateRelation(EntryInstanceContract $entryInstance, $value, array $requestData): void
     {
-        $this->entryType
+        $entryInstance->type()
             ->addHook(EntryType::HOOK_AFTER_SAVING, function (OnSavingHook $hook, Closure $next) use ($value) {
                 $hook->model()->{$this->getRelationshipName()}()->sync($value);
 
                 $next($hook);
             });
+    }
+
+    protected function makeRelatedModelSelectOption(Model $model): SelectOption
+    {
+        return SelectOption::make(
+            $model->getKey(),
+            (new EntryInstance($this->getRelatedEntryType(), $model))->title(),
+        );
     }
 }

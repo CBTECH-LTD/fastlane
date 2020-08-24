@@ -4,6 +4,28 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+### Added
+- Year field.
+- DateTime renderer on admin panel.
+
+---
+
+## 0.5.0 [2020-08-23]
+
+### Changed
+- Admin style tweaks.
+
+---
+
+## 0.4.0 [2020-08-23]
+
+### Changed
+- How entry types and fields are implemented.
+- Schema usage by entry types / fields.
+- Small tweaks on style.
+
+---
+
 ## 0.3.0 [2020-08-20]
 
 ### Added

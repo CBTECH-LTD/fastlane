@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 
 class ToggleField extends AbstractBaseField implements Contracts\ExportsToApiAttribute
@@ -14,6 +15,16 @@ class ToggleField extends AbstractBaseField implements Contracts\ExportsToApiAtt
     public function getType(): string
     {
         return 'toggle';
+    }
+
+    public function required(bool $required = true): self
+    {
+        return $this;
+    }
+
+    public function writeValue(EntryInstanceContract $entryInstance, $value, array $requestData): void
+    {
+        parent::writeValue($entryInstance, (bool)$value, $requestData);
     }
 
     public function toModelAttribute(): array

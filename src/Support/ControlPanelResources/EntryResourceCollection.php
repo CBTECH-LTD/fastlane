@@ -32,9 +32,11 @@ class EntryResourceCollection extends ResourceTypeCollection
 
     protected function meta(): array
     {
+        $dummyInstance = $this->entryType->newInstance($this->entryType->newModelInstance());
+
         return [
             ResourceMeta::make('entry_type', [
-                'schema'        => Collection::make($this->entryType->schema()->getIndexFields()),
+                'schema'        => Collection::make($dummyInstance->schema()->getIndexFields()),
                 'singular_name' => $this->entryType->name(),
                 'plural_name'   => $this->entryType->pluralName(),
                 'identifier'    => $this->entryType->identifier(),
