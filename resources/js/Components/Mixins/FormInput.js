@@ -6,6 +6,10 @@ export default {
             type: Object,
             required: true,
         },
+        stacked: {
+            type: Boolean,
+            default: false,
+        }
     },
 
     methods: {
@@ -22,6 +26,7 @@ export default {
         onInput (value) {
             this.field.value = value
             this.$emit('input', this.field.value)
+            this.field.emitValueChanged(this.field.value)
         },
     },
 

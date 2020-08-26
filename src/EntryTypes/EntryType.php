@@ -6,6 +6,7 @@ use CbtechLtd\Fastlane\EntryTypes\Hooks\BeforeHydratingHook;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\FastlaneFacade;
+use CbtechLtd\Fastlane\QueryFilter\QueryFilter;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollection;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
@@ -160,7 +161,7 @@ abstract class EntryType implements EntryTypeContract
     {
         $this->gate->authorize('list', $this->model());
 
-        $query = $queryFilter
+        $query = ($queryFilter ?? new QueryFilter)
             ->addOrder('created_at')
             ->addOrder('id')
             ->pipeThrough(

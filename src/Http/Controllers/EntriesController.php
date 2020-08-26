@@ -6,6 +6,9 @@ use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Support\Contracts\WithCollectionLinks;
+use CbtechLtd\Fastlane\Support\Contracts\WithCollectionMeta;
+use CbtechLtd\Fastlane\Support\Contracts\WithCustomViews;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
@@ -67,9 +70,23 @@ class EntriesController extends Controller
                 ResourceMeta::make('order', $this->fastlane->getRequest()->input('order')),
             ]);
 
+        if ($this->entryType() instanceof WithCollectionLinks) {
+            $collection->withLinks($this->entryType()->collectionLinks());
+        }
+
+        if ($this->entryType() instanceof WithCollectionMeta) {
+            $collection->withMeta($this->entryType()->collectionMeta());
+        }
+
         // Return the transformed collection and some important information like
         // entry type schema, names and links.
-        return $this->render('Entries/Index', [
+        $view = function () {
+            return $this->entryType() instanceof WithCustomViews
+                ? $this->entryType()->getIndexView()
+                : null;
+        };
+
+        return $this->render($view() ?? 'Entries/Index', [
             'items' => $collection->transform(),
         ]);
     }
@@ -80,8 +97,14 @@ class EntriesController extends Controller
             $this->authorize('create', $this->entryType()->model());
         }
 
-        return $this->render('Entries/Create', [
-            'item'      => (new EntryResource($this->entryInstance()))->toUpdate()->transform(),
+        $view = function () {
+            return $this->entryType() instanceof WithCustomViews
+                ? $this->entryType()->getCreateView()
+                : null;
+        };
+
+        return $this->render($view() ?? 'Entries/Create', [
+            'item'      => (new EntryResource($this->entryInstance()))->toCreate()->transform(),
             'entryType' => [
                 'schema'        => $this->entryInstance()->schema()->getCreateFields(),
                 'panels'        => Collection::make($this->entryInstance()->schema()->getPanels()),
@@ -110,7 +133,13 @@ class EntriesController extends Controller
             $this->authorize('update', $this->entryInstance()->model());
         }
 
-        return $this->render('Entries/Edit', [
+        $view = function () {
+            return $this->entryType() instanceof WithCustomViews
+                ? $this->entryType()->getEditView()
+                : null;
+        };
+
+        return $this->render($view() ?? 'Entries/Edit', [
             'item' => (new EntryResource($this->entryInstance()))->toUpdate()->transform(),
         ]);
     }

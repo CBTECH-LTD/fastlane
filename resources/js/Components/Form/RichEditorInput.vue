@@ -58,7 +58,7 @@ export default {
                 data.append('files[]', attachment.file)
                 data.append('draft_id', this.draftId)
 
-                const { data: { url } } = await axios.post(this.field.config.links.self, data, {
+                const { data: { urls } } = await axios.post(this.field.config.links.self, data, {
                     onUploadProgress: function (progressEvent) {
                         attachment.setUploadProgress(
                             Math.round((progressEvent.loaded * 100) / progressEvent.total)
@@ -67,8 +67,8 @@ export default {
                 })
 
                 return attachment.setAttributes({
-                    url: url,
-                    href: url,
+                    url: urls[0],
+                    href: urls[0],
                 })
             }
         },

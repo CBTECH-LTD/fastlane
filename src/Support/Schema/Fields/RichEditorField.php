@@ -22,14 +22,14 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
         return 'richEditor';
     }
 
-    public function writeValue($model, $value, array $requestData): void
+    public function writeValue(EntryInstance $entryInstance, $value, array $requestData): void
     {
-        if (is_callable($this->fillValueCallback)) {
-            call_user_func($this->fillValueCallback, $model, $value, $requestData);
+        if (is_callable($this->writeValueCallback)) {
+            call_user_func($this->writeValueCallback, $entryInstance, $value, $requestData);
             return;
         }
 
-        $model->{$this->getName()} = $value;
+        $entryInstance->model()->{$this->getName()} = $value;
 
         // Check whether files are accepted in the rich editor instance,
         // then persist all draft attachment files.
@@ -37,9 +37,14 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
             DraftAttachment::persistAllDraft(
                 $draftId,
                 $this,
-                $model,
+                $entryInstance->model(),
             );
         }
+    }
+
+    public function getAcceptableMimetypes(): array
+    {
+        return [];
     }
 
     public function toApiAttribute(Model $model, array $options = [])

@@ -72,8 +72,8 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
                 )
                 ->required()
                 ->showOnIndex()
-                ->hideOnForm(function () {
-                    return Auth::user()->is($this->modelInstance());
+                ->hideOnForm(function (EntryInstance $entryInstance) {
+                    return Auth::user()->is($entryInstance->model());
                 })
                 ->writeValueUsing(function (EntryInstance $entryInstance, $value) {
                     if ($value) {

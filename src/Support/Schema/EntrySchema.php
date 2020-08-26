@@ -95,7 +95,7 @@ class EntrySchema implements Contracts\EntrySchema
     {
         return $this->build(
             Collection::make($this->fromCache('all'))->filter(
-                fn($f) => $f instanceof WithVisibility && $f->isShownOnIndex()
+                fn($f) => $f instanceof WithVisibility && $f->isShownOnIndex($this->entryInstance)
             ), 'index'
         );
     }
@@ -104,7 +104,7 @@ class EntrySchema implements Contracts\EntrySchema
     {
         return $this->build(
             Collection::make($this->fromCache('all'))->filter(
-                fn($f) => $f instanceof WithVisibility && $f->isShownOnCreate()
+                fn($f) => $f instanceof WithVisibility && $f->isShownOnCreate($this->entryInstance)
             ), 'form'
         );
     }
@@ -113,7 +113,7 @@ class EntrySchema implements Contracts\EntrySchema
     {
         return $this->build(
             Collection::make($this->fromCache('all'))->filter(
-                fn($f) => $f instanceof WithVisibility && $f->isShownOnUpdate()
+                fn($f) => $f instanceof WithVisibility && $f->isShownOnUpdate($this->entryInstance)
             ), 'form'
         );
     }

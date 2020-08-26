@@ -14,6 +14,7 @@ import Image from '../../Components/List/Image'
 import Select from '../../Components/List/Select'
 import Toggle from '../../Components/List/Toggle'
 import DateTime from '../../Components/List/DateTime'
+import File from '../../Components/List/File'
 
 export default {
     hidden: {
@@ -45,7 +46,7 @@ export default {
         form: ImageInput,
     },
     file: {
-        list: Simple,
+        list: File,
         form: FileInput,
     },
     date: {

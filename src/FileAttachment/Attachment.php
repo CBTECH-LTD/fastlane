@@ -18,5 +18,6 @@ class Attachment extends Model implements Recordable
         'attachable_id',
         'file',
         'url',
+        'name',
     ];
 }

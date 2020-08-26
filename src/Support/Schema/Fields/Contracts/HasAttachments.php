@@ -13,4 +13,6 @@ interface HasAttachments
     public function isAcceptingAttachments(): bool;
 
     public function acceptAttachments($accept = true): self;
+
+    public function getAcceptableMimetypes(): array;
 }

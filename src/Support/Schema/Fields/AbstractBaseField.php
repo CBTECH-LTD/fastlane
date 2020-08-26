@@ -36,6 +36,7 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
     ];
 
     protected string $name;
+    protected string $description = '';
     protected ?Unique $unique = null;
     protected $default = null;
     protected ?string $panel = null;
@@ -110,6 +111,12 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
     // ============================================================
     // ============================================================
 
+    public function withDescription(string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
+
     public function setPlaceholder(string $placeholder): self
     {
         $this->placeholder = $placeholder;
@@ -174,28 +181,28 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
         return $this;
     }
 
-    public function isShownOnIndex(): bool
+    public function isShownOnIndex(EntryInstanceContract $entryInstance): bool
     {
         if (is_callable($this->showOnIndex)) {
-            return call_user_func($this->showOnIndex);
+            return call_user_func($this->showOnIndex, $entryInstance);
         }
 
         return $this->showOnIndex;
     }
 
-    public function isShownOnCreate(): bool
+    public function isShownOnCreate(EntryInstanceContract $entryInstance): bool
     {
         if (is_callable($this->hideOnCreate)) {
-            return ! call_user_func($this->hideOnCreate);
+            return call_user_func($this->hideOnCreate, $entryInstance) === false;
         }
 
-        return ! $this->hideOnCreate;
+        return $this->hideOnCreate === false;
     }
 
-    public function isShownOnUpdate(): bool
+    public function isShownOnUpdate(EntryInstanceContract $entryInstance): bool
     {
         if (is_callable($this->hideOnUpdate)) {
-            return ! call_user_func($this->hideOnUpdate);
+            return ! call_user_func($this->hideOnUpdate, $entryInstance);
         }
 
         return ! $this->hideOnUpdate;
@@ -227,6 +234,7 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
             'name'        => $this->getName(),
             'type'        => $this->getType(),
             'label'       => $this->getLabel(),
+            'description' => $this->description,
             'placeholder' => $this->placeholder ?? $this->getLabel(),
             'default'     => $this->default,
             'required'    => $this->required,

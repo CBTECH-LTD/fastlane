@@ -3,10 +3,12 @@
 namespace CbtechLtd\Fastlane;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
+use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
 use CbtechLtd\Fastlane\Exceptions\EntryTypeNotRegisteredException;
 use CbtechLtd\Fastlane\Http\Controllers;
 use CbtechLtd\Fastlane\Http\Requests\FastlaneRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Support\Contracts\WithCustomController;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuManager as MenuManagerContract;
 use CbtechLtd\Fastlane\Support\Menu\MenuManager;
 use Illuminate\Routing\Router;
@@ -109,11 +111,15 @@ class Fastlane
     public function registerControlPanelRoutes(Router $router): void
     {
         $this->entryTypes->each(function (EntryType $entryType) use ($router) {
+            $controller = $entryType instanceof WithCustomController
+                ? $entryType->getController()
+                : Controllers\EntriesController::class;
+
             $router
                 ->middleware('fastlane.resolve:control_panel')
                 ->group(fn() => $router->fastlaneControlPanel(
                     $entryType->identifier(),
-                    Controllers\EntriesController::class
+                    $controller
                 ));
         });
     }
@@ -159,7 +165,6 @@ class Fastlane
     {
         return [
             'entries:read',
-            'test:hey',
         ];
     }
 
@@ -174,7 +179,7 @@ class Fastlane
         // We don't add built-in types to the default config file because
         // it would error prone (devs could just remove it), but for now
         // we require all these built-in types to be correctly registered.
-        $builtinTypes = [BackendUserEntryType::class];
+        $builtinTypes = [FileManagerEntryType::class, BackendUserEntryType::class];
 
         $classes = array_merge(config('fastlane.entry_types'), $builtinTypes);
 

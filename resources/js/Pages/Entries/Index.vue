@@ -2,8 +2,12 @@
     <f-the-app-layout>
         <template v-slot:title>{{ items.meta.entry_type.plural_name }}</template>
         <template v-slot:actions>
-            <f-button v-if="items.links.create" :href="items.links.create" left-icon="plus" size="lg">Add {{ items.meta.entry_type.singular_name }}</f-button>
+            <slot name="actions">
+                <f-button v-if="items.links.create" :href="items.links.create" left-icon="plus" size="lg">Add {{ items.meta.entry_type.singular_name }}</f-button>
+            </slot>
         </template>
+
+        <slot name="before-table"/>
 
         <f-table-card :items="items.data" auto>
             <template v-slot:columns>
@@ -11,8 +15,8 @@
                     <span class="flex items-center">
                         {{ field.label }}
                         <f-button v-if="field.sortable" @click="orderBy(field)" variant="minimal" :color="orderField === field.name ? 'black' : 'gray'" class="ml-2">
-                            <f-icon v-if="orderDirection === 'asc'" name="sort-alpha-down" />
-                            <f-icon v-if="orderDirection === 'desc'" name="sort-alpha-down-alt" />
+                            <f-icon v-if="orderDirection === 'asc'" name="sort-alpha-down"/>
+                            <f-icon v-if="orderDirection === 'desc'" name="sort-alpha-down-alt"/>
                         </f-button>
                     </span>
                 </th>
@@ -42,21 +46,30 @@
 
             <template v-slot:footer>
                 <div class="flex items-center justify-center font-bold">
-                    <f-button v-if="items.meta.currentPage > 1" :href="items.meta.firstPageUrl" color="brand" variant="outline" class="mx-1"><f-icon name="step-backward" /></f-button>
-                    <f-button v-if="items.meta.previousPageUrl" :href="items.meta.previousPageUrl" color="brand" variant="outline" class="mx-1"><f-icon name="angle-left" /></f-button>
-                    <span v-if="hasMoreBefore" class="mx-1 px-1 text-gray-700"><f-icon name="ellipsis-h" /></span>
+                    <f-button v-if="items.meta.currentPage > 1" :href="items.meta.firstPageUrl" color="brand" variant="outline" class="mx-1">
+                        <f-icon name="step-backward"/>
+                    </f-button>
+                    <f-button v-if="items.meta.previousPageUrl" :href="items.meta.previousPageUrl" color="brand" variant="outline" class="mx-1">
+                        <f-icon name="angle-left"/>
+                    </f-button>
+                    <span v-if="hasMoreBefore" class="mx-1 px-1 text-gray-700"><f-icon name="ellipsis-h"/></span>
                     <f-button v-for="page in items.meta.pageUrls" :key="page.number" :href="page.url" color="brand" :variant="page.isCurrent ? 'solid' : 'outline'" class="mx-1">{{ page.number }}</f-button>
-                    <span v-if="hasMoreAfter" class="mx-1 px-1 text-gray-700"><f-icon name="ellipsis-h" /></span>
-                    <f-button v-if="items.meta.nextPageUrl" :href="items.meta.nextPageUrl" color="brand" variant="outline" class="mx-1"><f-icon name="angle-right" /></f-button>
-                    <f-button v-if="items.meta.currentPage < items.meta.lastPage" :href="items.meta.lastPageUrl" color="brand" variant="outline" class="mx-1"><f-icon name="step-forward" /></f-button>
+                    <span v-if="hasMoreAfter" class="mx-1 px-1 text-gray-700"><f-icon name="ellipsis-h"/></span>
+                    <f-button v-if="items.meta.nextPageUrl" :href="items.meta.nextPageUrl" color="brand" variant="outline" class="mx-1">
+                        <f-icon name="angle-right"/>
+                    </f-button>
+                    <f-button v-if="items.meta.currentPage < items.meta.lastPage" :href="items.meta.lastPageUrl" color="brand" variant="outline" class="mx-1">
+                        <f-icon name="step-forward"/>
+                    </f-button>
                 </div>
             </template>
         </f-table-card>
+
+        <slot name="after-table"/>
     </f-the-app-layout>
 </template>
 
 <script>
-import map from 'lodash/map'
 import ListSchema from '../../Support/ListSchema'
 
 export default {
@@ -64,8 +77,8 @@ export default {
 
     props: {
         items: {
-            required: true,
             type: Object,
+            required: true,
         },
     },
 
@@ -79,7 +92,7 @@ export default {
     computed: {
         hasMoreBefore () {
             if (this.items.meta.pageUrls.length === 0) {
-                return false;
+                return false
             }
 
             return this.items.meta.pageUrls[0].number > 1
@@ -87,7 +100,7 @@ export default {
 
         hasMoreAfter () {
             if (this.items.meta.pageUrls.length === 0) {
-                return false;
+                return false
             }
 
             return this.items.meta.pageUrls[this.items.meta.pageUrls.length - 1].number < this.items.meta.lastPage
@@ -102,7 +115,7 @@ export default {
         orderDirection () {
             return this.items.meta.order && this.items.meta.order.startsWith('-')
                 ? 'desc'
-                : 'asc';
+                : 'asc'
         }
     },
 

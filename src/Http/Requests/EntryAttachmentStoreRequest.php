@@ -37,6 +37,20 @@ class EntryAttachmentStoreRequest extends FormRequest
 
     public function rules()
     {
-        return [];
+        return [
+            'draft_id' => 'required|uuid',
+            'name'     => 'required|string',
+            'files'    => 'required|array|size:1',
+            'files.*'  => "required|file{$this->getMimetypeRule()}",
+        ];
+    }
+
+    protected function getMimetypeRule(): string
+    {
+        if (empty($acceptRules = $this->field->getAcceptableMimetypes())) {
+            return '';
+        }
+
+        return '|mimetypes:' . implode(',', $acceptRules);
     }
 }

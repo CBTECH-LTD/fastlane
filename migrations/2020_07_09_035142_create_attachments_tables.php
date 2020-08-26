@@ -16,14 +16,17 @@ class CreateAttachmentsTables extends Migration
         Schema::create('fastlane_attachments', function (Blueprint $table) {
             $table->id();
             $table->morphs('attachable');
-            $table->string('file');
+            $table->string('name')->nullable();
+//            $table->string('field')->nullable();
             $table->string('url')->index();
+            $table->string('file');
             $table->timestamps();
         });
 
         Schema::create('fastlane_draft_attachments', function (Blueprint $table) {
             $table->id();
             $table->string('draft_id')->index();
+            $table->string('name')->nullable();
             $table->string('file');
             $table->timestamps();
         });
