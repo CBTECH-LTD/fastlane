@@ -4,9 +4,14 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+---
+
+## 0.7.0 [2020-08-27]
+
 ### Added
 - Pagination to index pages.
 - Add order and sort to the index pages.
+- File manager.
 
 ---
 
