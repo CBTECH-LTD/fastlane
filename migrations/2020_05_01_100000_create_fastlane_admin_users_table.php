@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class FastlaneAdminUsersTable extends Migration
+class CreateFastlaneAdminUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -31,6 +31,6 @@ class FastlaneAdminUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('fastlane_users');
     }
 }

@@ -3,7 +3,6 @@
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\ImageUploader;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
@@ -38,7 +37,7 @@ class ImageField extends FileField implements ExportsToApiAttributeContract
     {
         return $this->uploader->processImageUpload(
             $request->file($this->getName()),
-            app('fastlane')->getRequestEntryType()
+            app('fastlane')->getRequest()->getEntryType()
         );
     }
 
@@ -53,7 +52,7 @@ class ImageField extends FileField implements ExportsToApiAttributeContract
     {
         parent::writeValue(
             $model,
-            $this->uploader->prepareValueToFill($value, $requestData),
+            [$this->uploader->prepareValueToFill($value, $requestData)],
             $requestData
         );
     }

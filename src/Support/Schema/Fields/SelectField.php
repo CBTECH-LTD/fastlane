@@ -115,9 +115,7 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
             'type'     => $this->renderAsCheckbox ? 'checkbox' : 'select',
         ]);
 
-        if ($destination === 'form') {
-            $this->resolveOptions($entryInstance);
-        }
+        $this->resolveOptions($entryInstance);
     }
 
     protected function resolveOptions(EntryInstance $entryInstance): void

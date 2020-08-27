@@ -23,6 +23,7 @@ import FSpinner from './Components/Spinner'
 import FTableCard from './Components/TableCard'
 import FTheAppLayout from './Components/TheAppLayout'
 import FTrix from './Components/Trix'
+import YearInput from './Components/Form/YearInput'
 
 export default {
     install (Vue) {
@@ -50,6 +51,7 @@ export default {
         Vue.component('f-form-field', FFormField)
         Vue.component('f-form-field-panel', FFormFieldPanel)
         Vue.component('f-form-date-time-input', FFormDateTimeInput)
+        Vue.component('f-form-year-input', YearInput)
         Vue.component('f-form-file-input', FformFileInput)
         Vue.component('f-form-radio-input', FFormRadioInput)
         Vue.component('f-form-rich-editor-input', FFormRichEditorInput)

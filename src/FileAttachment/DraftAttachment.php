@@ -18,6 +18,7 @@ class DraftAttachment extends Model implements Recordable
     protected $fillable = [
         'draft_id',
         'file',
+        'name',
     ];
 
     public static function persistAllDraft(string $draftId, SchemaField $field, Model $model): void
@@ -33,6 +34,7 @@ class DraftAttachment extends Model implements Recordable
         Attachment::create([
             'attachable_type' => get_class($model),
             'attachable_id'   => $model->getKey(),
+            'name'            => $this->name,
             'file'            => $this->file,
             'url'             => Storage::disk(config('fastlane.attachment_disk'))->url($this->file),
         ]);

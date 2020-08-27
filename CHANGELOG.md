@@ -6,6 +6,23 @@ All notable changes to `fastlane` will be documented in this file
 
 ---
 
+## 0.7.0 [2020-08-27]
+
+### Added
+- Pagination to index pages.
+- Add order and sort to the index pages.
+- File manager.
+
+---
+
+## 0.6.0 [2020-08-23]
+
+### Added
+- Year field.
+- DateTime renderer on admin panel.
+
+---
+
 ## 0.5.0 [2020-08-23]
 
 ### Changed

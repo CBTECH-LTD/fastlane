@@ -8,7 +8,7 @@ class EntryImageStoreRequest extends FormRequest
 {
     protected ?ImageField $field = null;
 
-    public function authorizeRequest()
+    public function authorize()
     {
         return $this->field() instanceof ImageField;
     }
@@ -24,7 +24,7 @@ class EntryImageStoreRequest extends FormRequest
             return $this->field;
         }
 
-        $field = $this->entryType()->schema()->findField($this->fieldName);
+        $field = $this->entryInstance()->schema()->findField($this->fieldName);
 
         if (! $field instanceof ImageField) {
             abort(404, 'Field does not accept images.');

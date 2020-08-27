@@ -6,16 +6,19 @@ use CbtechLtd\Fastlane\EntryTypes\Hooks\BeforeHydratingHook;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\FastlaneFacade;
+use CbtechLtd\Fastlane\QueryFilter\QueryFilter;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollection;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -154,21 +157,23 @@ abstract class EntryType implements EntryTypeContract
         return true;
     }
 
-    public function getItems(): Collection
+    public function getItems(?QueryFilterContract $queryFilter = null): LengthAwarePaginator
     {
         $this->gate->authorize('list', $this->model());
 
-        $query = $this
-            ->newModelInstance()
-            ->newModelQuery()
-            ->orderBy('created_at')
-            ->orderBy('id');
+        $query = ($queryFilter ?? new QueryFilter)
+            ->addOrder('created_at')
+            ->addOrder('id')
+            ->pipeThrough(
+                $this->newModelInstance()->newModelQuery()
+            );
 
         $this->queryItems($query);
 
-        return Collection::make($query->get())->map(function (Model $model) {
-            return $this->newInstance($model);
-        });
+        $pagination = $query->paginate($this->getItemsPerPage());
+        $pagination->getCollection()->transform(fn(Model $model) => $this->newInstance($model));
+
+        return $pagination;
     }
 
     public function findItem(string $hashid): EntryInstanceContract
@@ -204,7 +209,7 @@ abstract class EntryType implements EntryTypeContract
             ->all();
 
         $data = Validator::make($request->all(), $rules)->validated();
-        
+
         // Pass the validated date through all fields, call hooks before saving,
         // then call more hooks after model has been saved.
         $this->hydrateFields($entryInstance, $fields, $data);
@@ -354,5 +359,10 @@ abstract class EntryType implements EntryTypeContract
                     }
                 }
             });
+    }
+
+    protected function getItemsPerPage(): int
+    {
+        return config('fastlane.control_panel.pagination_per_page');
     }
 }

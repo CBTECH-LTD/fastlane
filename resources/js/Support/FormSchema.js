@@ -22,6 +22,9 @@ function generateMethods (form) {
         getDirty: {
             value: () => filter(form, field => field.isDirty()),
         },
+        getField: {
+            value: (name) => form[name]
+        },
         getAll: {
             value: () => form,
         },
@@ -79,6 +82,7 @@ export function FormSchemaFactory (data, schema) {
                 ? component.buildForSchema({ field, component, value, data })
                 : FormFieldFactory(field, component, value)
         )
+
     })
 
     return generateMethods(__fields)

@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
 
@@ -64,15 +65,6 @@ class DateField extends AbstractBaseField implements ExportsToApiAttributeContra
         ];
     }
 
-    protected function getConfig(): array
-    {
-        return [
-            'displayFormat' => $this->getDisplayFormat(),
-            'enableTime'    => $this->enableTime,
-            'enableSeconds' => $this->enableSeconds,
-        ];
-    }
-
     protected function getTypeRules(): array
     {
         return [
@@ -92,5 +84,14 @@ class DateField extends AbstractBaseField implements ExportsToApiAttributeContra
         return $this->enableTime
             ? ['dateTime']
             : ['date'];
+    }
+
+    protected function resolveConfig(EntryInstanceContract $entryInstance, string $destination): void
+    {
+        $this->resolvedConfig = $this->resolvedConfig->merge([
+            'displayFormat' => $this->getDisplayFormat(),
+            'enableTime'    => $this->enableTime,
+            'enableSeconds' => $this->enableSeconds,
+        ]);
     }
 }

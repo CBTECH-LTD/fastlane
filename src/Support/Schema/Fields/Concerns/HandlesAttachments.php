@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields\Concerns;
 
+use CbtechLtd\Fastlane\FileAttachment\Attachment;
 use CbtechLtd\Fastlane\FileAttachment\StoreDraftAttachment;
 use Closure;
 use Illuminate\Http\Request;

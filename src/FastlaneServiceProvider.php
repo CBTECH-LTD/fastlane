@@ -222,21 +222,42 @@ class FastlaneServiceProvider extends ServiceProvider
         }
 
         // Add a macro to generate Control Panel routes
-        Router::macro('fastlaneControlPanel', function (string $prefix, string $controller) {
-            $this->group(['prefix' => '/entry-types/' . $prefix], function () use ($prefix, $controller) {
-                $this->get('/', [$controller, 'index'])->name("{$prefix}.index");
-                $this->get('/new', [$controller, 'create'])->name("{$prefix}.create");
-                $this->post('/', [$controller, 'store'])->name("{$prefix}.store");
-                $this->get('/{id}', [$controller, 'edit'])->name("{$prefix}.edit");
-                $this->patch('/{id}', [$controller, 'update'])->name("{$prefix}.update");
-                $this->delete('/{id}', [$controller, 'delete'])->name("{$prefix}.delete");
+        Router::macro('fastlaneControlPanel', function (string $prefix, string $controller, array $disabledRoutes = []) {
+            $this->group(['prefix' => '/entry-types/' . $prefix], function () use ($prefix, $controller, $disabledRoutes) {
+                if (! in_array('index', $disabledRoutes)) {
+                    $this->get('/', [$controller, 'index'])->name("{$prefix}.index");
+                }
+
+                if (! in_array('create', $disabledRoutes)) {
+                    $this->get('/new', [$controller, 'create'])->name("{$prefix}.create");
+                }
+
+                if (! in_array('store', $disabledRoutes)) {
+                    $this->post('/', [$controller, 'store'])->name("{$prefix}.store");
+                }
+
+                if (! in_array('edit', $disabledRoutes)) {
+                    $this->get('/{id}', [$controller, 'edit'])->name("{$prefix}.edit");
+                }
+
+                if (! in_array('update', $disabledRoutes)) {
+                    $this->patch('/{id}', [$controller, 'update'])->name("{$prefix}.update");
+                }
+
+                if (! in_array('delete', $disabledRoutes)) {
+                    $this->delete('/{id}', [$controller, 'delete'])->name("{$prefix}.delete");
+                }
 
                 // Attachment management routes
-                $this->post('/attachments/{fieldName}', [EntryAttachmentsController::class, 'store'])->name("{$prefix}.attachments");
-                $this->delete('/attachments/{fieldName}', [EntryAttachmentsController::class, 'delete']);
+                if (! in_array('attachments', $disabledRoutes)) {
+                    $this->post('/attachments/{fieldName}', [EntryAttachmentsController::class, 'store'])->name("{$prefix}.attachments");
+                    $this->delete('/attachments/{fieldName}', [EntryAttachmentsController::class, 'delete']);
+                }
 
                 // Image upload routes
-                $this->post('/images/{fieldName}', [EntryImagesController::class, 'store'])->name("{$prefix}.images");
+                if (! in_array('image', $disabledRoutes)) {
+                    $this->post('/images/{fieldName}', [EntryImagesController::class, 'store'])->name("{$prefix}.images");
+                }
             });
         });
 
@@ -260,6 +281,14 @@ class FastlaneServiceProvider extends ServiceProvider
         Inertia::version(function () {
             return md5_file(__DIR__ . '/../public/mix-manifest.json');
         });
+    }
+
+    protected function registerDisks(): void
+    {
+        $this->app->config['filesystems.disks.fastlane'] = [
+            'driver' => 'local',
+            'root'   => storage_path('app/fastlane'),
+        ];
     }
 
     protected function setupControlPanelRoutes(): void

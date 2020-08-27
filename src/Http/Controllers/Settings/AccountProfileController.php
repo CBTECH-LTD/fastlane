@@ -12,10 +12,10 @@ class AccountProfileController extends AbstractAccountsController
 {
     public function edit()
     {
-        $resource = new EntryResource(Auth::user(), $this->entryType());
+        $instance = $this->entryType()->newInstance(Auth::user());
 
         return $this->render('Settings/ProfileEdit', [
-            'item'        => $resource->toUpdate()->transform(),
+            'item'        => (new EntryResource($instance))->toUpdate()->transform(),
             'links'       => [
                 'form' => route('cp.account.profile'),
             ],
@@ -37,8 +37,6 @@ class AccountProfileController extends AbstractAccountsController
 
     protected function entryType(): BackendUserEntryType
     {
-        return app('fastlane')->getEntryTypeByClass(BackendUserEntryType::class)
-            ->new(Auth::user())
-            ->resolve([]);
+        return app('fastlane')->getEntryTypeByClass(BackendUserEntryType::class);
     }
 }

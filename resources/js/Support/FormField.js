@@ -1,6 +1,8 @@
 import Vue from 'vue'
 
 export function FormFieldFactory (field, component, value, customData = {}) {
+    const $bus = new Vue
+
     return Vue.observable({
         ...field,
         component,
@@ -15,6 +17,12 @@ export function FormFieldFactory (field, component, value, customData = {}) {
         },
         isDirty () {
             return this.value !== this.originalValue
+        },
+        onValueChanged (callback) {
+            $bus.$on('value-changed', callback)
+        },
+        emitValueChanged (data) {
+            $bus.$emit('value-changed', data)
         },
         ...customData,
     })

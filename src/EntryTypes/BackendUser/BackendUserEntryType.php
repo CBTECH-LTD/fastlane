@@ -13,6 +13,7 @@ use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules;
 use CbtechLtd\Fastlane\Support\Schema\Fields\SelectField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
@@ -71,8 +72,8 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
                 )
                 ->required()
                 ->showOnIndex()
-                ->hideOnForm(function () {
-                    return Auth::user()->is($this->modelInstance());
+                ->hideOnForm(function (EntryInstance $entryInstance) {
+                    return Auth::user()->is($entryInstance->model());
                 })
                 ->writeValueUsing(function (EntryInstance $entryInstance, $value) {
                     if ($value) {
@@ -99,15 +100,16 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
         return $user->createToken($name, $abilities);
     }
 
-    public function updateAuthenticatedUser(Request $request): User
+    public function updateAuthenticatedUser(Request $request): EntryInstance
     {
-        $entry = Auth::user();
+        $entryInstance = $this->newInstance(Auth::user());
 
         // Validate the request data against the update fields
         // and save the validated data in a new variable.
-        $fields = $this->schema()->getUpdateFields();
+        $fields = $entryInstance->schema()->getUpdateFields();
 
         $rules = Collection::make($fields)
+            ->filter(fn(SchemaField $f) => $f instanceof WithRules)
             ->mapWithKeys(fn(SchemaField $fieldType) => $fieldType->getUpdateRules())
             ->all();
 
@@ -115,19 +117,18 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
 
         // Pass the validated date through all fields, call hooks before saving,
         // then call more hooks after model has been saved.
-        $this->hydrateFields($entry, $fields, $data);
+        $this->hydrateFields($entryInstance, $fields, $data);
 
-        $beforeHook = new OnSavingHook($this, $entry, $data);
-        $this->executeHooks(static::HOOK_BEFORE_UPDATING, $beforeHook);
-        $this->executeHooks(static::HOOK_BEFORE_SAVING, $beforeHook);
+        $savingHook = new OnSavingHook($entryInstance, $data);
+        $this->executeHooks(static::HOOK_BEFORE_UPDATING, $savingHook);
+        $this->executeHooks(static::HOOK_BEFORE_SAVING, $savingHook);
 
-        $beforeHook->model()->save();
+        $savingHook->entryInstance()->saveModel();
 
-        $afterHook = new OnSavingHook($this, $beforeHook->model(), $data);
-        $this->executeHooks(static::HOOK_AFTER_UPDATING, $afterHook);
-        $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
+        $this->executeHooks(static::HOOK_AFTER_UPDATING, $savingHook);
+        $this->executeHooks(static::HOOK_AFTER_SAVING, $savingHook);
 
-        return $afterHook->model();
+        return $savingHook->entryInstance();
     }
 
     protected function queryItems(Builder $query): void

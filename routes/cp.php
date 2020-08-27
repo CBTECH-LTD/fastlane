@@ -58,7 +58,7 @@ Route::middleware(['fastlane.auth:fastlane-cp', 'verified'])->group(function ($r
     $router->patch('account/security', [AccountSecurityController::class, 'update']);
 
     $router->get('account/tokens', [AccountTokensController::class, 'index'])->name('account.tokens.index');
-    $router->get('account/tokens/new', [AccountTokensController::class, 'create'])->name('account.tokens.create')->middleware('password.confirm');
+    $router->get('account/tokens/new', [AccountTokensController::class, 'create'])->name('account.tokens.create')->middleware('password.confirm:cp.password.confirm');
     $router->post('account/tokens', [AccountTokensController::class, 'store'])->name('account.tokens.store');
     $router->delete('account/tokens/{token}', [AccountTokensController::class, 'destroy'])->name('account.tokens.destroy');
 

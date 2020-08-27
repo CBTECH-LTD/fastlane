@@ -6,9 +6,16 @@ use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Support\Contracts\WithCollectionLinks;
+use CbtechLtd\Fastlane\Support\Contracts\WithCollectionMeta;
+use CbtechLtd\Fastlane\Support\Contracts\WithCustomViews;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
+use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
+use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;
+use CbtechLtd\Support\QueryFilter;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
@@ -35,23 +42,52 @@ class EntriesController extends Controller
 
     public function index()
     {
-        $items = $this->entryType()->getItems()
-            ->mapInto(EntryResource::class)
-            ->transform(fn(EntryResource $res) => $res->toIndex());
+        /** @var LengthAwarePaginator $paginator */
+        $paginator = $this->entryType()->getItems(
+            $this->fastlane->getRequest()->buildQueryFilter()
+        );
 
-        $collection = EntryResourceCollection::make($items->all())
-            ->forEntryType($this->entryType());
+        // Redirect to the first pagination page if the requested page
+        // is bigger than the maximum existent page in the paginator.
+        if ($paginator->currentPage() > $paginator->lastPage()) {
+            return redirect()->route(
+                "cp.{$this->entryType()->identifier()}.index",
+                Collection::make(request()->query())->except(['page'])->all()
+            );
+        }
 
-        return $this->render('Entries/Index', [
-            'items'     => $collection->transform(),
-            'entryType' => [
-                'schema'        => $this->entryInstance()->schema()->getIndexFields(),
-                'singular_name' => $this->entryType()->name(),
-                'plural_name'   => Str::plural($this->entryType()->name()),
-            ],
-            'links'     => [
-                'create' => URL::relative("cp.{$this->entryType()->identifier()}.create"),
-            ],
+        // Transform the paginator collection, which is composed of
+        // entry instances, into a collection of entry resources ready
+        // to be transformed to our front-end application.
+        $paginator->getCollection()
+            ->transform(
+                fn(EntryInstance $entry) => (new EntryResource($entry))->toIndex()
+            );
+
+        $collection = EntryResourceCollection::makeFromPaginator($paginator)
+            ->forEntryType($this->entryType())
+            ->withMeta([
+                ResourceMeta::make('order', $this->fastlane->getRequest()->input('order')),
+            ]);
+
+        if ($this->entryType() instanceof WithCollectionLinks) {
+            $collection->withLinks($this->entryType()->collectionLinks());
+        }
+
+        if ($this->entryType() instanceof WithCollectionMeta) {
+            $collection->withMeta($this->entryType()->collectionMeta());
+        }
+
+        // Return the transformed collection and some important information like
+        // entry type schema, names and links.
+        $view = function () {
+            return $this->entryType() instanceof WithCustomViews
+                ? $this->entryType()->getIndexView()
+                : null;
+        };
+
+        return $this->render($view() ?? 'Entries/Index', [
+            'items' => $collection->transform(),
         ]);
     }
 
@@ -61,8 +97,14 @@ class EntriesController extends Controller
             $this->authorize('create', $this->entryType()->model());
         }
 
-        return $this->render('Entries/Create', [
-            'item'      => (new EntryResource($this->entryInstance()))->toUpdate()->transform(),
+        $view = function () {
+            return $this->entryType() instanceof WithCustomViews
+                ? $this->entryType()->getCreateView()
+                : null;
+        };
+
+        return $this->render($view() ?? 'Entries/Create', [
+            'item'      => (new EntryResource($this->entryInstance()))->toCreate()->transform(),
             'entryType' => [
                 'schema'        => $this->entryInstance()->schema()->getCreateFields(),
                 'panels'        => Collection::make($this->entryInstance()->schema()->getPanels()),
@@ -91,7 +133,13 @@ class EntriesController extends Controller
             $this->authorize('update', $this->entryInstance()->model());
         }
 
-        return $this->render('Entries/Edit', [
+        $view = function () {
+            return $this->entryType() instanceof WithCustomViews
+                ? $this->entryType()->getEditView()
+                : null;
+        };
+
+        return $this->render($view() ?? 'Entries/Edit', [
             'item' => (new EntryResource($this->entryInstance()))->toUpdate()->transform(),
         ]);
     }
