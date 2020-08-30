@@ -2,10 +2,8 @@
     <f-the-app-layout>
         <template v-slot:page-sidebar>
             <f-sidebar>
-                <template v-slot:title>Account Settings</template>
-                <template v-slot:description>
-                    Here you can setup your profile, change your password and manage API tokens.
-                </template>
+                <template v-slot:title>{{ $l('core.account_settings.title') }}</template>
+                <template v-slot:description>{{ $l('core.account_settings.description') }}</template>
 
                 <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scroll">
                     <f-navigation-list class="my-6" :items="sidebarMenu"/>

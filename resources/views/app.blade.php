@@ -11,6 +11,13 @@
 <body class="font-sans antialiased h-screen bg-white">
 @inertia
 
+<script>
+    window.fastlane = {
+        locale: '{{ config('app.locale', 'en') }}',
+        translations: @json(app('fastlane')->getTranslations())
+    }
+</script>
+
 <script src="{{ mix('manifest.js', 'vendor/fastlane') }}"></script>
 <script src="{{ mix('vendor.js', 'vendor/fastlane') }}"></script>
 <script src="{{ mix('app.js', 'vendor/fastlane') }}"></script>

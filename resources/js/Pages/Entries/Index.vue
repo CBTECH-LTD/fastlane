@@ -3,7 +3,7 @@
         <template v-slot:title>{{ items.meta.entry_type.plural_name }}</template>
         <template v-slot:actions>
             <slot name="actions">
-                <f-button v-if="items.links.create" :href="items.links.create" left-icon="plus" size="lg">Add {{ items.meta.entry_type.singular_name }}</f-button>
+                <f-button v-if="items.links.create" :href="items.links.create" left-icon="plus" size="lg">{{ $l('core.add') }} {{ items.meta.entry_type.singular_name }}</f-button>
             </slot>
         </template>
 

@@ -15,6 +15,7 @@ use CbtechLtd\Fastlane\Support\Menu\MenuManager;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -25,16 +26,13 @@ class Fastlane
     protected array $flashMessages = [];
     protected MenuManagerContract $menuManager;
     protected FastlaneRequest $request;
+    protected array $translations = [];
 
     public function __construct()
     {
-        $this->initialize();
-    }
-
-    public function initialize(): void
-    {
         $this->registerEntryTypes();
         $this->registerMenuManager();
+        $this->registerTranslations();
     }
 
     public function setRequest(FastlaneRequest $request): self
@@ -169,6 +167,11 @@ class Fastlane
         ];
     }
 
+    public function getTranslations(): array
+    {
+        return $this->translations;
+    }
+
     public function getMenuManager(): MenuManagerContract
     {
         return $this->menuManager;
@@ -205,5 +208,12 @@ class Fastlane
     protected function registerMenuManager(): void
     {
         $this->menuManager = new MenuManager;
+    }
+
+    protected function registerTranslations(): void
+    {
+        $this->translations = [
+            'core' => Lang::get('fastlane::core'),
+        ];
     }
 }

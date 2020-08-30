@@ -23,9 +23,11 @@ use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Translation\Translator;
 use Inertia\Inertia;
 
 class FastlaneServiceProvider extends ServiceProvider
@@ -70,7 +72,7 @@ class FastlaneServiceProvider extends ServiceProvider
             // Publishing the translation files.
             $this->publishes([
                 __DIR__ . '/../resources/lang' => resource_path('lang/vendor/fastlane'),
-            ], 'lang');
+            ], 'fastlane-lang');
 
             // Registering package commands.
             $this->commands([

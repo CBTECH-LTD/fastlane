@@ -93,7 +93,7 @@ export default {
             proudlyDisplayPoweredByUppy: false,
             onRequestCloseModal: () => this.closeModal(),
             metaFields: [
-                { id: 'name', name: 'Name', placeholder: 'File name' }
+                { id: 'name', name: this.$l('core.fields.name'), placeholder: this.$l('core.fields.name') }
             ]
             // note: 'Images up to 10 MB',
         }).use(ImageEditor, {

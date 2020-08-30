@@ -4,7 +4,7 @@
         <template v-slot:subtitle>{{ item.meta.entry_type.singular_name }}</template>
         <template v-slot:actions>
             <f-button :href="item.links.parent" variant="outline" left-icon="arrow-left">
-                Back to list
+                {{ $l('core.back_to_list') }}
             </f-button>
             <f-button submit form="editForm"
                       class="ml-4"
@@ -14,7 +14,7 @@
                       :disabled="isFormDisabled"
                       :aria-disabled="isFormDisabled"
                       :loading="isUpdating">
-                Save
+                {{ $l('core.save') }}
             </f-button>
         </template>
 
@@ -28,17 +28,17 @@
             <template v-slot:title>
                 <span class="flex items-center text-danger-600">
                     <f-icon name="exclamation-triangle" class="text-2xl mr-2"/>
-                    Danger Zone
+                    {{ $l('core.danger_zone') }}
                 </span>
             </template>
 
             <div class="flex justify-between">
                 <div class="flex flex-col text-sm">
-                    <strong class="font-bold text-gray-900">Delete this entry?</strong>
-                    <span class="font-normal text-gray-800">Once you delete an entry, there is no going back. Please be certain</span>
+                    <strong class="font-bold text-gray-900">{{ $l('core.delete_entry_title') }}</strong>
+                    <span class="font-normal text-gray-800">{{ $l('core.delete_entry_description') }}</span>
                 </div>
                 <div>
-                    <f-button @click="deleteItem" color="danger" variant="outline" left-icon="trash">Delete this entry</f-button>
+                    <f-button @click="deleteItem" color="danger" variant="outline" left-icon="trash">{{ $l('core.delete_entry_button') }}</f-button>
                 </div>
             </div>
         </f-boxed-card>
@@ -46,70 +46,70 @@
 </template>
 
 <script>
-    import Dialogs from '../../Support/Dialogs'
-    import { FormSchemaFactory } from '../../Support/FormSchema'
+import Dialogs from '../../Support/Dialogs'
+import { FormSchemaFactory } from '../../Support/FormSchema'
 
-    export default {
-        name: 'Entries.Edit',
+export default {
+    name: 'Entries.Edit',
 
-        props: {
-            item: {
-                required: true,
-                type: Object,
-            },
+    props: {
+        item: {
+            required: true,
+            type: Object,
+        },
+    },
+
+    // remember: ['form'],
+
+    data () {
+        return {
+            isUpdating: false,
+            form: new FormSchemaFactory(
+                this.item.attributes, this.item.meta.entry_type.schema
+            )
+        }
+    },
+
+    computed: {
+        isFormDisabled () {
+            return this.isUpdating || !this.form.isDirty()
+        },
+    },
+
+    methods: {
+        getFieldSlot (field) {
+            return field.panel
+                ? `${field.panel}____${field.name}`
+                : `default_panel____${field.name}`
         },
 
-        // remember: ['form'],
+        async submitForm () {
+            const formObject = this.form.toFormObject()
 
-        data () {
-            return {
-                isUpdating: false,
-                form: new FormSchemaFactory(
-                    this.item.attributes, this.item.meta.entry_type.schema
-                )
+            if (formObject && this.form.isDirty() && !this.isUpdating) {
+                this.isUpdating = true
+
+                try {
+                    await this.$inertia.patch(this.item.links.self, formObject.all(), {
+                        preserveState: false,
+                    })
+                } catch {}
+
+                this.isUpdating = false
             }
         },
 
-        computed: {
-            isFormDisabled () {
-                return this.isUpdating || !this.form.isDirty()
-            },
-        },
+        async deleteItem () {
+            if (!this.isUpdating && await Dialogs.confirm('Are you absolutely sure?')) {
+                this.isUpdating = true
 
-        methods: {
-            getFieldSlot (field) {
-                return field.panel
-                    ? `${field.panel}____${field.name}`
-                    : `default_panel____${field.name}`
-            },
+                try {
+                    await this.$inertia.delete(this.item.links.self)
+                } catch {}
 
-            async submitForm () {
-                const formObject = this.form.toFormObject()
-
-                if (formObject && this.form.isDirty() && !this.isUpdating) {
-                    this.isUpdating = true
-
-                    try {
-                        await this.$inertia.patch(this.item.links.self, formObject.all(), {
-                            preserveState: false,
-                        })
-                    } catch {}
-
-                    this.isUpdating = false
-                }
-            },
-
-            async deleteItem () {
-                if (!this.isUpdating && await Dialogs.confirm('Are you absolutely sure?')) {
-                    this.isUpdating = true
-
-                    try {
-                        await this.$inertia.delete(this.item.links.self)
-                    } catch {}
-
-                    this.isUpdating = true
-                }
+                this.isUpdating = true
             }
         }
     }
+}
 </script>

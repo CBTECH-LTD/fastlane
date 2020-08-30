@@ -1,9 +1,9 @@
 <template>
     <f-the-app-layout>
-        <template v-slot:title>New {{ item.meta.entry_type.singular_name }}</template>
+        <template v-slot:title>{{ $l('core.new') }} {{ item.meta.entry_type.singular_name }}</template>
         <template v-slot:actions>
             <f-button :href="links.parent" variant="outline" left-icon="arrow-left">
-                Back to list
+                {{ $l('core.back_to_list') }}
             </f-button>
             <f-button submit form="createForm"
                       class="ml-4"
@@ -13,7 +13,7 @@
                       :disabled="isFormDisabled"
                       :aria-disabled="isFormDisabled"
                       :loading="isCreating">
-                Save
+                {{ $l('core.save') }}
             </f-button>
         </template>
 
@@ -26,55 +26,55 @@
 </template>
 
 <script>
-    import { FormSchemaFactory } from '../../Support/FormSchema'
+import { FormSchemaFactory } from '../../Support/FormSchema'
 
-    export default {
-        name: 'Entries.Create',
+export default {
+    name: 'Entries.Create',
 
-        props: {
-            item: {
-                required: true,
-                type: Object,
-            },
-            links: {
-                required: true,
-                type: Object,
-            },
+    props: {
+        item: {
+            required: true,
+            type: Object,
+        },
+        links: {
+            required: true,
+            type: Object,
+        },
+    },
+
+    remember: ['form'],
+
+    data () {
+        return {
+            isCreating: false,
+            form: new FormSchemaFactory(this.item.attributes, this.item.meta.entry_type.schema),
+        }
+    },
+
+    computed: {
+        isFormDisabled () {
+            return this.isCreating || !this.form.isDirty()
+        }
+    },
+
+    methods: {
+        getFieldSlot (field) {
+            return field.panel
+                ? `${field.panel}____${field.name}`
+                : `default_panel____${field.name}`
         },
 
-        remember: ['form'],
+        async submitForm () {
+            if (this.form.isDirty() && !this.isCreating) {
+                this.isCreating = true
 
-        data () {
-            return {
-                isCreating: false,
-                form: new FormSchemaFactory(this.item.attributes, this.item.meta.entry_type.schema),
-            }
-        },
+                try {
+                    await this.$inertia.post(this.links.form, this.form.toFormObject(false).all())
+                } catch {}
 
-        computed: {
-            isFormDisabled () {
-                return this.isCreating || !this.form.isDirty()
-            }
-        },
-
-        methods: {
-            getFieldSlot (field) {
-                return field.panel
-                    ? `${field.panel}____${field.name}`
-                    : `default_panel____${field.name}`
-            },
-
-            async submitForm () {
-                if (this.form.isDirty() && !this.isCreating) {
-                    this.isCreating = true
-
-                    try {
-                        await this.$inertia.post(this.links.form, this.form.toFormObject(false).all())
-                    } catch {}
-
-                    this.isCreating = false
-                }
+                this.isCreating = false
             }
         }
     }
+}
 </script>

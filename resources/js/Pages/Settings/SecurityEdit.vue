@@ -1,6 +1,6 @@
 <template>
     <AccountSettings :sidebar-menu="sidebarMenu">
-        <template v-slot:title>Edit your password</template>
+        <template v-slot:title>{{ $l('core.account_settings.security_title') }}</template>
         <template v-slot:actions>
             <f-button submit form="editForm"
                       class="ml-4"
@@ -10,7 +10,7 @@
                       :disabled="isFormDisabled"
                       :aria-disabled="isFormDisabled"
                       :loading="isUpdating">
-                Save
+                {{ $l('core.save') }}
             </f-button>
         </template>
 
@@ -19,7 +19,6 @@
 </template>
 
 <script>
-import map from 'lodash/map'
 import AccountSettings from './Shared/AccountSettings'
 import { FormSchemaFactory } from '../../Support/FormSchema'
 
@@ -56,8 +55,8 @@ export default {
         return {
             isUpdating: false,
             form: new FormSchemaFactory({}, [
-                makeField('New password', 'password', 'password'),
-                makeField('Confirm new password', 'password_confirmation', 'password'),
+                makeField(this.$l('core.account_settings.security_new_password'), 'password', 'password'),
+                makeField(this.$l('core.account_settings.security_confirm_new_password'), 'password_confirmation', 'password'),
             ])
         }
     },

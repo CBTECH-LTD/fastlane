@@ -56,7 +56,7 @@ class ContentEntryType extends EntryType implements RenderableOnMenu
 
             BlockEditorField::make('blocks', __('fastlane::core.fields.blocks')),
 
-            FieldPanel::make('Settings')->withIcon('tools')
+            FieldPanel::make(__('fastlane::core.settings'))->withIcon('tools')
                 ->withFields([
                     ToggleField::make('is_active', __('fastlane::core.fields.active'))
                         ->required()

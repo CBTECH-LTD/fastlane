@@ -65,16 +65,16 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
     public function fields(): array
     {
         return [
-            StringField::make('name', 'Name')
+            StringField::make('name', __('fastlane::core.fields.name'))
                 ->required()
                 ->showOnIndex(),
 
-            StringField::make('email', 'Email')
+            StringField::make('email', __('fastlane::core.fields.email'))
                 ->required()
                 ->unique(new Unique(User::class, 'email'))
                 ->showOnIndex(),
 
-            SelectField::make('role', 'Role')
+            SelectField::make('role', __('fastlane::core.fields.role'))
                 ->withOptions(
                     Role::all()->map(
                         fn(Role $role) => SelectOption::make($role->name, $role->name)
@@ -91,7 +91,7 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
                     }
                 }),
 
-            ToggleField::make('is_active', 'Active')
+            ToggleField::make('is_active', __('fastlane::core.fields.active'))
                 ->required()
                 ->setDefault(true),
         ];

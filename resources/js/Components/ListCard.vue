@@ -9,7 +9,7 @@
                     <f-icon name="exclamation-triangle"/>
                 </div>
                 <strong class="block text-gray-700 mb-2">
-                    <slot name="empty-title">Nothing to show here.</slot>
+                    <slot name="empty-title">{{ $l('core.empty_lists') }}</slot>
                 </strong>
                 <span class="text-gray-600">
                     <slot name="empty-message"/>
@@ -34,14 +34,14 @@
 
 <script>
 
-    export default {
-        name: 'List',
+export default {
+    name: 'List',
 
-        props: {
-            items: {
-                type: Array,
-                required: true,
-            }
+    props: {
+        items: {
+            type: Array,
+            required: true,
         }
     }
+}
 </script>
