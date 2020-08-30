@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="mt-20 w-full flex-grow flex">
-            <div class="flex flex-col bg-white h-screen sticky top-0 overflow-hidden" style="width: 320px">
+            <div class="flex flex-col bg-white h-screen sticky overflow-hidden" style="width: 320px; top: 80px;">
                 <!-- Navigation items -->
                 <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scroll">
                     <f-navigation-list class="my-6 px-2" :items="this.$page.menu"/>
@@ -30,7 +30,7 @@
                 <div v-if="$slots.hasOwnProperty('page-sidebar')">
                     <slot name="page-sidebar"/>
                 </div>
-                <div class="flex-grow bg-gray-200 mb-8" style="border-radius: 2rem">
+                <div class="flex-grow mb-8" style="border-radius: 2rem">
                     <div v-if="$slots.hasOwnProperty('title')" ref="sticky" class="title-bar-wrapper" :class="stickyBarClass">
                         <div class="title-bar">
                             <div class="div">
@@ -110,7 +110,7 @@ export default {
 
 <style scoped>
 .title-bar-wrapper {
-    @apply sticky top-0 py-8 z-30 bg-gray-300 transition-all duration-300 overflow-hidden;
+    @apply sticky top-0 py-8 z-30 transition-all duration-300 overflow-hidden;
     border-top-left-radius: 2rem;
     border-top-right-radius: 2rem;
 }
@@ -131,12 +131,12 @@ export default {
 }
 
 .title-bar-wrapper.is-floating {
-    @apply bg-gray-300 pb-1 shadow-lg;
+    @apply pb-1;
 }
 
 .title-bar-wrapper.is-floating .title-bar {
-    @apply py-4 mb-12;
-    transform: translateY(50px);
+    @apply py-4 mb-12 bg-gray-100 border border-gray-300 ;
+    transform: translateY(48px);
 }
 
 .title-bar-wrapper.is-floating .title-bar__title {

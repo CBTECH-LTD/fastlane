@@ -2,12 +2,13 @@
 
 namespace CbtechLtd\Fastlane\FileAttachment;
 
+use CbtechLtd\Fastlane\FileAttachment\Contracts\DraftAttachmentHandler;
 use CbtechLtd\Fastlane\Http\Requests\EntryAttachmentStoreRequest;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\HasAttachments;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
 
-class StoreDraftAttachment
+class StoreDraftAttachment implements DraftAttachmentHandler
 {
     protected HasAttachments $field;
 
@@ -16,7 +17,7 @@ class StoreDraftAttachment
         $this->field = $field;
     }
 
-    public function __invoke(EntryAttachmentStoreRequest $request): string
+    public function handle(EntryAttachmentStoreRequest $request): DraftAttachment
     {
         $disk = Config::get('fastlane.attachment_disk');
         $data = $request->validated();
@@ -24,13 +25,10 @@ class StoreDraftAttachment
         /** @var UploadedFile $file */
         $file = $data['files'][0];
 
-        $model = DraftAttachment::create([
+        return DraftAttachment::create([
             'draft_id' => $data['draft_id'],
             'name'     => $data['name'],
             'file'     => $file->store($this->field->getStorageDirectory(), $disk),
         ]);
-
-//        return Storage::disk($disk)->url($model->file);
-        return $model->file;
     }
 }

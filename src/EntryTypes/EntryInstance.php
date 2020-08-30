@@ -5,11 +5,11 @@ namespace CbtechLtd\Fastlane\EntryTypes;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
-use CbtechLtd\Fastlane\Support\Eloquent\Contracts\LoadAttributesFromEntryType;
-use CbtechLtd\Fastlane\Support\Eloquent\Contracts\LoadRelationshipsFromEntryType;
 use CbtechLtd\Fastlane\Support\Schema\Contracts\EntrySchema as EntrySchemaContract;
 use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ReadValue;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
+use CbtechLtd\Fastlane\Support\Schema\Fields\RelationField;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
@@ -82,14 +82,35 @@ class EntryInstance implements EntryInstanceContract
     {
         $this->schema = new EntrySchema($this);
 
-        if ($this->model instanceof LoadRelationshipsFromEntryType) {
-            $this->model->loadRelationsFromEntryType($this);
-        }
+        $this->addRelationshipsToModel();
+        $this->addAttributesToModel();
+    }
 
-        if ($this->model instanceof LoadAttributesFromEntryType) {
-            $this->model->loadAttributesFromEntryType($this);
-        }
+    protected function addRelationshipsToModel(): void
+    {
+        Collection::make($this->schema()->getFields())
+            ->filter(fn(SchemaField $field) => $field instanceof RelationField)
+            ->each(function (RelationField $ft) {
+                // We dynamically add a relation to the model if there's no
+                // method declared with the same name.
+                if (! method_exists($this, $ft->getRelationshipName())) {
+                    $this->model::resolveRelationUsing(
+                        $ft->getRelationshipName(),
+                        $ft->getRelationshipMethod()
+                    );
+                }
+            });
+    }
 
+    protected function addAttributesToModel(): void
+    {
+        $fields = Collection::make($this->schema()->getFields())
+            ->filter(fn(SchemaField $field) => $field instanceof WriteValue)
+            ->mapWithKeys(function (WriteValue $ft) {
+                return $ft->toModelAttribute();
+            });
 
+        $this->model()->mergeFillable($fields->keys()->all());
+        $this->model()->mergeCasts($fields->filter()->all());
     }
 }

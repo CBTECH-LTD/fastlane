@@ -5,21 +5,17 @@ namespace CbtechLtd\Fastlane\EntryTypes\FileManager;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
 use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
-use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\WithCollectionLinks;
 use CbtechLtd\Fastlane\Support\Contracts\WithCustomController;
 use CbtechLtd\Fastlane\Support\Contracts\WithCustomViews;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
-use CbtechLtd\Fastlane\Support\Schema\Fields\FieldValue;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FileField;
-use CbtechLtd\Fastlane\Support\Schema\Fields\HiddenField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\URL;
 
 class FileManagerEntryType extends EntryType implements RenderableOnMenu, WithCustomViews, WithCollectionLinks, WithCustomController
 {
@@ -109,8 +105,9 @@ class FileManagerEntryType extends EntryType implements RenderableOnMenu, WithCu
     public function storeMany(Request $request): void
     {
         Collection::make($request->input('file'))->each(function (string $file) use ($request) {
-            $draft = DraftAttachment::where('draft_id', $request->input('file__draft_id'))
+            $draft = DraftAttachment::query()
                 ->where('file', $file)
+                ->where('draft_id', $request->input('file__draft_id'))
                 ->first();
 
             $req = Request::createFrom($request)->merge([

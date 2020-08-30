@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
+use CbtechLtd\Fastlane\FileAttachment\Attachment;
 use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
@@ -11,9 +12,7 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\HasAttachments;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Str;
 
 class FileField extends AbstractBaseField implements ExportsToApiAttributeContract, HasAttachments
 {
@@ -50,9 +49,21 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
             return call_user_func($this->readValueCallback, $entryInstance);
         }
 
-        $value = $entryInstance->model()->{$this->getName()};
-        
-        return new FieldValue($this->getName(), Storage::disk(config('fastlane.attachment_disk'))->url($value));
+        $attachment = Attachment::query()
+            ->where('file', $entryInstance->model()->{$this->getName()})
+            ->where('attachable_type', get_class($entryInstance->model()))
+            ->where('attachable_id', $entryInstance->model()->getKey())
+            ->first();
+
+        $value = $attachment instanceof Attachment
+            ? [
+                'file' => $attachment->file,
+                'name' => $attachment->name,
+                'url'  => $attachment->url,
+            ]
+            : null;
+
+        return new FieldValue($this->getName(), $value);
     }
 
     public function writeValue(EntryInstance $entryInstance, $value, array $requestData): void
@@ -72,11 +83,12 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
         // then persist all draft attachment files.
         $entryInstance->type()->addHook(EntryType::HOOK_AFTER_SAVING, function (OnSavingHook $hook) use ($requestData, $entryInstance, $value) {
             if ($this->isAcceptingAttachments() && $draftId = Arr::get($requestData, $this->getName() . '__draft_id')) {
-                DraftAttachment::where('draft_id', $draftId)
-                    ->whereIn('file', $value)
+                $attachments = DraftAttachment::query()
+                    ->where('file', $value)
+                    ->where('draft_id', $draftId)
                     ->get()
-                    ->each(function (DraftAttachment $draft) use ($draftId, $entryInstance) {
-                        $draft->persist($this, $entryInstance->model());
+                    ->map(function (DraftAttachment $draft) use ($draftId, $entryInstance) {
+                        return $draft->persist($this, $entryInstance->model());
                     });
             }
         });
@@ -87,7 +99,7 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
         return [
             // TODO: Improve the URL stuff. Something like ImageField and ImageUploader would be better.
             $this->getName()                => 'array',
-            $this->getName() . '.*'         => "sometimes|starts_with:{$this->getStorageDirectory()}/",
+            $this->getName() . '.*'         => "sometimes|exists:fastlane_draft_attachments,file",
             $this->getName() . '__draft_id' => "required_with:{$this->getName()}|uuid",
         ];
     }

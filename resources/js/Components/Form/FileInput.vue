@@ -125,7 +125,7 @@ export default {
             const value = this.field.value || []
 
             const files = map(successful, f => {
-                return f.uploadURL
+                return f.response.body.file
             })
 
             this.onInput(value.concat(files))

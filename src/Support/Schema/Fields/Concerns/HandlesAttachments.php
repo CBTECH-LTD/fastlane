@@ -2,21 +2,16 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields\Concerns;
 
-use CbtechLtd\Fastlane\FileAttachment\Attachment;
+use CbtechLtd\Fastlane\FileAttachment\Contracts\DraftAttachmentHandler;
+use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
 use CbtechLtd\Fastlane\FileAttachment\StoreDraftAttachment;
+use CbtechLtd\Fastlane\Http\Requests\EntryAttachmentStoreRequest;
 use Closure;
-use Illuminate\Http\Request;
 
 trait HandlesAttachments
 {
     /** @var Closure */
-    protected $addFileCallback;
-
-    /** @var Closure */
-    protected $removeFileCallback;
-
-    /** @var Closure */
-    protected $purgeDraftFilesCallback;
+    protected $addFileHandler;
 
     /** @var bool | Closure */
     protected $acceptFiles = true;
@@ -33,13 +28,13 @@ trait HandlesAttachments
         return $this->storageDirectory;
     }
 
-    public function storeAttachment(Request $request): string
+    public function storeAttachment(EntryAttachmentStoreRequest $request): DraftAttachment
     {
-        $callback = is_callable($this->addFileCallback)
-            ? $this->addFileCallback
+        $callback = is_callable($this->addFileHandler)
+            ? $this->addFileHandler
             : new StoreDraftAttachment($this);
 
-        return call_user_func($callback, $request);
+        return $callback->handle($request);
     }
 
     /**
@@ -52,21 +47,9 @@ trait HandlesAttachments
         return $this;
     }
 
-    public function storeAttachmentUsing($callback): self
+    public function storeAttachmentUsing(DraftAttachmentHandler $handler): self
     {
-        $this->addFileCallback = $callback;
-        return $this;
-    }
-
-    public function removeFileUsing($callback): self
-    {
-        $this->removeFileCallback = $callback;
-        return $this;
-    }
-
-    public function purgeDraftFilesUsing($callback): self
-    {
-        $this->purgeDraftFilesCallback = $callback;
+        $this->addFileHandler = $handler;
         return $this;
     }
 
