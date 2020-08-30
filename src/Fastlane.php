@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
+use CbtechLtd\Fastlane\EntryTypes\Content\ContentEntryType;
 use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
 use CbtechLtd\Fastlane\Exceptions\EntryTypeNotRegisteredException;
 use CbtechLtd\Fastlane\Http\Controllers;
@@ -179,7 +180,11 @@ class Fastlane
         // We don't add built-in types to the default config file because
         // it would error prone (devs could just remove it), but for now
         // we require all these built-in types to be correctly registered.
-        $builtinTypes = [FileManagerEntryType::class, BackendUserEntryType::class];
+        $builtinTypes = [
+            ContentEntryType::class,
+            FileManagerEntryType::class,
+            BackendUserEntryType::class,
+        ];
 
         $classes = array_merge(config('fastlane.entry_types'), $builtinTypes);
 

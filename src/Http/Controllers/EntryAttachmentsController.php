@@ -2,18 +2,20 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers;
 
+use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
 use CbtechLtd\Fastlane\Http\Requests\EntryAttachmentStoreRequest;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 
 class EntryAttachmentsController extends Controller
 {
     public function store(EntryAttachmentStoreRequest $request)
     {
-        /** @var HandlesAttachments $field */
-        $field = $request->field();
+        /** @var DraftAttachment */
+        $model = $request->field()->storeAttachment($request);
 
         return response()->json([
-            'url' => $field->storeAttachment($request),
+            'file' => $model->file,
+            'name' => $model->name,
+            'url'  => $model->getUrlAttribute(),
         ]);
     }
 }

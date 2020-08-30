@@ -9,12 +9,14 @@ use CbtechLtd\Fastlane\Console\Commands\MakeEntryTypeCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Commands\CreateSystemAdminCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
+use CbtechLtd\Fastlane\FileAttachment\Attachment;
 use CbtechLtd\Fastlane\Http\Controllers\EntryAttachmentsController;
 use CbtechLtd\Fastlane\Http\Controllers\EntryImagesController;
 use CbtechLtd\Fastlane\Http\Middleware\Authenticate;
 use CbtechLtd\Fastlane\Http\Middleware\ResolveFastlaneRequest;
 use CbtechLtd\Fastlane\Http\Middleware\RedirectIfAuthenticated;
 use CbtechLtd\Fastlane\Http\Middleware\SetInertiaRootTemplate;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
@@ -39,6 +41,14 @@ class FastlaneServiceProvider extends ServiceProvider
         $this->bootUrlMacro();
         $this->bootRoutes();
 
+        /**
+         * Define a morph map to decouple the database from our internal structure.
+         */
+
+        Relation::morphMap([
+            'fastlane_attachments' => Attachment::class,
+        ]);
+
         /*
          * Optional methods to load your package assets
          */
@@ -58,9 +68,9 @@ class FastlaneServiceProvider extends ServiceProvider
             ], 'views');*/
 
             // Publishing the translation files.
-            /*$this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/fastlane'),
-            ], 'lang');*/
+            $this->publishes([
+                __DIR__ . '/../resources/lang' => resource_path('lang/vendor/fastlane'),
+            ], 'lang');
 
             // Registering package commands.
             $this->commands([
@@ -83,6 +93,9 @@ class FastlaneServiceProvider extends ServiceProvider
 
         // Register migrations
         $this->loadMigrationsFrom(__DIR__ . '/../migrations');
+
+        // Register translation
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'fastlane');
 
         // Register views and menu
         $this->registerViews();

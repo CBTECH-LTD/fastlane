@@ -6,6 +6,13 @@ All notable changes to `fastlane` will be documented in this file
 
 ---
 
+## 0.8.0 [2020-08-30]
+
+### Added
+- Block editor.
+
+---
+
 ## 0.7.0 [2020-08-27]
 
 ### Added
