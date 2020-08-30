@@ -15,6 +15,7 @@ import Select from '../../Components/List/Select'
 import Toggle from '../../Components/List/Toggle'
 import DateTime from '../../Components/List/DateTime'
 import File from '../../Components/List/File'
+import BlockEditorInput from '../../Components/Form/BlockEditor/BlockEditorInput'
 
 export default {
     hidden: {
@@ -61,4 +62,8 @@ export default {
         list: Simple,
         form: RichEditorInput,
     },
+    blockEditor: {
+        list: Simple,
+        form: BlockEditorInput,
+    }
 }

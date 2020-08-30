@@ -2,11 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields\Contracts;
 
-use Illuminate\Http\Request;
+use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
+use CbtechLtd\Fastlane\Http\Requests\EntryAttachmentStoreRequest;
 
 interface HasAttachments
 {
-    public function storeAttachment(Request $request): string;
+    public function storeAttachment(EntryAttachmentStoreRequest $request): DraftAttachment;
 
     public function getStorageDirectory(): string;
 

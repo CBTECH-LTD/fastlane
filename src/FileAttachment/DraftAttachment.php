@@ -29,16 +29,23 @@ class DraftAttachment extends Model implements Recordable
             ->persist($field, $model);
     }
 
-    public function persist(SchemaField $field, $model): void
+    public function persist(SchemaField $field, $model): Attachment
     {
-        Attachment::create([
+        $attachment = Attachment::create([
             'attachable_type' => get_class($model),
             'attachable_id'   => $model->getKey(),
             'name'            => $this->name,
             'file'            => $this->file,
-            'url'             => Storage::disk(config('fastlane.attachment_disk'))->url($this->file),
+            'url'             => $this->getUrlAttribute(),
         ]);
 
         $this->delete();
+
+        return $attachment;
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return Storage::disk(config('fastlane.attachment_disk'))->url($this->file);
     }
 }

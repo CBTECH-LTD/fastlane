@@ -6,6 +6,7 @@ use Altek\Accountant\Contracts\Recordable;
 use Altek\Accountant\Recordable as RecordableTrait;
 use Altek\Eventually\Eventually;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Attachment extends Model implements Recordable
 {
@@ -20,4 +21,9 @@ class Attachment extends Model implements Recordable
         'url',
         'name',
     ];
+
+    public function getUrlAttribute(): string
+    {
+        return Storage::disk(config('fastlane.attachment_disk'))->url($this->file);
+    }
 }

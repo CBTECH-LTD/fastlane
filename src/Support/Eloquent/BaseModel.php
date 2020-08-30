@@ -9,12 +9,9 @@ use Altek\Accountant\Recordable as RecordableTrait;
 use Altek\Eventually\Eventually;
 use CbtechLtd\Fastlane\Support\Eloquent\Concerns\Activable;
 use CbtechLtd\Fastlane\Support\Eloquent\Concerns\Hashable;
-use CbtechLtd\Fastlane\Support\Eloquent\Concerns\RelatesToEntryType;
-use CbtechLtd\Fastlane\Support\Eloquent\Contracts\LoadAttributesFromEntryType;
-use CbtechLtd\Fastlane\Support\Eloquent\Contracts\LoadRelationshipsFromEntryType;
 use Illuminate\Database\Eloquent\Model;
 
-abstract class BaseModel extends Model implements Recordable, LoadAttributesFromEntryType, LoadRelationshipsFromEntryType
+abstract class BaseModel extends Model implements Recordable
 {
-    use Hashable, RecordableTrait, Eventually, Activable, RelatesToEntryType;
+    use Hashable, RecordableTrait, Eventually, Activable;
 }

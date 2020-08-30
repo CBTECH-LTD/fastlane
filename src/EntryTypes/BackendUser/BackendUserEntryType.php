@@ -47,6 +47,16 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
         return 'user';
     }
 
+    public function name(): string
+    {
+        return __('fastlane::core.user.singular_name');
+    }
+
+    public function pluralName(): string
+    {
+        return __('fastlane::core.user.plural_name');
+    }
+
     public function model(): string
     {
         return User::class;

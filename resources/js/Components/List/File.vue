@@ -3,8 +3,8 @@
         <span v-if="extension.length" class="uppercase p-1 bg-indigo-300 text-indigo-700 rounded mr-2">
             {{ extension }}
         </span>
-        <f-link as="a" :href="value" target="_blank" class="text-sm">
-            {{ value }}
+        <f-link as="a" :href="value ? value.url : null" target="_blank" class="text-sm">
+            {{ value ? value.file : '' }}
         </f-link>
     </span>
 </template>
@@ -18,7 +18,11 @@ export default {
 
     computed: {
         extension () {
-            const splitted = this.value.split('.')
+            if (!this.value) {
+                return ''
+            }
+
+            const splitted = this.value.file.split('.')
 
             if (splitted.length > 1) {
                 return splitted[splitted.length - 1]
