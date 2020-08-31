@@ -1,5 +1,5 @@
 <template>
-    <div :style="containerStyle" class="min-h-screen bg-gray-200 border-r border-gray-300 py-12">
+    <div :style="containerStyle" class="min-h-screen bg-gray-200 border border-gray-300 rounded-lg py-12 mb-8">
         <div class="h-screen overflow-y-auto">
             <div class="font-semibold text-gray-900 text-2xl tracking-tight px-8">
                 <slot name="title"/>

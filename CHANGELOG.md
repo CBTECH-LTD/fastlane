@@ -4,6 +4,11 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+## Changed
+- More options to File field, like file size, min and max number of files.
+- How attachments work.
+- Image field works same way as file field.
+
 ---
 
 ## 0.8.1 [2020-08-30]

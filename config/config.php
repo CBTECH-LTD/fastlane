@@ -44,7 +44,7 @@ return [
      */
     'menu'              => \CbtechLtd\Fastlane\Support\Menu\MenuBuilder::class,
 
-    /*
+    /**
      * Minimum length of models Hash IDs.
      */
     'hashid_min_length' => 5,
@@ -54,17 +54,13 @@ return [
      */
     'super_admin'       => true,
 
-    /*
-     * Determine the storage disk to be used fot file attachments.
-     */
-    'attachment_disk'   => 'public',
-
     /**
-     * URL to process images using Thumbor.
+     * Determine handlers and storage disk to be used for file attachments.
      */
-
-    'image_uploader' => [
-        'class' => CbtechLtd\Fastlane\FileUpload\StorageDiskImageUploader::class,
-        'disk'  => 's3',
+    'attachments'       => [
+        'draft_handler'     => CbtechLtd\Fastlane\FileAttachment\DraftAttachmentHandler::class,
+        'permanent_handler' => '',
+        'disk'              => 'public',
+        'max_size'          => 10000000, // in kb
     ],
 ];

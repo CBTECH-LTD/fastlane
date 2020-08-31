@@ -61,6 +61,7 @@ export default {
         },
 
         isSelected (option) {
+            console.log(option)
             if (this.field.config.multiple) {
                 return !!find(this.field.value, v => {
                     return v.value === option.value
@@ -81,7 +82,7 @@ export default {
                 return map(value, v => v.value)
             }
 
-            return [value[0].value] || []
+            return value.length ? [value[0].value] : []
         }
 
         const filteredValue = filter(field.config.options, o => {

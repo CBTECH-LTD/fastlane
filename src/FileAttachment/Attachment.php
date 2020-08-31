@@ -22,8 +22,17 @@ class Attachment extends Model implements Recordable
         'name',
     ];
 
-    public function getUrlAttribute(): string
+    public function url(): string
     {
-        return Storage::disk(config('fastlane.attachment_disk'))->url($this->file);
+        return Storage::disk(config('fastlane.attachments.disk'))->url($this->file);
+    }
+
+    public function toArray()
+    {
+        return new AttachmentValue(
+            $this->file,
+            $this->name,
+            $this->url()
+        );
     }
 }

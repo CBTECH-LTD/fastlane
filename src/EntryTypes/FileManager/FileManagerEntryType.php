@@ -3,7 +3,8 @@
 namespace CbtechLtd\Fastlane\EntryTypes\FileManager;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
-use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
+use CbtechLtd\Fastlane\FileAttachment\AttachmentValue;
+use CbtechLtd\Fastlane\FileAttachment\Contracts\DraftAttachmentHandler;
 use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\WithCollectionLinks;
@@ -15,7 +16,6 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 
 class FileManagerEntryType extends EntryType implements RenderableOnMenu, WithCustomViews, WithCollectionLinks, WithCustomController
 {
@@ -104,18 +104,17 @@ class FileManagerEntryType extends EntryType implements RenderableOnMenu, WithCu
 
     public function storeMany(Request $request): void
     {
-        Collection::make($request->input('file'))->each(function (string $file) use ($request) {
-            $draft = DraftAttachment::query()
-                ->where('file', $file)
-                ->where('draft_id', $request->input('file__draft_id'))
-                ->first();
+        /** @var DraftAttachmentHandler $handler */
+        $handler = app()->make(config('fastlane.attachments.draft_handler'));
 
-            $req = Request::createFrom($request)->merge([
-                'file' => [$file],
-                'name' => $draft->name,
-            ]);
+        $handler->findDrafts($request->input('file__draft_id'), $request->input('file'))
+            ->each(function (AttachmentValue $value) use ($request) {
+                $req = Request::createFrom($request)->merge([
+                    'file' => [$value->getFile()],
+                    'name' => $value->getName(),
+                ]);
 
-            $this->store($req);
-        });
+                $this->store($req);
+            });
     }
 }

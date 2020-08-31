@@ -10989,10 +10989,11 @@ __webpack_require__.r(__webpack_exports__);
 
     this.uppy = new _uppy_core__WEBPACK_IMPORTED_MODULE_3__["Uppy"]({
       autoProceed: this.autoUpload,
-      restrictions: {// maxFileSize: 10000000,
-        // maxNumberOfFiles: 10,
-        // minNumberOfFiles: 0,
-        // allowedFileTypes: [],
+      restrictions: {
+        maxFileSize: this.field.config.maxFileSize,
+        minNumberOfFiles: this.field.config.minNumberOfFiles,
+        maxNumberOfFiles: this.field.config.maxNumberOfFiles,
+        allowedFileTypes: this.field.config.fileTypes.length ? this.field.config.fileTypes : null
       }
     }).use(_uppy_dashboard__WEBPACK_IMPORTED_MODULE_4___default.a, {
       target: this.$refs.container,
@@ -11541,6 +11542,8 @@ __webpack_require__.r(__webpack_exports__);
       return this.field.value.value;
     },
     isSelected: function isSelected(option) {
+      console.log(option);
+
       if (this.field.config.multiple) {
         return !!lodash_find__WEBPACK_IMPORTED_MODULE_5___default()(this.field.value, function (v) {
           return v.value === option.value;
@@ -11566,7 +11569,7 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
 
-      return [value[0].value] || false;
+      return value.length ? [value[0].value] : [];
     };
 
     var filteredValue = lodash_filter__WEBPACK_IMPORTED_MODULE_4___default()(field.config.options, function (o) {
@@ -11677,13 +11680,9 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var flatpickr__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! flatpickr */ "./node_modules/flatpickr/dist/flatpickr.js");
-/* harmony import */ var flatpickr__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(flatpickr__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var flatpickr_dist_themes_airbnb_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flatpickr/dist/themes/airbnb.css */ "./node_modules/flatpickr/dist/themes/airbnb.css");
-/* harmony import */ var flatpickr_dist_themes_airbnb_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flatpickr_dist_themes_airbnb_css__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _Mixins_FormInput__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Mixins/FormInput */ "./resources/js/Components/Mixins/FormInput.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Mixins_FormInput__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Mixins/FormInput */ "./resources/js/Components/Mixins/FormInput.js");
 //
 //
 //
@@ -11697,53 +11696,19 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-
-
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'YearInput',
-  mixins: [_Mixins_FormInput__WEBPACK_IMPORTED_MODULE_3__["default"]],
+  mixins: [_Mixins_FormInput__WEBPACK_IMPORTED_MODULE_1__["default"]],
   data: function data() {
-    return {
-      flatpickr: null
+    return {//
     };
   },
   computed: {
     defaultPlaceholder: function defaultPlaceholder() {
-      return moment__WEBPACK_IMPORTED_MODULE_2___default()().format('YYYY');
+      return moment__WEBPACK_IMPORTED_MODULE_0___default()().format('Y');
     }
-  },
-  methods: {
-    onInput: function onInput() {
-      this.field.value = this.$refs.datePicker.value;
-      this.$emit('input', this.field.value);
-    }
-  },
-  mounted: function mounted() {
-    var _this = this;
-
-    this.$nextTick(function () {
-      _this.flatpickr = flatpickr__WEBPACK_IMPORTED_MODULE_0___default()(_this.$refs.datePicker, {
-        enableTime: _this.field.config.enableTime,
-        enableSeconds: _this.field.config.enableSeconds,
-        altInput: true,
-        altFormat: 'YYYY',
-        dateFormat: 'Y',
-        onClose: _this.onInput,
-        onChange: _this.onInput,
-        allowInput: true,
-        time_24hr: true,
-        locale: {
-          firstDayOfWeek: 0
-        }
-      });
-    });
-  },
-  beforeDestroy: function beforeDestroy() {
-    this.flatpickr.destroy();
   }
 });
 
@@ -11858,7 +11823,15 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Mixins_ListRenderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Mixins/ListRenderer */ "./resources/js/Components/Mixins/ListRenderer.js");
+/* harmony import */ var lodash_map__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash/map */ "./node_modules/lodash/map.js");
+/* harmony import */ var lodash_map__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash_map__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Mixins_ListRenderer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Mixins/ListRenderer */ "./resources/js/Components/Mixins/ListRenderer.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 //
 //
 //
@@ -11870,20 +11843,37 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'ListFile',
-  mixins: [_Mixins_ListRenderer__WEBPACK_IMPORTED_MODULE_0__["default"]],
+  mixins: [_Mixins_ListRenderer__WEBPACK_IMPORTED_MODULE_1__["default"]],
   computed: {
-    extension: function extension() {
-      if (!this.value) {
+    files: function files() {
+      var _this = this;
+
+      return lodash_map__WEBPACK_IMPORTED_MODULE_0___default()(this.value || [], function (item) {
+        return _objectSpread(_objectSpread({}, item), {}, {
+          extension: _this.getExtension(item.file)
+        });
+      });
+    }
+  },
+  methods: {
+    getExtension: function getExtension(file) {
+      if (!file) {
         return '';
       }
 
-      var splitted = this.value.file.split('.');
+      var split = file.split('.');
 
-      if (splitted.length > 1) {
-        return splitted[splitted.length - 1];
+      if (split.length > 1) {
+        return split[split.length - 1];
       }
 
       return '';
@@ -54323,10 +54313,25 @@ var render = function() {
           "input",
           _vm._b(
             {
-              ref: "datePicker",
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.field.value,
+                  expression: "field.value"
+                }
+              ],
               staticClass: "w-full form-input",
-              attrs: { type: "text", placeholder: _vm.defaultPlaceholder },
-              domProps: { value: _vm.field.value }
+              attrs: { type: "text" },
+              domProps: { value: _vm.field.value },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.field, "value", $event.target.value)
+                }
+              }
             },
             "input",
             _vm.$attrs,
@@ -54450,35 +54455,47 @@ var render = function() {
     "span",
     { staticClass: "block text-sm" },
     [
-      _vm.extension.length
-        ? _c(
-            "span",
-            {
-              staticClass:
-                "uppercase p-1 bg-indigo-300 text-indigo-700 rounded mr-2"
-            },
-            [_vm._v("\n        " + _vm._s(_vm.extension) + "\n    ")]
-          )
-        : _vm._e(),
-      _vm._v(" "),
-      _c(
-        "f-link",
-        {
-          staticClass: "text-sm",
-          attrs: {
-            as: "a",
-            href: _vm.value ? _vm.value.url : null,
-            target: "_blank"
-          }
-        },
-        [
-          _vm._v(
-            "\n        " + _vm._s(_vm.value ? _vm.value.file : "") + "\n    "
-          )
-        ]
-      )
+      _vm.files.length === 1
+        ? [
+            _vm.files[0].extension.length
+              ? _c(
+                  "span",
+                  {
+                    staticClass:
+                      "uppercase p-1 bg-indigo-300 text-indigo-700 rounded mr-2"
+                  },
+                  [
+                    _vm._v(
+                      "\n            " +
+                        _vm._s(_vm.files[0].extension) +
+                        "\n        "
+                    )
+                  ]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _c(
+              "f-link",
+              {
+                staticClass: "text-sm",
+                attrs: { as: "a", href: _vm.files[0].url, target: "_blank" }
+              },
+              [
+                _vm._v(
+                  "\n            " + _vm._s(_vm.files[0].file) + "\n        "
+                )
+              ]
+            )
+          ]
+        : [
+            _c("span", [
+              _vm._v(
+                _vm._s(_vm.$lc("core.fields.file.selected", _vm.files.length))
+              )
+            ])
+          ]
     ],
-    1
+    2
   )
 }
 var staticRenderFns = []
@@ -54987,7 +55004,8 @@ var render = function() {
   return _c(
     "div",
     {
-      staticClass: "min-h-screen bg-gray-200 border-r border-gray-300 py-12",
+      staticClass:
+        "min-h-screen bg-gray-200 border border-gray-300 rounded-lg py-12 mb-8",
       style: _vm.containerStyle
     },
     [

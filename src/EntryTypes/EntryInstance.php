@@ -68,6 +68,7 @@ class EntryInstance implements EntryInstanceContract
     {
         if ($this->model()->isDirty()) {
             $this->model()->save();
+            $this->model()->refresh();
         }
 
         return $this;

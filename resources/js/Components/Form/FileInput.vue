@@ -77,10 +77,10 @@ export default {
         this.uppy = new Uppy({
             autoProceed: this.autoUpload,
             restrictions: {
-                // maxFileSize: 10000000,
-                // maxNumberOfFiles: 10,
-                // minNumberOfFiles: 0,
-                // allowedFileTypes: [],
+                maxFileSize: this.field.config.maxFileSize,
+                minNumberOfFiles: this.field.config.minNumberOfFiles,
+                maxNumberOfFiles: this.field.config.maxNumberOfFiles,
+                allowedFileTypes: this.field.config.fileTypes.length ? this.field.config.fileTypes : null,
             },
         }).use(Dashboard, {
             target: this.$refs.container,

@@ -5,7 +5,6 @@ namespace CbtechLtd\Fastlane\FileAttachment;
 use Altek\Accountant\Contracts\Recordable;
 use Altek\Accountant\Recordable as RecordableTrait;
 use Altek\Eventually\Eventually;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -19,33 +18,11 @@ class DraftAttachment extends Model implements Recordable
         'draft_id',
         'file',
         'name',
+        'handler',
     ];
 
-    public static function persistAllDraft(string $draftId, SchemaField $field, Model $model): void
+    public function url(): string
     {
-        static::where('draft_id', $draftId)
-            ->get()
-            ->each
-            ->persist($field, $model);
-    }
-
-    public function persist(SchemaField $field, $model): Attachment
-    {
-        $attachment = Attachment::create([
-            'attachable_type' => get_class($model),
-            'attachable_id'   => $model->getKey(),
-            'name'            => $this->name,
-            'file'            => $this->file,
-            'url'             => $this->getUrlAttribute(),
-        ]);
-
-        $this->delete();
-
-        return $attachment;
-    }
-
-    public function getUrlAttribute(): string
-    {
-        return Storage::disk(config('fastlane.attachment_disk'))->url($this->file);
+        return Storage::disk(config('fastlane.attachments.disk'))->url($this->file);
     }
 }

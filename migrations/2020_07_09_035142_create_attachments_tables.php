@@ -15,7 +15,6 @@ class CreateAttachmentsTables extends Migration
     {
         Schema::create('fastlane_attachments', function (Blueprint $table) {
             $table->id();
-//            $table->uuid('uuid')->unique();
             $table->morphs('attachable');
             $table->string('name')->nullable();
             $table->string('url')->index();
@@ -25,7 +24,6 @@ class CreateAttachmentsTables extends Migration
 
         Schema::create('fastlane_draft_attachments', function (Blueprint $table) {
             $table->id();
-//            $table->uuid('uuid')->unique();
             $table->string('draft_id')->index();
             $table->string('name')->nullable();
             $table->string('file');

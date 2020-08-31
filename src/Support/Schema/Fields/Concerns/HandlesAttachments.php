@@ -2,9 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields\Concerns;
 
+use CbtechLtd\Fastlane\FileAttachment\AttachmentValue;
 use CbtechLtd\Fastlane\FileAttachment\Contracts\DraftAttachmentHandler;
-use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
-use CbtechLtd\Fastlane\FileAttachment\StoreDraftAttachment;
 use CbtechLtd\Fastlane\Http\Requests\EntryAttachmentStoreRequest;
 use Closure;
 
@@ -28,13 +27,15 @@ trait HandlesAttachments
         return $this->storageDirectory;
     }
 
-    public function storeAttachment(EntryAttachmentStoreRequest $request): DraftAttachment
+    public function storeAttachment(EntryAttachmentStoreRequest $request): AttachmentValue
     {
-        $callback = is_callable($this->addFileHandler)
-            ? $this->addFileHandler
-            : new StoreDraftAttachment($this);
+        $defaultHandler = config('fastlane.attachments.draft_handler');
 
-        return $callback->handle($request);
+        $callback = $this->addFileHandler instanceof DraftAttachmentHandler
+            ? $this->addFileHandler
+            : new $defaultHandler($this);
+
+        return $callback->write($request, $this);
     }
 
     /**

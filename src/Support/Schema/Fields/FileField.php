@@ -2,10 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\EntryTypes\EntryType;
-use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
-use CbtechLtd\Fastlane\FileAttachment\Attachment;
-use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
+use CbtechLtd\Fastlane\FileAttachment\AttachmentValue;
+use CbtechLtd\Fastlane\FileAttachment\Contracts\PersistentAttachmentHandler;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
@@ -43,61 +41,63 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
         return $this;
     }
 
+    public function min(int $number): self
+    {
+        return $this->setRule('min', $number);
+    }
+
+    public function max(int $number): self
+    {
+        return $this->setRule('max', $number);
+    }
+
+    public function maxSize(int $size): self
+    {
+        return $this->setRule('size', $size);
+    }
+
     public function readValue(EntryInstance $entryInstance): FieldValue
     {
         if (is_callable($this->readValueCallback)) {
             return call_user_func($this->readValueCallback, $entryInstance);
         }
 
-        $attachment = Attachment::query()
-            ->where('file', $entryInstance->model()->{$this->getName()})
-            ->where('attachable_type', get_class($entryInstance->model()))
-            ->where('attachable_id', $entryInstance->model()->getKey())
-            ->first();
+        $files = Arr::wrap($entryInstance->model()->{$this->getName()});
+        $handler = app()->make(config('fastlane.attachments.persistent_handler'));
 
-        $value = $attachment instanceof Attachment
-            ? [
-                'file' => $attachment->file,
-                'name' => $attachment->name,
-                'url'  => $attachment->url,
-            ]
-            : null;
+//        dd($handler->read($entryInstance, $files));
+
+        $value = $handler->read($entryInstance, $files)->map(
+            fn(AttachmentValue $attachment) => $attachment->toArray()
+        )->all();
 
         return new FieldValue($this->getName(), $value);
     }
 
     public function writeValue(EntryInstance $entryInstance, $value, array $requestData): void
     {
-        if (is_callable($this->writeValueCallback)) {
-            call_user_func($this->writeValueCallback, $entryInstance, $value[0], $requestData);
+        if (! $this->isAcceptingAttachments() || ! $draftId = Arr::get($requestData, $this->getName() . '__draft_id')) {
             return;
         }
 
-        // TODO: We need to improve it. How to save multiple on database?
-        //       Should it be a json object? A text with some character to separate files?
-        $entryInstance->model()->{$this->getName()} = $this->multiple
-            ? $value
-            : $value[0];
+        if (is_callable($this->writeValueCallback)) {
+            call_user_func($this->writeValueCallback, $entryInstance, $value, $requestData);
+            return;
+        }
 
-        // Check whether files are accepted in the rich editor instance,
-        // then persist all draft attachment files.
-        $entryInstance->type()->addHook(EntryType::HOOK_AFTER_SAVING, function (OnSavingHook $hook) use ($requestData, $entryInstance, $value) {
-            if ($this->isAcceptingAttachments() && $draftId = Arr::get($requestData, $this->getName() . '__draft_id')) {
-                $attachments = DraftAttachment::query()
-                    ->where('file', $value)
-                    ->where('draft_id', $draftId)
-                    ->get()
-                    ->map(function (DraftAttachment $draft) use ($draftId, $entryInstance) {
-                        return $draft->persist($this, $entryInstance->model());
-                    });
-            }
-        });
+        /** @var PersistentAttachmentHandler $handler */
+        $handler = app()->make(config('fastlane.attachments.persistent_handler'));
+        $handler->write($entryInstance, $this->getName(), $value, $draftId);
+    }
+
+    public function toModelAttribute(): array
+    {
+        return [$this->getName() => 'array'];
     }
 
     protected function getTypeRules(): array
     {
         return [
-            // TODO: Improve the URL stuff. Something like ImageField and ImageUploader would be better.
             $this->getName()                => 'array',
             $this->getName() . '.*'         => "sometimes|exists:fastlane_draft_attachments,file",
             $this->getName() . '__draft_id' => "required_with:{$this->getName()}|uuid",
@@ -107,10 +107,13 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
     protected function resolveConfig(EntryInstance $entryInstance, string $destination): void
     {
         $this->resolvedConfig = $this->resolvedConfig->merge([
-            'multiple'  => $this->multiple,
-            'fileTypes' => $this->getAcceptableMimetypes(),
-            'csrfToken' => csrf_token(),
-            'links'     => [
+            'multiple'         => $this->multiple,
+            'maxFileSize'      => $this->getRuleParams('size', config('fastlane.attachments.max_size')),
+            'minNumberOfFiles' => $this->getRuleParams('min', $this->required ? 1 : 0),
+            'maxNumberOfFiles' => $this->getRuleParams('max', $this->multiple ? 1 : null),
+            'fileTypes'        => $this->getAcceptableMimetypes(),
+            'csrfToken'        => csrf_token(),
+            'links'            => [
                 'self' => URL::relative("cp.{$entryInstance->type()->identifier()}.attachments", $this->getName()),
             ],
         ]);

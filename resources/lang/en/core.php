@@ -66,6 +66,9 @@ return [
         'slug'     => 'Slug',
         'role'     => 'Role',
         'password' => 'Password',
+        'file'     => [
+            'selected' => 'No file selected|1 file selected|{count} files selected',
+        ],
         'toggle'   => [
             'turn_on'  => 'Click to turn on',
             'turn_off' => 'Click to turn off',

@@ -184,10 +184,17 @@ trait HandlesRules
 
     protected function getRule(string $name): string
     {
-        if ($rule = Arr::get($this->rules, $name, null)) {
-            return $name . ':' . $rule;
+        if (Arr::has($this->rules, $name)) {
+            $params = $this->getRuleParams($name, null);
+
+            return $name . ($params ? ":{$params}" : '');
         }
 
         return '';
+    }
+
+    protected function getRuleParams(string $name, $default = null): string
+    {
+        return Arr::get($this->rules, $name, $default);
     }
 }
