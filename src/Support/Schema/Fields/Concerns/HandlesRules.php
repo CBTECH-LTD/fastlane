@@ -193,7 +193,7 @@ trait HandlesRules
         return '';
     }
 
-    protected function getRuleParams(string $name, $default = null): string
+    protected function getRuleParams(string $name, $default = null): ?string
     {
         return Arr::get($this->rules, $name, $default);
     }
