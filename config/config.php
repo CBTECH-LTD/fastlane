@@ -63,4 +63,16 @@ return [
         'disk'               => 'public',
         'max_size'           => 10000000, // in kb
     ],
+
+    'currency' => [
+        /**
+         * Default currency settings to be used when a CurrencyField does not
+         * provide its own settings.
+         *
+         * Consult https://github.com/RobinHerbots/Inputmask to view a complete
+         * list of possible mask values.
+         */
+        'symbol' => '£',
+        'mask'   => '\R\$ currency',
+    ],
 ];

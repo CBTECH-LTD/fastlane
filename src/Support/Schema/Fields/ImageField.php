@@ -16,4 +16,9 @@ class ImageField extends FileField implements ExportsToApiAttributeContract
         'image/png',
         'image/gif',
     ];
+
+    public function getType(): string
+    {
+        return 'image';
+    }
 }

@@ -2,7 +2,6 @@ import StringInput from '../../Components/Form/StringInput'
 import TextInput from '../../Components/Form/TextInput'
 import ToggleInput from '../../Components/Form/ToggleInput'
 import SelectInput from '../../Components/Form/SelectInput'
-import ImageInput from '../../Components/Form/ImageInput'
 import DateTimeInput from '../../Components/Form/DateTimeInput'
 import RichEditorInput from '../../Components/Form/RichEditorInput'
 import PasswordInput from '../../Components/Form/PasswordInput'
@@ -16,6 +15,8 @@ import Toggle from '../../Components/List/Toggle'
 import DateTime from '../../Components/List/DateTime'
 import File from '../../Components/List/File'
 import BlockEditorInput from '../../Components/Form/BlockEditor/BlockEditorInput'
+import CurrencyInput from '../../Components/Form/CurrencyInput'
+import NumberInput from '../../Components/Form/NumberInput'
 
 export default {
     hidden: {
@@ -25,6 +26,14 @@ export default {
     string: {
         list: Simple,
         form: StringInput,
+    },
+    number: {
+        list: Simple,
+        form: NumberInput,
+    },
+    currency: {
+        list: Simple,
+        form: CurrencyInput,
     },
     password: {
         list: Simple,
@@ -44,7 +53,7 @@ export default {
     },
     image: {
         list: Image,
-        form: ImageInput,
+        form: FileInput,
     },
     file: {
         list: File,

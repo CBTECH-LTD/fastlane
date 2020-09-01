@@ -10,6 +10,7 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\HasAttachments;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 
 class FileField extends AbstractBaseField implements ExportsToApiAttributeContract, HasAttachments
@@ -65,8 +66,6 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
         $files = Arr::wrap($entryInstance->model()->{$this->getName()});
         $handler = app()->make(config('fastlane.attachments.persistent_handler'));
 
-//        dd($handler->read($entryInstance, $files));
-
         $value = $handler->read($entryInstance, $files)->map(
             fn(AttachmentValue $attachment) => $attachment->toArray()
         )->all();
@@ -85,9 +84,25 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
             return;
         }
 
+        // TODO: Remove draft attachments with excluded=true
+
         /** @var PersistentAttachmentHandler $handler */
-        $handler = app()->make(config('fastlane.attachments.persistent_handler'));
-        $handler->write($entryInstance, $this->getName(), $value, $draftId);
+        $persistentHandler = app()->make(config('fastlane.attachments.persistent_handler'));
+
+        $persistentHandler->write(
+            $entryInstance,
+            $this->getName(),
+            Collection::make($value)->filter(fn($v) => ! $v['excluded'])->all(),
+            $draftId
+
+        );
+
+        $persistentHandler->remove(
+            $entryInstance,
+            $this->getName(),
+            Collection::make($value)->filter(fn($v) => $v['excluded'])->all(),
+            $draftId
+        );
     }
 
     public function toModelAttribute(): array
@@ -98,9 +113,12 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
     protected function getTypeRules(): array
     {
         return [
-            $this->getName()                => 'array',
-            $this->getName() . '.*'         => "sometimes|exists:fastlane_draft_attachments,file",
-            $this->getName() . '__draft_id' => "required_with:{$this->getName()}|uuid",
+            $this->getName()                 => 'array',
+            $this->getName() . '.*'          => "present|array",
+            $this->getName() . '.*.file'     => "required|string",
+            $this->getName() . '.*.is_draft' => "required|boolean",
+            $this->getName() . '.*.excluded' => "required|boolean",
+            $this->getName() . '__draft_id'  => "required_with:{$this->getName()}|uuid",
         ];
     }
 
@@ -110,7 +128,7 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
             'multiple'         => $this->multiple,
             'maxFileSize'      => $this->getRuleParams('size', config('fastlane.attachments.max_size')),
             'minNumberOfFiles' => $this->getRuleParams('min', $this->required ? 1 : 0),
-            'maxNumberOfFiles' => $this->getRuleParams('max', $this->multiple ? 1 : null),
+            'maxNumberOfFiles' => $this->getRuleParams('max', $this->multiple ? null : 1),
             'fileTypes'        => $this->getAcceptableMimetypes(),
             'csrfToken'        => csrf_token(),
             'links'            => [

@@ -153,6 +153,6 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
 
     protected function menuGroup(): string
     {
-        return 'System';
+        return __('fastlane::core.menu.system_group');
     }
 }

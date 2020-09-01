@@ -9,9 +9,9 @@
                 </span>
             </label>
             <div :class="fieldContainerClasses">
-                <span :class="fieldClasses">
+                <div :class="fieldClasses">
                     <slot/>
-                </span>
+                </div>
                 <div class="w-full mt-2">
                     <span v-if="errors && errors.length" class="block my-1 text-sm text-red-600">
                         <span class="block" v-for="e in errors">{{ e }}</span>

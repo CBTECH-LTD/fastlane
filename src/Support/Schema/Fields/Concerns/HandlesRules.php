@@ -165,7 +165,7 @@ trait HandlesRules
     protected function buildUpdateRules(): array
     {
         $rules = array_merge(
-            [$this->getBaseRules()],
+            ['sometimes', $this->getBaseRules()],
             [Arr::get($this->getTypeRules(), $this->getName(), '')],
             [$this->updateRules]
         );

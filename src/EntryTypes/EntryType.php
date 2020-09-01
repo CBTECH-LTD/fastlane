@@ -157,6 +157,22 @@ abstract class EntryType implements EntryTypeContract
         return true;
     }
 
+    public function getItemsForRelationField(?QueryFilterContract $queryFilter = null): Collection
+    {
+        $this->gate->authorize('list', $this->model());
+
+        $query = ($queryFilter ?? new QueryFilter)
+            ->addOrder('created_at')
+            ->addOrder('id')
+            ->pipeThrough(
+                $this->newModelInstance()->newModelQuery()
+            );
+
+        $this->queryItemsForRelationField($query);
+
+        return $query->get()->map(fn(Model $model) => $this->newInstance($model));
+    }
+
     public function getItems(?QueryFilterContract $queryFilter = null): LengthAwarePaginator
     {
         $this->gate->authorize('list', $this->model());
@@ -170,10 +186,10 @@ abstract class EntryType implements EntryTypeContract
 
         $this->queryItems($query);
 
-        $pagination = $query->paginate($this->getItemsPerPage());
-        $pagination->getCollection()->transform(fn(Model $model) => $this->newInstance($model));
+        $paginator = $query->paginate($this->getItemsPerPage());
+        $paginator->getCollection()->transform(fn(Model $model) => $this->newInstance($model));
 
-        return $pagination;
+        return $paginator;
     }
 
     public function findItem(string $hashid): EntryInstanceContract
@@ -190,16 +206,15 @@ abstract class EntryType implements EntryTypeContract
 
     public function store(Request $request): EntryInstanceContract
     {
-        $this->gate->authorize('create', $this->model());
-        $entryInstance = $this->newInstance(null);
-
-        // Check whether the authenticated user can update
-        // the given entry instance.
+        // Check whether the authenticated user can create an
+        // instance of the given entry type.
         if ($this->policy()) {
             $this->gate->authorize('create', $this->model());
         }
 
-        // Validate the request data against the update fields
+        $entryInstance = $this->newInstance(null);
+
+        // Validate the request data against the create fields
         // and save the validated data in a new variable.
         $fields = $entryInstance->schema()->getCreateFields();
 
@@ -325,6 +340,11 @@ abstract class EntryType implements EntryTypeContract
         $roles->each(function ($value) {
             FastlaneFacade::createRole($value);
         });
+    }
+
+    protected function queryItemsForRelationField(Builder $query): void
+    {
+        //
     }
 
     protected function queryItems(Builder $query): void

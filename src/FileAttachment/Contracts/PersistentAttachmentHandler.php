@@ -22,4 +22,12 @@ interface PersistentAttachmentHandler
      * @param string        $draftId
      */
     public function write(EntryInstance $entryInstance, string $fieldName, array $value, string $draftId): void;
+
+    /**
+     * @param EntryInstance $entryInstance
+     * @param string        $fieldName
+     * @param array         $value
+     * @param string        $draftId
+     */
+    public function remove(EntryInstance $entryInstance, string $fieldName, array $value, string $draftId): void;
 }

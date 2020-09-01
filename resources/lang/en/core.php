@@ -24,6 +24,13 @@ return [
         'identifier'    => 'contents',
     ],
 
+    // File Manager Entry Type
+    'file_manager'             => [
+        'singular_name' => 'File',
+        'plural_name'   => 'Files',
+        'identifier'    => 'files',
+    ],
+
     // Backend User Entry Type
     'user'                     => [
         'singular_name' => 'User',
