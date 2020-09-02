@@ -218,7 +218,7 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
             return;
         }
 
-        $entryInstance->model()->{$this->getName()} = $value;
+        $entryInstance->model()->{$this->getName()} = $value ?? $this->getDefault();
         $this->executeHooks(static::HOOK_AFTER_FILLING, $fillingHook);
     }
 
@@ -273,6 +273,11 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
     {
         $this->panel = $panel->getName();
         return $this;
+    }
+
+    protected function getDefault()
+    {
+        return $this->default;
     }
 
     protected function getConfig(): array

@@ -11,6 +11,8 @@ class BlockEditorField extends AbstractBaseField implements HasAttachments
 {
     use HandlesAttachments;
 
+    protected $default = [];
+
     public function getType(): string
     {
         return 'blockEditor';
@@ -41,6 +43,11 @@ class BlockEditorField extends AbstractBaseField implements HasAttachments
     public function getAcceptableMimetypes(): array
     {
         return [];
+    }
+
+    protected function getMigrationMethod(): array
+    {
+        return ['json'];
     }
 
     public function toModelAttribute(): array

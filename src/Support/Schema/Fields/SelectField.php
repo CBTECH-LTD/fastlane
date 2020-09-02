@@ -18,6 +18,7 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
 
     protected $default = null;
     protected bool $multiple = false;
+    protected bool $taggable = false;
     protected bool $renderAsCheckbox = false;
 
     /** @var Closure | array */
@@ -50,6 +51,17 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
     public function isMultiple(): bool
     {
         return $this->multiple;
+    }
+
+    public function taggable(bool $taggable = true): self
+    {
+        $this->taggable = $taggable;
+        return $this;
+    }
+
+    public function isTaggable(): bool
+    {
+        return $this->taggable;
     }
 
     public function withOptions($options): self
@@ -90,6 +102,15 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
         return $this->readValue($model);
     }
 
+    public function toModelAttribute(): array
+    {
+        $cast = $this->isMultiple()
+            ? 'array'
+            : null;
+
+        return [$this->getName() => $cast];
+    }
+
     protected function getTypeRules(): array
     {
         $values = $this->getResolvedConfig('options')->map(
@@ -108,10 +129,29 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
         return [$this->getName() => 'in:' . $values->implode(',')];
     }
 
+    protected function getDefault()
+    {
+        if ($this->isMultiple()) {
+            return [];
+        }
+
+        return null;
+    }
+
+    protected function getMigrationMethod(): array
+    {
+        if ($this->isMultiple()) {
+            return ['json'];
+        }
+
+        return ['string'];
+    }
+
     protected function resolveConfig(EntryInstance $entryInstance, string $destination): void
     {
         $this->resolvedConfig = $this->resolvedConfig->merge([
             'multiple' => $this->isMultiple(),
+            'taggable' => $this->isTaggable(),
             'type'     => $this->renderAsCheckbox ? 'checkbox' : 'select',
         ]);
 

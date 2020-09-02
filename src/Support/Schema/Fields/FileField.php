@@ -41,6 +41,11 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
         return $this;
     }
 
+    public function isMultiple(): bool
+    {
+        return $this->multiple;
+    }
+
     public function min(int $number): self
     {
         return $this->setRule('min', $number);
@@ -107,10 +112,10 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
     protected function resolveConfig(EntryInstance $entryInstance, string $destination): void
     {
         $this->resolvedConfig = $this->resolvedConfig->merge([
-            'multiple'         => $this->multiple,
+            'multiple'         => $this->isMultiple(),
             'maxFileSize'      => $this->getRuleParams('size', config('fastlane.attachments.max_size')),
             'minNumberOfFiles' => $this->getRuleParams('min', $this->required ? 1 : 0),
-            'maxNumberOfFiles' => $this->getRuleParams('max', $this->multiple ? 1 : null),
+            'maxNumberOfFiles' => $this->getRuleParams('max', ! $this->isMultiple() ? 1 : null),
             'fileTypes'        => $this->getAcceptableMimetypes(),
             'csrfToken'        => csrf_token(),
             'links'            => [
