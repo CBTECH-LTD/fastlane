@@ -56,3 +56,9 @@
         }
     }
 </script>
+
+<style>
+    .trix-content ul, .trix-content ol {
+        list-style: disc !important;
+    }
+</style>

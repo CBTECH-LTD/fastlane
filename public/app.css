@@ -1008,6 +1008,10 @@ video {
   box-shadow: none;
 }
 
+.btn.btn-oval {
+  border-radius: 9999px;
+}
+
 .btn-sm {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
@@ -25207,6 +25211,42 @@ tfoot .table__column-group {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
+}
+
+/**
+ * Codex editor styles
+ */
+
+.codex-editor h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.codex-editor h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.codex-editor h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.codex-editor h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.codex-editor h5 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.codex-editor h6 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 @media (min-width: 640px) {

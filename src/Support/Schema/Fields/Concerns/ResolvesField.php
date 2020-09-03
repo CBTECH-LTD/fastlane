@@ -11,6 +11,7 @@ trait ResolvesField
 
     public function resolve(EntryInstanceContract $entryInstance, string $destination): self
     {
+        $this->entryInstance = $entryInstance;
         $this->resolvedConfig = new Collection;
         $this->resolveConfig($entryInstance, $destination);
 

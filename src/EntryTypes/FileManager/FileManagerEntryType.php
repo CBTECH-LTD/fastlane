@@ -25,7 +25,7 @@ class FileManagerEntryType extends EntryType implements RenderableOnMenu, WithCu
 
     public function identifier(): string
     {
-        return 'files';
+        return __('fastlane::core.file_manager.identifier');
     }
 
     public function model(): string
@@ -35,17 +35,17 @@ class FileManagerEntryType extends EntryType implements RenderableOnMenu, WithCu
 
     public function name(): string
     {
-        return __('File');
+        return __('fastlane::core.file_manager.singular_name');
     }
 
     public function pluralName(): string
     {
-        return __('Files');
+        return __('fastlane::core.file_manager.plural_name');
     }
 
     protected function menuGroup(): string
     {
-        return __('System');
+        return __('fastlane::core.menu.system_group');
     }
 
     public function icon(): string

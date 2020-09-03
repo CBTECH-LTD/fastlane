@@ -14,6 +14,7 @@
 
         computed: {
             formattedValue () {
+                console.log(this.value, this.config.displayFormat)
                 return moment(this.value).format(this.config.displayFormat)
             }
         },

@@ -6,7 +6,8 @@
                 type="text"
                 class="w-full form-input"
                 v-bind="$attrs"
-                v-model="field.value"
+                :value="field.value"
+                @input="ev => onInput(ev.target.value)"
             />
         </div>
     </f-form-field>

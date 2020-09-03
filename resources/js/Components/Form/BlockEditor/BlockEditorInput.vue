@@ -1,7 +1,13 @@
 <template>
-    <div class="w-full form-input p-6">
-        <div :id="editorId" ref="editor"></div>
-    </div>
+    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required" :stacked="field.label_stacked">
+        <template v-if="field.label && field.label_visible" v-slot:label>
+            {{ field.label }}
+        </template>
+        
+        <div class="w-full form-input p-6">
+            <div :id="editorId" ref="editor"></div>
+        </div>
+    </f-form-field>
 </template>
 
 <script>

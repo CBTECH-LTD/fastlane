@@ -71,7 +71,7 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
 
             StringField::make('email', __('fastlane::core.fields.email'))
                 ->required()
-                ->unique(new Unique(User::class, 'email'))
+                ->unique()
                 ->showOnIndex(),
 
             SelectField::make('role', __('fastlane::core.fields.role'))
@@ -153,6 +153,6 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
 
     protected function menuGroup(): string
     {
-        return 'System';
+        return __('fastlane::core.menu.system_group');
     }
 }

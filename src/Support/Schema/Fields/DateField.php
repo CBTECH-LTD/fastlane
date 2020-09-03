@@ -44,14 +44,14 @@ class DateField extends AbstractBaseField implements ExportsToApiAttributeContra
         }
 
         if (! $this->enableTime) {
-            return 'd/m/Y';
+            return 'DD/MM/Y';
         }
 
         if (! $this->enableSeconds) {
-            return 'd/m/Y - H:i';
+            return 'DD/MM/Y - H:i';
         }
 
-        return 'd/m/Y - H:i:S';
+        return 'DD/MM/Y - H:i:S';
     }
 
     public function toModelAttribute(): array

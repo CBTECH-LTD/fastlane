@@ -18,6 +18,9 @@ class DraftAttachment extends Model implements Recordable
         'draft_id',
         'file',
         'name',
+        'extension',
+        'size',
+        'mimetype',
         'handler',
     ];
 

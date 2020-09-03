@@ -92,7 +92,8 @@ export default {
         return FormFieldFactory(
             field,
             component,
-            filteredValue || field.default
+            filteredValue || field.default,
+            {}
         )
     }
 }

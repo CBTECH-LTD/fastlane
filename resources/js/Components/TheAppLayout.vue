@@ -33,7 +33,7 @@
                 <div class="flex-grow mb-8" style="border-radius: 2rem">
                     <div v-if="$slots.hasOwnProperty('title')" ref="sticky" class="title-bar-wrapper" :class="stickyBarClass">
                         <div class="title-bar">
-                            <div class="div">
+                            <div class="w-4/5">
                                 <h1 class="title-bar__title">
                                     <slot name="title"/>
                                 </h1>

@@ -5,7 +5,7 @@
         </template>
         <template v-slot:before-table>
             <div class="w-full my-8">
-                <f-form-file-input :auto-upload="false" :inline="false" :show-upload-button="false" ref="fileInput" :field="uploadForm.getField('file')" @input="uploadFiles"/>
+                <f-form-file-input inline :auto-upload="false" :show-upload-button="false" ref="fileInput" :field="uploadForm.getField('file')" @input="uploadFiles"/>
             </div>
         </template>
         <template>

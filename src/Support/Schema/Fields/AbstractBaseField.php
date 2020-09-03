@@ -14,11 +14,11 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Sortable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Migratable as MigratableContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Panelizable as PanelizableContract;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable as ResolvableContract;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue as SupportModelContract;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules as WithRulesContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ReadValue as ReadValueContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable as ResolvableContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules as WithRulesContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithVisibility as WithVisibilityContract;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue as SupportModelContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Hooks\OnFillingHook;
 use Closure;
 use Illuminate\Support\Collection;
@@ -37,14 +37,15 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
 
     protected string $name;
     protected string $description = '';
-    protected ?Unique $unique = null;
+    protected bool $formVisibleLabel = true;
+    protected bool $formStackedLabel = false;
     protected $default = null;
     protected ?string $panel = null;
     protected int $listWidth = 0;
-    protected EntryType $entryType;
     protected ?string $placeholder;
     protected $writeValueCallback;
     protected $readValueCallback;
+    protected EntryInstanceContract $entryInstance;
 
     /** @var string | Closure */
     protected $label;
@@ -73,6 +74,28 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function withStackedLabel(): self
+    {
+        $this->formStackedLabel = true;
+        return $this;
+    }
+
+    public function isLabelStacked(): bool
+    {
+        return $this->formStackedLabel;
+    }
+
+    public function hideLabel(): self
+    {
+        $this->formVisibleLabel = false;
+        return $this;
+    }
+
+    public function isLabelVisible(): bool
+    {
+        return $this->formVisibleLabel;
     }
 
     /**
@@ -120,12 +143,6 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
     public function setPlaceholder(string $placeholder): self
     {
         $this->placeholder = $placeholder;
-        return $this;
-    }
-
-    public function setEntryType(EntryType $entryType): self
-    {
-        $this->entryType = $entryType;
         return $this;
     }
 
@@ -231,17 +248,19 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
     public function toArray()
     {
         return [
-            'name'        => $this->getName(),
-            'type'        => $this->getType(),
-            'label'       => $this->getLabel(),
-            'description' => $this->description,
-            'placeholder' => $this->placeholder ?? $this->getLabel(),
-            'default'     => $this->default,
-            'required'    => $this->required,
-            'sortable'    => $this->isSortable(),
-            'listWidth'   => $this->listWidth,
-            'panel'       => $this->panel,
-            'config'      => $this->getConfig(),
+            'name'          => $this->getName(),
+            'type'          => $this->getType(),
+            'label'         => $this->getLabel(),
+            'description'   => $this->description,
+            'placeholder'   => $this->placeholder ?? $this->getLabel(),
+            'default'       => $this->default,
+            'required'      => $this->required,
+            'sortable'      => $this->isSortable(),
+            'label_stacked' => $this->isLabelStacked(),
+            'label_visible' => $this->isLabelVisible(),
+            'listWidth'     => $this->listWidth,
+            'panel'         => $this->panel,
+            'config'        => $this->getConfig(),
         ];
     }
 

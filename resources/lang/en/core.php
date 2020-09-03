@@ -24,6 +24,13 @@ return [
         'identifier'    => 'contents',
     ],
 
+    // File Manager Entry Type
+    'file_manager'             => [
+        'singular_name' => 'File',
+        'plural_name'   => 'Files',
+        'identifier'    => 'files',
+    ],
+
     // Backend User Entry Type
     'user'                     => [
         'singular_name' => 'User',
@@ -59,17 +66,19 @@ return [
 
     // Field labels
     'fields'                   => [
-        'active'   => 'Active',
-        'blocks'   => 'Blocks',
-        'email'    => 'Email',
-        'name'     => 'Name',
-        'slug'     => 'Slug',
-        'role'     => 'Role',
-        'password' => 'Password',
-        'file'     => [
+        'active'           => 'Active',
+        'blocks'           => 'Blocks',
+        'email'            => 'Email',
+        'name'             => 'Name',
+        'slug'             => 'Slug',
+        'role'             => 'Role',
+        'password'         => 'Password',
+        'meta_title'       => 'Meta Title',
+        'meta_description' => 'Meta Description',
+        'file'             => [
             'selected' => 'No file selected|1 file selected|{count} files selected',
         ],
-        'toggle'   => [
+        'toggle'           => [
             'turn_on'  => 'Click to turn on',
             'turn_off' => 'Click to turn off',
         ],

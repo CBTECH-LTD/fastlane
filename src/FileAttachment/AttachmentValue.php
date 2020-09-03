@@ -9,12 +9,24 @@ class AttachmentValue implements Arrayable
     private string $file;
     private string $name;
     private string $url;
+    private ?string $extension = null;
+    private ?string $size = null;
+    private ?string $mimeType = null;
 
-    public function __construct(string $file, string $name, string $url)
-    {
+    public function __construct(
+        string $file,
+        string $name,
+        string $url,
+        ?string $extension = null,
+        ?string $size = null,
+        ?string $mimeType = null
+    ) {
         $this->file = $file;
         $this->name = $name;
         $this->url = $url;
+        $this->extension = $extension;
+        $this->size = $size;
+        $this->mimeType = $mimeType;
     }
 
     /**
@@ -44,9 +56,12 @@ class AttachmentValue implements Arrayable
     public function toArray()
     {
         return [
-            'file' => $this->file,
-            'name' => $this->name,
-            'url'  => $this->url,
+            'file'      => $this->file,
+            'name'      => $this->name,
+            'url'       => $this->url,
+            'extension' => $this->extension,
+            'size'      => $this->size,
+            'mimetype'  => $this->mimeType,
         ];
     }
 }

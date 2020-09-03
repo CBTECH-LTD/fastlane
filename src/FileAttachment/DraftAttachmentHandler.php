@@ -23,7 +23,14 @@ class DraftAttachmentHandler implements Contracts\DraftAttachmentHandler
                 $q->whereIn('file', $files);
             })
             ->get()->map(
-                fn(DraftAttachment $a) => new AttachmentValue($a->file, $a->name, $a->url())
+                fn(DraftAttachment $a) => new AttachmentValue(
+                    $a->file,
+                    $a->name,
+                    $a->url(),
+                    $a->extension,
+                    $a->size,
+                    $a->mimetype,
+                )
             );
     }
 
@@ -41,16 +48,26 @@ class DraftAttachmentHandler implements Contracts\DraftAttachmentHandler
         $file = $data['files'][0];
 
         $draft = DraftAttachment::create([
-            'handler'  => get_class($this),
-            'draft_id' => $data['draft_id'],
-            'name'     => $data['name'],
-            'file'     => $file->store($field->getStorageDirectory(), $disk),
+            'handler'   => get_class($this),
+            'draft_id'  => $data['draft_id'],
+            'name'      => $data['name'],
+            'file'      => $file->store($field->getStorageDirectory(), $disk),
+            'extension' => $file->extension(),
+            'size'      => $file->getSize(),
+            'mimetype'  => $file->getMimeType(),
         ]);
 
         if (! $draft) {
             abort(500);
         }
 
-        return new AttachmentValue($draft->file, $draft->name, $draft->url());
+        return new AttachmentValue(
+            $draft->file,
+            $draft->name,
+            $draft->url(),
+            $draft->extension,
+            $draft->size,
+            $draft->mimetype,
+        );
     }
 }

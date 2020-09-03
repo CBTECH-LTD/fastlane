@@ -20,19 +20,13 @@ class Attachment extends Model implements Recordable
         'file',
         'url',
         'name',
+        'extension',
+        'size',
+        'mimetype',
     ];
 
     public function url(): string
     {
         return Storage::disk(config('fastlane.attachments.disk'))->url($this->file);
-    }
-
-    public function toArray()
-    {
-        return new AttachmentValue(
-            $this->file,
-            $this->name,
-            $this->url()
-        );
     }
 }

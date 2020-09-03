@@ -27,9 +27,9 @@ class BelongsToManyField extends RelationField
         return new FieldValue($this->getName(), $value);
     }
 
-    public function isMultiple(): bool
+    public function getRelationshipLabel(): string
     {
-        return true;
+        return $this->relatedEntryType->pluralName();
     }
 
     public function getRelationshipName(): string
@@ -58,13 +58,5 @@ class BelongsToManyField extends RelationField
 
                 $next($hook);
             });
-    }
-
-    protected function makeRelatedModelSelectOption(Model $model): SelectOption
-    {
-        return SelectOption::make(
-            $model->getKey(),
-            (new EntryInstance($this->getRelatedEntryType(), $model))->title(),
-        );
     }
 }

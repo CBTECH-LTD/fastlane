@@ -6,6 +6,7 @@ use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 interface EntryType extends Hookable
 {
@@ -34,6 +35,8 @@ interface EntryType extends Hookable
     public function isVisibleOnMenu(): bool;
 
     public function getItems(?QueryFilterContract $queryFilter = null): LengthAwarePaginator;
+
+    public function getItemsForRelationField(?QueryFilterContract $queryFilter = null): Collection;
 
     public function findItem(string $hashid): EntryInstance;
 
