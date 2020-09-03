@@ -4,6 +4,9 @@ All notable changes to `fastlane` will be documented in this file
 
 ## [Unreleased]
 
+## Added
+- Slug field.
+
 ## Changed
 - More options to File field, like file size, min and max number of files.
 - How attachments work.
