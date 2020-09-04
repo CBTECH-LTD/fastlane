@@ -27,17 +27,6 @@ trait HandlesAttachments
         return $this->storageDirectory;
     }
 
-    public function storeAttachment(EntryAttachmentStoreRequest $request): AttachmentValue
-    {
-        $defaultHandler = config('fastlane.attachments.draft_handler');
-
-        $callback = $this->addFileHandler instanceof DraftAttachmentHandler
-            ? $this->addFileHandler
-            : new $defaultHandler($this);
-
-        return $callback->write($request, $this);
-    }
-
     /**
      * @param string | Closure $directory
      * @return $this
@@ -52,6 +41,17 @@ trait HandlesAttachments
     {
         $this->addFileHandler = $handler;
         return $this;
+    }
+
+    public function storeAttachment(EntryAttachmentStoreRequest $request): AttachmentValue
+    {
+        $defaultHandler = config('fastlane.attachments.draft_handler');
+
+        $callback = $this->addFileHandler instanceof DraftAttachmentHandler
+            ? $this->addFileHandler
+            : new $defaultHandler($this);
+
+        return $callback->write($request, $this);
     }
 
     public function isAcceptingAttachments(): bool

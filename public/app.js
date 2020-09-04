@@ -10628,8 +10628,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 return uploadByFile;
               }(),
-              uploadByUrl: function uploadByUrl(url) {
-                return null;
+              uploadByUrl: function uploadByUrl() {
+                return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
+                    while (1) {
+                      switch (_context2.prev = _context2.next) {
+                        case 0:
+                          return _context2.abrupt("return", null);
+
+                        case 1:
+                        case "end":
+                          return _context2.stop();
+                      }
+                    }
+                  }, _callee2);
+                }))();
               }
             }
           }
@@ -10652,23 +10665,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         underline: _editorjs_underline__WEBPACK_IMPORTED_MODULE_18___default.a
       },
       onChange: function () {
-        var _onChange = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
+        var _onChange = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
             while (1) {
-              switch (_context2.prev = _context2.next) {
+              switch (_context3.prev = _context3.next) {
                 case 0:
-                  _context2.next = 2;
+                  _context3.next = 2;
                   return _this.editor.save();
 
                 case 2:
-                  _this.field.value = _context2.sent;
+                  _this.field.value = _context3.sent;
 
                 case 3:
                 case "end":
-                  return _context2.stop();
+                  return _context3.stop();
               }
             }
-          }, _callee2);
+          }, _callee3);
         }));
 
         function onChange() {
@@ -12112,7 +12125,7 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       return {
-        backgroundImage: "url(".concat(this.value, ")")
+        backgroundImage: "url(".concat(this.value.url, ")")
       };
     }
   }

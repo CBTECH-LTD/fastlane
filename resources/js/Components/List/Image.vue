@@ -18,7 +18,7 @@
                 }
 
                 return {
-                    backgroundImage: `url(${this.value})`,
+                    backgroundImage: `url(${this.value.url})`,
                 }
             }
         },

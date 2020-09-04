@@ -3,7 +3,7 @@
         <template v-if="field.label && field.label_visible" v-slot:label>
             {{ field.label }}
         </template>
-        
+
         <div class="w-full form-input p-6">
             <div :id="editorId" ref="editor"></div>
         </div>
@@ -109,7 +109,7 @@ export default {
                                     file: { id, url, name },
                                 }
                             },
-                            uploadByUrl (url) {
+                            async uploadByUrl () {
                                 return null
                             }
                         },
