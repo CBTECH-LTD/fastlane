@@ -5,6 +5,7 @@ All notable changes to `fastlane` will be documented in this file
 ## [Unreleased]
 
 ## Added
+- File manager.
 - Slug field.
 
 ## Changed
