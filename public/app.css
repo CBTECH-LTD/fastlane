@@ -635,7 +635,7 @@ pre,
 code,
 kbd,
 samp {
-  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 /**
@@ -10329,6 +10329,14 @@ video {
 
 .font-sans {
   font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.font-serif {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+.font-mono {
+  font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 .font-hairline {
@@ -32574,6 +32582,14 @@ tfoot .table__column-group {
     font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 
+  .sm\:font-serif {
+    font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  }
+
+  .sm\:font-mono {
+    font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+
   .sm\:font-hairline {
     font-weight: 100;
   }
@@ -54685,6 +54701,14 @@ tfoot .table__column-group {
 
   .md\:font-sans {
     font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .md\:font-serif {
+    font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  }
+
+  .md\:font-mono {
+    font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
 
   .md\:font-hairline {
@@ -76800,6 +76824,14 @@ tfoot .table__column-group {
     font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 
+  .lg\:font-serif {
+    font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  }
+
+  .lg\:font-mono {
+    font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+
   .lg\:font-hairline {
     font-weight: 100;
   }
@@ -98911,6 +98943,14 @@ tfoot .table__column-group {
 
   .xl\:font-sans {
     font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .xl\:font-serif {
+    font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  }
+
+  .xl\:font-mono {
+    font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
 
   .xl\:font-hairline {

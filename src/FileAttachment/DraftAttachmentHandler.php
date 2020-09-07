@@ -20,17 +20,17 @@ class DraftAttachmentHandler implements Contracts\DraftAttachmentHandler
         return DraftAttachment::query()
             ->where('draft_id', $draftId)
             ->when(is_array($files), function ($q) use ($files) {
-                $q->whereIn('file', $files);
+                $q->whereIn('file', Collection::make($files)->pluck('file')->all());
             })
             ->get()->map(
-                fn(DraftAttachment $a) => new AttachmentValue(
+                fn(DraftAttachment $a) => (new AttachmentValue(
                     $a->file,
                     $a->name,
                     $a->url(),
                     $a->extension,
                     $a->size,
                     $a->mimetype,
-                )
+                ))->setAsDraft()
             );
     }
 

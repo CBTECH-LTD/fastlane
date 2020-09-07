@@ -3,19 +3,35 @@
 namespace CbtechLtd\Fastlane\EntryTypes\FileManager;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
+use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\FileAttachment\AttachmentValue;
 use CbtechLtd\Fastlane\FileAttachment\Contracts\DraftAttachmentHandler;
+use CbtechLtd\Fastlane\FileAttachment\Contracts\PersistentAttachmentHandler;
+use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
 use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
+use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Contracts\WithCollectionLinks;
 use CbtechLtd\Fastlane\Support\Contracts\WithCustomController;
 use CbtechLtd\Fastlane\Support\Contracts\WithCustomViews;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
+use CbtechLtd\Fastlane\Support\Schema\Fields\FieldValue;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FileField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\HiddenField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\File as FileFacade;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class FileManagerEntryType extends EntryType implements RenderableOnMenu, WithCustomViews, WithCollectionLinks, WithCustomController
 {
@@ -61,8 +77,23 @@ class FileManagerEntryType extends EntryType implements RenderableOnMenu, WithCu
                 ->showOnIndex()
                 ->sortable(),
 
-            FileField::make('file', 'File')
-                ->withDescription(__('Select the files you want to upload. You can select as many files as you want.'))
+            StringField::make('extension', 'Extension')
+                ->maxLength(10)
+                ->showOnIndex()
+                ->hideOnForm()
+                ->sortable(),
+
+            HiddenField::make('size', 'Size')->showOnIndex(),
+
+            HiddenField::make('mimetype', 'Mime Type')->showOnIndex(),
+
+            HiddenField::make('url', 'URL')
+                ->showOnIndex()
+                ->readValueUsing(function (EntryInstanceContract $entryInstance) {
+                    return new FieldValue('url', $entryInstance->model()->url());
+                }),
+
+            StringField::make('file', 'File')
                 ->showOnIndex()
                 ->required(),
 
@@ -102,19 +133,60 @@ class FileManagerEntryType extends EntryType implements RenderableOnMenu, WithCu
         return FileManagerController::class;
     }
 
-    public function storeMany(Request $request): void
+    public function store(Request $request): EntryInstanceContract
     {
-        /** @var DraftAttachmentHandler $handler */
-        $handler = app()->make(config('fastlane.attachments.draft_handler'));
+        // Check whether the authenticated user can create an
+        // instance of the given entry type.
+        if ($this->policy()) {
+            $this->gate->authorize('create', $this->model());
+        }
 
-        $handler->findDrafts($request->input('file__draft_id'), $request->input('file'))
-            ->each(function (AttachmentValue $value) use ($request) {
-                $req = Request::createFrom($request)->merge([
-                    'file' => [$value->getFile()],
-                    'name' => $value->getName(),
-                ]);
+        $entryInstance = $this->newInstance(null);
 
-                $this->store($req);
+        /** @var PersistentAttachmentHandler $handler */
+        $uploadedFile = $request->file('files.0');
+        $filePath = $uploadedFile->store('files', Config::get('fastlane.attachments.disk'));
+
+        $request->merge([
+            'file'      => $filePath,
+            'extension' => FileFacade::extension($filePath),
+            'mimetype'  => $uploadedFile->getMimeType(),
+            'size'      => (string)$uploadedFile->getSize(),
+            'active'    => true,
+        ]);
+
+        // Validate the request data against the create fields
+        // and save the validated data in a new variable.
+        $fields = $entryInstance->schema()->getFields();
+
+        $rules = Collection::make($fields)
+            ->filter(fn(SchemaField $f) => $f instanceof WithRules)
+            ->mapWithKeys(fn(WithRules $f) => $f->getCreateRules())
+            ->all();
+
+        $data = Validator::make($request->all(), $rules)->validated();
+
+        // Pass the validated date through all fields, call hooks before saving,
+        // then call more hooks after model has been saved.
+        $this->hydrateFields($entryInstance, $fields, $data);
+
+        $entryInstance->saveModel();
+        return $entryInstance;
+    }
+
+    protected function queryItems(Builder $query): void
+    {
+        $query->when(request()->input('filter.types'), function (Builder $q, array $types) {
+            $q->where(function (Builder $q) use ($types) {
+                foreach ($types as $type) {
+                    if (Str::endsWith($type, '/*')) {
+                        $q->orWhere('mimetype', 'like', Str::replaceLast('/*', '', $type) . '%');
+                        continue;
+                    }
+
+                    $q->orWhere('mimetype', $type);
+                }
             });
+        });
     }
 }

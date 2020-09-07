@@ -2,10 +2,10 @@
 
 namespace CbtechLtd\Fastlane\FileAttachment;
 
-use CbtechLtd\Fastlane\EntryTypes\EntryType;
-use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
+use CbtechLtd\Fastlane\EntryTypes\FileManager\File;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -27,10 +27,9 @@ class PersistentAttachmentHandler implements Contracts\PersistentAttachmentHandl
      */
     public function read(EntryInstance $entryInstance, array $files): Collection
     {
-        return Attachment::query()
-            ->whereIn('file', $files)
-            ->where('attachable_type', get_class($entryInstance->model()))
-            ->where('attachable_id', $entryInstance->model()->getKey())
+        return File::query()
+            ->where('handler', get_class($this))
+            ->whereIn('id', $files)
             ->get()->map(
                 fn(Attachment $a) => new AttachmentValue(
                     $a->file,
@@ -45,29 +44,13 @@ class PersistentAttachmentHandler implements Contracts\PersistentAttachmentHandl
 
     /**
      * @param EntryInstance $entryInstance
-     * @param string        $fieldName
-     * @param array         $value
-     * @param string        $draftId
+     * @param UploadedFile  $file
+     * @param string        $directory
+     * @return string
      */
-    public function write(EntryInstance $entryInstance, string $fieldName, array $value, string $draftId): void
+    public function write(EntryInstance $entryInstance, UploadedFile $file, string $directory = 'files'): string
     {
-        $files = Collection::make($value)->pluck('file')->all();
-        $entryInstance->model()->{$fieldName} = $files;
-
-        // We persist draft attachments after the model has being saved because
-        // wee need the model's id.
-        // TODO: Find a way to persist drafts before saving the model to guarantee
-        //       that we don't get models with files information while attachments
-        //       does not actually exist.
-        $entryInstance->type()->addHook(EntryType::HOOK_AFTER_SAVING, function (OnSavingHook $hook) use ($entryInstance, $files, $draftId) {
-            DraftAttachment::query()
-                ->where('draft_id', $draftId)
-                ->whereIn('file', $files)
-                ->get()
-                ->map(function (DraftAttachment $draft) use ($draftId, $entryInstance) {
-                    return $this->persist($entryInstance, $draft);
-                });
-        });
+        return $file->store($directory, Config::get('fastlane.attachments.disk'));
     }
 
     protected function persist(EntryInstance $entryInstance, DraftAttachment $draft): AttachmentValue

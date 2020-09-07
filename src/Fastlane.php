@@ -115,7 +115,7 @@ class Fastlane
                 : Controllers\EntriesController::class;
 
             $router
-                ->middleware('fastlane.resolve:control_panel')
+                ->middleware('fastlane.resolve:' . $entryType->identifier())
                 ->group(fn() => $router->fastlaneControlPanel(
                     $entryType->identifier(),
                     $controller

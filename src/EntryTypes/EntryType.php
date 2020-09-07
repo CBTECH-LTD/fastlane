@@ -7,15 +7,15 @@ use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\QueryFilter\QueryFilter;
+use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollection;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
-use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -177,7 +177,9 @@ abstract class EntryType implements EntryTypeContract
     {
         $this->gate->authorize('list', $this->model());
 
-        $query = ($queryFilter ?? new QueryFilter)
+        $this->prepareQueryFilter($queryFilter ?? new QueryFilter);
+
+        $query = $queryFilter
             ->addOrder('created_at')
             ->addOrder('id')
             ->pipeThrough(
@@ -345,6 +347,11 @@ abstract class EntryType implements EntryTypeContract
     protected function queryItemsForRelationField(Builder $query): void
     {
         //
+    }
+
+    protected function prepareQueryFilter(QueryFilterContract $queryFilter): void
+    {
+
     }
 
     protected function queryItems(Builder $query): void

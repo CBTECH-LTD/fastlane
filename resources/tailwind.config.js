@@ -1,4 +1,4 @@
-const { colors } = require('tailwindcss/defaultTheme')
+const { fontFamily, colors } = require('tailwindcss/defaultTheme')
 
 module.exports = {
     theme: {
@@ -66,6 +66,7 @@ module.exports = {
             }
         },
         fontFamily: {
+            ...fontFamily,
             sans: [
                 'Inter',
                 '"Segoe UI"',

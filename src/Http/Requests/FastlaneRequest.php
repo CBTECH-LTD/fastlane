@@ -48,7 +48,6 @@ class FastlaneRequest extends Request
     public function buildQueryFilter(): QueryFilterContract
     {
         return tap(new QueryFilter(), function (QueryFilter $qf) {
-
             if ($order = $this->input('order')) {
                 $fieldName = Str::replaceFirst('-', '', $order);
 

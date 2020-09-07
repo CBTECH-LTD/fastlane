@@ -9,6 +9,7 @@ use CbtechLtd\Fastlane\Console\Commands\MakeEntryTypeCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Commands\CreateSystemAdminCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
+use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
 use CbtechLtd\Fastlane\FileAttachment\Attachment;
 use CbtechLtd\Fastlane\Http\Controllers\EntryAttachmentsController;
 use CbtechLtd\Fastlane\Http\Controllers\EntryImagesController;
@@ -168,8 +169,21 @@ class FastlaneServiceProvider extends ServiceProvider
 
         // Set data that must be available to all components.
         Inertia::share('app.name', Config::get('app.name'));
+
         Inertia::share('app.baseUrl', Config::get('app.url'));
+
         Inertia::share('app.requestUrl', request()->path());
+
+        Inertia::share('app.cpUrls', function () {
+            return [
+                'fileManager' => route('cp.file-manager.index'),
+            ];
+        });
+
+        Inertia::share('app.csrfToken', function () {
+            return csrf_token();
+        });
+
         Inertia::share('app.assets', [
             'logoImage'       => config('fastlane.asset_logo_img'),
             'loginBackground' => config('fastlane.asset_login_bg'),

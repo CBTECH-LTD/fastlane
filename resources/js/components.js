@@ -8,8 +8,9 @@ import FFormSelectInput from './Components/Form/SelectInput'
 import FFormStringInput from './Components/Form/StringInput'
 import FFormToggleInput from './Components/Form/ToggleInput'
 import FFormTextInput from './Components/Form/TextInput'
-import FformFileInput from './Components/Form/FileInput'
+import FFormFileInput from './Components/Form/FileInput'
 import FFormFieldPanel from './Components/Form/FieldPanel'
+import FFormYearInput from './Components/Form/YearInput'
 import FFormRoot from './Components/Form/FormRoot'
 import FIcon from './Components/Icon'
 import FLink from './Components/Link'
@@ -23,7 +24,8 @@ import FSpinner from './Components/Spinner'
 import FTableCard from './Components/TableCard'
 import FTheAppLayout from './Components/TheAppLayout'
 import FTrix from './Components/Trix'
-import YearInput from './Components/Form/YearInput'
+
+import FFileManager from './Components/FileManager'
 
 export default {
     install (Vue) {
@@ -41,6 +43,7 @@ export default {
         Vue.component('f-spinner', FSpinner)
         Vue.component('f-the-app-layout', FTheAppLayout)
         Vue.component('f-trix', FTrix)
+        Vue.component('f-file-manager', FFileManager)
 
         // Menu specific..)
         Vue.component('f-menu-group', FMenuGroup)
@@ -51,8 +54,8 @@ export default {
         Vue.component('f-form-field', FFormField)
         Vue.component('f-form-field-panel', FFormFieldPanel)
         Vue.component('f-form-date-time-input', FFormDateTimeInput)
-        Vue.component('f-form-year-input', YearInput)
-        Vue.component('f-form-file-input', FformFileInput)
+        Vue.component('f-form-year-input', FFormYearInput)
+        Vue.component('f-form-file-input', FFormFileInput)
         Vue.component('f-form-radio-input', FFormRadioInput)
         Vue.component('f-form-rich-editor-input', FFormRichEditorInput)
         Vue.component('f-form-single-choice-input', FFormSelectInput)

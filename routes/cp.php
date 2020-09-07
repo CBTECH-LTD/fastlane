@@ -1,9 +1,11 @@
 <?php
 
+use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
 use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Http\Controllers\Account\AccountProfileController;
 use CbtechLtd\Fastlane\Http\Controllers\Account\AccountSecurityController;
 use CbtechLtd\Fastlane\Http\Controllers\Account\AccountTokensController;
+use CbtechLtd\Fastlane\Http\Controllers\API\FileManagerController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\ConfirmPasswordController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\ForgotPasswordController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\LoginController;
@@ -61,6 +63,11 @@ Route::middleware(['fastlane.auth:fastlane-cp', 'verified'])->group(function ($r
     $router->get('account/tokens/new', [AccountTokensController::class, 'create'])->name('account.tokens.create')->middleware('password.confirm:cp.password.confirm');
     $router->post('account/tokens', [AccountTokensController::class, 'store'])->name('account.tokens.store');
     $router->delete('account/tokens/{token}', [AccountTokensController::class, 'destroy'])->name('account.tokens.destroy');
+
+    $router->middleware('fastlane.resolve:' . app()->make(FileManagerEntryType::class)->identifier())->group(function () use ($router) {
+        $router->get('file-manager/files', [FileManagerController::class, 'index'])->name('file-manager.index');
+        $router->post('file-manager/files', [FileManagerController::class, 'store'])->name('file-manager.store');
+    });
 
     // Register Entry Types routes
     FastlaneFacade::registerControlPanelRoutes($router);

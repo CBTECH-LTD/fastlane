@@ -5,11 +5,8 @@
         </template>
         <template v-slot:before-table>
             <div class="w-full my-8">
-                <f-form-file-input inline :auto-upload="false" :show-upload-button="false" ref="fileInput" :field="uploadForm.getField('file')" @input="uploadFiles"/>
+                <f-form-file-input :show-upload-button="false" ref="fileInput" :field="uploadForm.getField('file')" @input="uploadFiles"/>
             </div>
-        </template>
-        <template>
-
         </template>
     </EntriesIndex>
 </template>
@@ -43,7 +40,7 @@ export default {
             this.$refs.fileInput.openModal()
         },
 
-        async uploadFiles (files) {
+        async uploadFiles () {
             if (!this.isUploading) {
                 this.isUploading = true
 

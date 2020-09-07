@@ -4,9 +4,9 @@
         <template v-if="field.description && (inline || showUploadButton)" v-slot:description>{{ field.description }}</template>
 
         <div class="w-full">
-            <template v-if="field.value.length">
+            <template v-if="listFiles && field.value && field.value.length">
                 <transition-group name="files-list" tag="div" class="w-full flex flex-wrap">
-                    <div v-for="file in persistentFiles" :key="file.file" class="relative w-1/2 p-2">
+                    <div v-for="file in field.value" :key="file.file" class="relative w-1/2 p-2">
                         <div class="absolute top-0 right-0 -mr-2 -mt-2 z-10">
                             <f-button @click="removeFile(file)" color="danger" size="sm" class="btn-oval p-0 flex items-center justify-center">
                                 <div class="flex items-center justify-center w-full h-full">
@@ -30,10 +30,21 @@
                 </transition-group>
             </template>
 
-            <div ref="container"></div>
-            <div v-if="!inline && showUploadButton">
-                <f-button @click="openModal" left-icon="file-upload" size="lg">Upload {{ field.label }}</f-button>
-            </div>
+            <f-button @click="openFileManager" left-icon="file-upload" size="lg">Select {{ field.label }}</f-button>
+
+            <portal to="modals">
+                <f-file-manager v-if="showFileManager"
+                    :endpoint="$page.app.cpUrls.fileManager"
+                    :selected="this.field.value"
+                    :max-file-size="field.config.maxFileSize"
+                    :min-number-of-files="field.config.minNumberOfFiles"
+                    :max-number-of-files="field.config.maxNumberOfFiles"
+                    :file-types="field.config.fileTypes"
+                    :csrf-token="$page.app.csrfToken"
+                    @files-selected="onFilesSelected"
+                    @close="closeFileManager"
+                />
+            </portal>
         </div>
     </f-form-field>
 </template>
@@ -57,6 +68,10 @@ export default {
     inheritAttrs: false,
 
     props: {
+        listFiles: {
+            type: Boolean,
+            default: true,
+        },
         autoUpload: {
             type: Boolean,
             default: false,
@@ -75,35 +90,26 @@ export default {
         }
     },
 
-    data () {
-        return {
-            uppy: null,
-            draftId: uuidv4(),
-        }
-    },
-
-    computed: {
-        persistentFiles () {
-            return this.field.value.filter(
-                file => !file.excluded
-            )
-        },
-        excludedFiles () {
-            return this.field.value.filter(
-                file => file.excluded === true
-            )
-        }
-    },
+    data: () => ({
+        showFileManager: false,
+    }),
 
     methods: {
         commit (formObject) {
-            formObject.put(this.field.name, this.field.value.map(f => ({
-                file: f.file,
-                is_draft: !!f.is_draft,
-                excluded: !!f.excluded,
-            })))
+            formObject.put(this.field.name, this.field.value.map(f => f.id))
+        },
 
-            formObject.put(`${this.field.name}__draft_id`, this.draftId)
+        openFileManager () {
+            this.showFileManager = true
+        },
+
+        closeFileManager () {
+            this.showFileManager = false
+        },
+
+        onFilesSelected (files) {
+            this.onInput(files)
+            this.closeFileManager()
         },
 
         removeFile (file) {
@@ -113,104 +119,17 @@ export default {
 
             if (index > -1) {
                 const newVal = cloneDeep(this.field.value)
-                this.$set(newVal[index], 'excluded', true)
+                this.$delete(newVal, index)
                 this.onInput(newVal)
             }
-        },
-
-        openModal () {
-            const dash = this.uppy.getPlugin('Dashboard')
-
-            if (!dash.isModalOpen()) {
-                dash.openModal()
-            }
-        },
-
-        closeModal () {
-            this.uppy.getPlugin('Dashboard').closeModal()
         },
 
         isImage (file) {
             return file.mimetype && file.mimetype.startsWith('image/')
         }
     },
-
-    mounted () {
-        this.uppy = new Uppy({
-            autoProceed: this.autoUpload,
-            restrictions: {
-                maxFileSize: this.field.config.maxFileSize,
-                minNumberOfFiles: this.field.config.minNumberOfFiles,
-                maxNumberOfFiles: this.field.config.maxNumberOfFiles,
-                allowedFileTypes: this.field.config.fileTypes.length ? this.field.config.fileTypes : null,
-            },
-        }).use(Dashboard, {
-            target: this.$refs.container,
-            inline: this.inline,
-            width: '100%',
-            height: this.height,
-            showProgressDetails: true,
-            showLinkToFileUploadResult: false,
-            browserBackButtonClose: false,
-            proudlyDisplayPoweredByUppy: false,
-            onRequestCloseModal: () => this.closeModal(),
-            metaFields: [
-                { id: 'name', name: this.$l('core.fields.name'), placeholder: this.$l('core.fields.name') }
-            ]
-            // note: 'Images up to 10 MB',
-        }).use(ImageEditor, {
-            id: `ImageEditor_${this.field.name}`,
-            target: Dashboard,
-            quality: 0.8,
-            cropperOptions: {
-                viewMode: 1,
-                background: false,
-                autoCropArea: 1,
-                responsive: true,
-            }
-        }).use(XHRUpload, {
-            endpoint: this.field.config.links.self,
-            withCredentials: true,
-            bundle: false,
-            headers: {
-                'X-CSRF-TOKEN': this.field.config.csrfToken
-            }
-        })
-
-        this.uppy.on('file-added', () => {
-            this.uppy.setMeta({
-                draft_id: this.draftId,
-            })
-        })
-
-        this.uppy.on('complete', ({ successful }) => {
-            const value = (this.field.multiple)
-                ? this.field.value || []
-                : []
-
-            const files = map(successful, f => {
-                return {
-                    ...f.response.body,
-                    is_draft: true,
-                }
-            })
-
-            this.onInput(value.concat(files))
-            this.closeModal()
-
-            if (!this.multiple) {
-                this.uppy.reset()
-            }
-        })
-    },
-
-    beforeDestroy () {
-        delete this.uppy
-    }
 }
 </script>
-
-<style module src="../../../css/components/uppy.dashboard.css"></style>
 
 <style scoped>
 .files-list-enter-active,

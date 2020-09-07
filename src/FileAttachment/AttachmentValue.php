@@ -12,6 +12,7 @@ class AttachmentValue implements Arrayable
     private ?string $extension = null;
     private ?string $size = null;
     private ?string $mimeType = null;
+    private bool $draft = false;
 
     public function __construct(
         string $file,
@@ -53,6 +54,17 @@ class AttachmentValue implements Arrayable
         return $this->url;
     }
 
+    public function isDraft(): bool
+    {
+        return $this->draft;
+    }
+
+    public function setAsDraft(): self
+    {
+        $this->draft = true;
+        return $this;
+    }
+
     public function toArray()
     {
         return [
@@ -62,6 +74,7 @@ class AttachmentValue implements Arrayable
             'extension' => $this->extension,
             'size'      => $this->size,
             'mimetype'  => $this->mimeType,
+            'is_draft'  => $this->isDraft(),
         ];
     }
 }

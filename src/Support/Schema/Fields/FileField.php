@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\FileAttachment\AttachmentValue;
+use CbtechLtd\Fastlane\EntryTypes\FileManager\File;
 use CbtechLtd\Fastlane\FileAttachment\Contracts\PersistentAttachmentHandler;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
@@ -68,46 +68,9 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
             return call_user_func($this->readValueCallback, $entryInstance);
         }
 
-        $files = Arr::wrap($entryInstance->model()->{$this->getName()});
-        $handler = app()->make(config('fastlane.attachments.persistent_handler'));
+        $files = File::query()->whereKey(Arr::wrap($entryInstance->model()->{$this->getName()}))->get();
 
-        $value = $handler->read($entryInstance, $files)->map(
-            fn(AttachmentValue $attachment) => $attachment->toArray()
-        )->all();
-
-        return new FieldValue($this->getName(), $value);
-    }
-
-    public function writeValue(EntryInstance $entryInstance, $value, array $requestData): void
-    {
-        if (! $this->isAcceptingAttachments() || ! $draftId = Arr::get($requestData, $this->getName() . '__draft_id')) {
-            return;
-        }
-
-        if (is_callable($this->writeValueCallback)) {
-            call_user_func($this->writeValueCallback, $entryInstance, $value, $requestData);
-            return;
-        }
-
-        // TODO: Remove draft attachments with excluded=true
-
-        /** @var PersistentAttachmentHandler $handler */
-        $persistentHandler = app()->make(config('fastlane.attachments.persistent_handler'));
-
-        $persistentHandler->write(
-            $entryInstance,
-            $this->getName(),
-            Collection::make($value)->filter(fn($v) => ! $v['excluded'])->all(),
-            $draftId
-
-        );
-
-        $persistentHandler->remove(
-            $entryInstance,
-            $this->getName(),
-            Collection::make($value)->filter(fn($v) => $v['excluded'])->all(),
-            $draftId
-        );
+        return new FieldValue($this->getName(), $files->toArray());
     }
 
     public function toModelAttribute(): array
@@ -118,12 +81,9 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
     protected function getTypeRules(): array
     {
         return [
-            $this->getName()                 => 'array',
-            $this->getName() . '.*'          => "present|array",
-            $this->getName() . '.*.file'     => "required|string",
-            $this->getName() . '.*.is_draft' => "required|boolean",
-            $this->getName() . '.*.excluded' => "required|boolean",
-            $this->getName() . '__draft_id'  => "required_with:{$this->getName()}|uuid",
+            $this->getName()        => 'array',
+            $this->getName() . '.*' => "present|array",
+            $this->getName() . '.*' => "required|exists:fastlane_files,id",
         ];
     }
 

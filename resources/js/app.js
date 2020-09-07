@@ -1,6 +1,7 @@
 import { InertiaApp } from '@inertiajs/inertia-vue'
 import ErrorBagsFactory from './Support/ErrorBags'
 import Vue from 'vue'
+import PortalVue from 'portal-vue'
 import VueI18n from 'vue-i18n'
 import components from './components.js'
 import Asset from './Plugins/Asset'
@@ -12,6 +13,7 @@ import Lang from './Plugins/Lang'
 Vue.use(Asset)
 Vue.use(Lang)
 Vue.use(VueI18n)
+Vue.use(PortalVue)
 
 /*
  * Register all components and pages globally.
