@@ -30,16 +30,6 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
         }
 
         $entryInstance->model()->{$this->getName()} = $value;
-
-        // Check whether files are accepted in the rich editor instance,
-        // then persist all draft attachment files.
-        if ($this->isAcceptingAttachments() && $draftId = Arr::get($requestData, $this->getName() . '__draft_id')) {
-            DraftAttachment::persistAllDraft(
-                $draftId,
-                $this,
-                $entryInstance->model(),
-            );
-        }
     }
 
     public function getAcceptableMimetypes(): array
@@ -71,7 +61,7 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
         $this->resolvedConfig = $this->resolvedConfig->merge([
             'acceptFiles' => $this->acceptFiles,
             'links'       => [
-                'self' => URL::relative("cp.{$entryInstance->type()->identifier()}.attachments", $this->getName()),
+                'fileManager' => URL::relative("cp.file-manager.index"),
             ],
         ]);
     }

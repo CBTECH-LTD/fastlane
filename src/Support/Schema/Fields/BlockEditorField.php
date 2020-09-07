@@ -35,7 +35,7 @@ class BlockEditorField extends AbstractBaseField implements HasAttachments
         $this->resolvedConfig = $this->resolvedConfig->merge([
             'csrfToken' => csrf_token(),
             'links'     => [
-                'attachments' => URL::relative("cp.{$entryInstance->type()->identifier()}.attachments", $this->getName()),
+                'fileManager' => URL::relative('cp.file-manager.index'),
             ],
         ]);
     }

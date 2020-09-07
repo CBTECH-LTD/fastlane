@@ -58,10 +58,8 @@ return [
      * Determine handlers and storage disk to be used for file attachments.
      */
     'attachments'       => [
-        'draft_handler'      => CbtechLtd\Fastlane\FileAttachment\DraftAttachmentHandler::class,
-        'persistent_handler' => CbtechLtd\Fastlane\FileAttachment\PersistentAttachmentHandler::class,
-        'disk'               => 'public',
-        'max_size'           => 10000000, // in kb
+        'disk'     => 'public',
+        'max_size' => 10000000, // in kb
     ],
 
     'currency' => [

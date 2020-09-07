@@ -37,7 +37,7 @@
                         <f-icon class="text-lg" name="image"/>
                     </button>
                     <portal to="modals">
-                        <f-file-manager  v-if="showFileManager" :endpoint="$page.app.cpUrls.fileManager" :file-types="['image/*']" :csrf-token="$page.app.csrfToken" @files-selected="files => onFilesSelected(files, commands.image)" @close="closeFileManager" />
+                        <f-file-manager  v-if="showFileManager" :endpoint="field.config.links.fileManager" :file-types="['image/*']" :csrf-token="$page.app.csrfToken" @files-selected="files => onFilesSelected(files, commands.image)" @close="closeFileManager" />
                     </portal>
 
                     <button type="button" class="menubar__button" @click="commands.iframe">
@@ -193,7 +193,6 @@ export default {
     },
 
     data: () => ({
-        draftId: uuidv4(),
         editor: null,
         linkUrl: null,
         linkMenuIsActive: false,
@@ -206,7 +205,6 @@ export default {
          */
         commit (formObject) {
             formObject.put(this.field.name, this.field.value)
-            formObject.put(`${this.field.name}__draft_id`, this.draftId)
         },
 
         onInput (value) {
@@ -220,7 +218,6 @@ export default {
                 const data = new FormData()
                 data.append('Content-Type', attachment.file.type)
                 data.append('files[]', attachment.file)
-                data.append('draft_id', this.draftId)
 
                 const { data: { urls } } = await axios.post(this.field.config.links.self, data, {
                     onUploadProgress: function (progressEvent) {

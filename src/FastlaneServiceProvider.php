@@ -276,17 +276,6 @@ class FastlaneServiceProvider extends ServiceProvider
                 if (! in_array('delete', $disabledRoutes)) {
                     $this->delete('/{id}', [$controller, 'delete'])->name("{$prefix}.delete");
                 }
-
-                // Attachment management routes
-                if (! in_array('attachments', $disabledRoutes)) {
-                    $this->post('/attachments/{fieldName}', [EntryAttachmentsController::class, 'store'])->name("{$prefix}.attachments");
-                    $this->delete('/attachments/{fieldName}', [EntryAttachmentsController::class, 'delete']);
-                }
-
-                // Image upload routes
-                if (! in_array('image', $disabledRoutes)) {
-                    $this->post('/images/{fieldName}', [EntryImagesController::class, 'store'])->name("{$prefix}.images");
-                }
             });
         });
 

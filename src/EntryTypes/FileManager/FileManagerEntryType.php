@@ -3,15 +3,9 @@
 namespace CbtechLtd\Fastlane\EntryTypes\FileManager;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
-use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
-use CbtechLtd\Fastlane\FileAttachment\AttachmentValue;
-use CbtechLtd\Fastlane\FileAttachment\Contracts\DraftAttachmentHandler;
 use CbtechLtd\Fastlane\FileAttachment\Contracts\PersistentAttachmentHandler;
-use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
-use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
-use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Contracts\WithCollectionLinks;
 use CbtechLtd\Fastlane\Support\Contracts\WithCustomController;
@@ -19,24 +13,20 @@ use CbtechLtd\Fastlane\Support\Contracts\WithCustomViews;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldValue;
-use CbtechLtd\Fastlane\Support\Schema\Fields\FileField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\HiddenField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File as FileFacade;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class FileManagerEntryType extends EntryType implements RenderableOnMenu, WithCustomViews, WithCollectionLinks, WithCustomController
+class FileManagerEntryType extends EntryType implements WithCustomViews, WithCollectionLinks, WithCustomController
 {
-    use RendersOnMenu;
-
     const PERM_MANAGE_FILES = 'manage files';
 
     public function identifier(): string

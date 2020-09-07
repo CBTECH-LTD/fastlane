@@ -63,7 +63,7 @@ export default {
                     class: Attaches,
                     config: {
                         field: 'files[]',
-                        endpoint: this.field.config.links.attachments,
+                        endpoint: this.field.config.links.fileManager,
                         additionalRequestHeaders: {
                             'X-CSRF-TOKEN': this.field.config.csrfToken,
                         },
@@ -99,7 +99,7 @@ export default {
                                 formData.append('files[]', file)
 
                                 const { data: { id, url, name } } = await axios.post(
-                                    this.field.config.links.attachments,
+                                    this.field.config.links.fileManager,
                                     formData,
                                     { headers: { 'X-CSRF-TOKEN': this.field.config.csrfToken } },
                                 )

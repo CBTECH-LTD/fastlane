@@ -3,14 +3,12 @@
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\EntryTypes\FileManager\File;
-use CbtechLtd\Fastlane\FileAttachment\Contracts\PersistentAttachmentHandler;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\HasAttachments;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 
 class FileField extends AbstractBaseField implements ExportsToApiAttributeContract, HasAttachments
@@ -97,7 +95,7 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
             'fileTypes'        => $this->getAcceptableMimetypes(),
             'csrfToken'        => csrf_token(),
             'links'            => [
-                'self' => URL::relative("cp.{$entryInstance->type()->identifier()}.attachments", $this->getName()),
+                'fileManager' => URL::relative("cp.file-manager.index"),
             ],
         ]);
     }

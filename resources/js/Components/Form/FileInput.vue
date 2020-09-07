@@ -34,8 +34,8 @@
 
             <portal to="modals">
                 <f-file-manager v-if="showFileManager"
-                    :endpoint="$page.app.cpUrls.fileManager"
-                    :selected="this.field.value"
+                    :endpoint="field.config.links.fileManager"
+                    :selected="field.value"
                     :max-file-size="field.config.maxFileSize"
                     :min-number-of-files="field.config.minNumberOfFiles"
                     :max-number-of-files="field.config.maxNumberOfFiles"
