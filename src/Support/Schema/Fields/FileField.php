@@ -68,7 +68,7 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
 
         $files = File::query()->whereKey(Arr::wrap($entryInstance->model()->{$this->getName()}))->get();
 
-        return new FieldValue($this->getName(), $files->toArray());
+        return $this->buildFieldValueInstance($this->getName(), $files->toArray());
     }
 
     public function toModelAttribute(): array
@@ -98,5 +98,10 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
                 'fileManager' => URL::relative("cp.file-manager.index"),
             ],
         ]);
+    }
+
+    protected function buildFieldValueInstance(string $fieldName, $value): FieldValue
+    {
+        return new FileFieldValue($fieldName, $value);
     }
 }

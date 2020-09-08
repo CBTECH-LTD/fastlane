@@ -30,7 +30,7 @@ use ReflectionClass;
 
 abstract class EntryType implements EntryTypeContract
 {
-    use HandlesHooks;
+    use HandlesHooks, QueriesForContentAPI;
 
     /** @description OnSavingHook */
     const HOOK_BEFORE_HYDRATING = 'beforeHydrating';

@@ -9,6 +9,7 @@ use CbtechLtd\Fastlane\Support\Schema\Contracts\EntrySchema as EntrySchemaContra
 use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ReadValue;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
+use CbtechLtd\Fastlane\Support\Schema\Fields\FieldValue;
 use CbtechLtd\Fastlane\Support\Schema\Fields\RelationField;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -52,6 +53,17 @@ class EntryInstance implements EntryInstanceContract
     public function type(): EntryTypeContract
     {
         return $this->type;
+    }
+
+    public function get(string $field, $default = null): FieldValue
+    {
+        $field = $this->schema()->findField($field);
+
+        if ($field instanceof ReadValue) {
+            return $field->readValue($this);
+        }
+
+        return new FieldValue($field, null);
     }
 
     public function model(): Model

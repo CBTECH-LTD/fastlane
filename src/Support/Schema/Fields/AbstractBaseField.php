@@ -111,7 +111,7 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
             return call_user_func($this->readValueCallback, $entryInstance);
         }
 
-        return new FieldValue($this->getName(), $entryInstance->model()->{$this->getName()});
+        return $this->buildFieldValueInstance($this->getName(), $entryInstance->model()->{$this->getName()});
     }
 
     /**
@@ -128,6 +128,20 @@ abstract class AbstractBaseField implements SchemaField, ResolvableContract, Rea
     {
         $this->readValueCallback = $callback;
         return $this;
+    }
+
+    /**
+     * Build an instance of FieldValue class to represent the field value.
+     * If you want to use a custom class extending FieldValue, this is
+     * the best place to use your custom class.
+     *
+     * @param string $fieldName
+     * @param        $value
+     * @return FieldValue
+     */
+    protected function buildFieldValueInstance(string $fieldName, $value): FieldValue
+    {
+        return new FieldValue($fieldName, $value);
     }
 
     // ============================================================

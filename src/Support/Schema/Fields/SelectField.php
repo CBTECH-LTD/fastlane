@@ -88,7 +88,7 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
         /** @var Collection<SelectOption> $options */
         $options = $this->resolvedConfig->get('options');
 
-        return new FieldValue($this->getName(), $options->filter(
+        return $this->buildFieldValueInstance($this->getName(), $options->filter(
             fn(SelectOption $opt) => $opt->isSelected() || in_array($opt->getValue(), $value)
         )->toArray());
     }
@@ -165,5 +165,14 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
             : $this->options;
 
         $this->resolvedConfig->put('options', Collection::make($options));
+    }
+
+    protected function buildFieldValueInstance(string $fieldName, $value): FieldValue
+    {
+        if ($this->isMultiple()) {
+            return new MultipleSelectFieldValue($fieldName, $value);
+        }
+
+        return new SingleSelectFieldValue($fieldName, $value);
     }
 }

@@ -77,4 +77,9 @@ class CurrencyField extends AbstractBaseField implements ExportsToApiAttributeCo
             'max'      => $this->getRuleParams('max'),
         ]);
     }
+
+    protected function buildFieldValueInstance(string $fieldName, $value): FieldValue
+    {
+        return new CurrencyFieldValue($fieldName, $value);
+    }
 }

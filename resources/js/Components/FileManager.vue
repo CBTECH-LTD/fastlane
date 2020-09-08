@@ -100,7 +100,7 @@ export default {
             return filter(this.files, f => f.selected)
         },
         isMultiple () {
-            return this.maxNumberOfFiles === undefined || parseInt(this.maxNumberOfFiles) > 1
+            return this.maxNumberOfFiles === undefined || this.maxNumberOfFiles === null || parseInt(this.maxNumberOfFiles) > 1
         }
     },
 
@@ -126,6 +126,7 @@ export default {
             return file.selected ||
                 !this.isMultiple ||
                 this.maxNumberOfFiles === undefined ||
+                this.maxNumberOfFiles === null ||
                 this.selectedFiles.length < parseInt(this.maxNumberOfFiles)
         },
 

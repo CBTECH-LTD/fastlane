@@ -71,6 +71,8 @@ return [
          * list of possible mask values.
          */
         'symbol' => '£',
+        'code'   => 'GBP',
         'mask'   => '\R\$ currency',
+        'locale' => null,
     ],
 ];
