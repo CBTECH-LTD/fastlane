@@ -40,6 +40,6 @@ class FieldValue implements Arrayable, \Stringable
 
     public function __toString()
     {
-        return $this->value();
+        return $this->value() ?? '';
     }
 }

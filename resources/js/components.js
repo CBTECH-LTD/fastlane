@@ -19,6 +19,7 @@ import FListItemAction from './Components/ListItemAction'
 import FMenuGroup from './Components/MenuGroup'
 import FMenuLink from './Components/MenuLink'
 import FNavigationList from './Components/NavigationList'
+import FPaginator from './Components/Paginator'
 import FSidebar from './Components/Sidebar'
 import FSpinner from './Components/Spinner'
 import FTableCard from './Components/TableCard'
@@ -38,6 +39,7 @@ export default {
         Vue.component('f-list-card', FListCard)
         Vue.component('f-list-item-action', FListItemAction)
         Vue.component('f-navigation-list', FNavigationList)
+        Vue.component('f-paginator', FPaginator)
         Vue.component('f-table-card', FTableCard)
         Vue.component('f-sidebar', FSidebar)
         Vue.component('f-spinner', FSpinner)

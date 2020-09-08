@@ -10,8 +10,8 @@ use Illuminate\Support\Collection;
 
 class QueryBuilder
 {
-    private Builder $builder;
-    private EntryInstance $entryInstance;
+    protected Builder $builder;
+    protected EntryInstance $entryInstance;
 
     public function __construct(EntryType $entryType)
     {
@@ -22,9 +22,33 @@ class QueryBuilder
         $this->builder = $this->entryInstance->model()->newQuery();
     }
 
+    public function active(): self
+    {
+        $this->builder->where('is_active', true);
+        return $this;
+    }
+
     public function limit(int $value): self
     {
         $this->builder->limit($value);
+        return $this;
+    }
+
+    public function key($value): self
+    {
+        $this->builder->whereKey($value);
+        return $this;
+    }
+
+    public function except(array $ids, string $column = 'id'): self
+    {
+        $this->builder->whereNotIn($column, $ids);
+        return $this;
+    }
+
+    public function orderBy(string $column, string $order = 'asc'): self
+    {
+        $this->builder->orderBy($column, $order);
         return $this;
     }
 

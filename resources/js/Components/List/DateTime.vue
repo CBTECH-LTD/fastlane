@@ -5,18 +5,17 @@
 </template>
 
 <script>
-    import ListRenderer from '../Mixins/ListRenderer'
-    import moment from 'moment'
+import ListRenderer from '../Mixins/ListRenderer'
+import moment from 'moment'
 
-    export default {
-        name: 'ListDateTime',
-        mixins: [ListRenderer],
+export default {
+    name: 'ListDateTime',
+    mixins: [ListRenderer],
 
-        computed: {
-            formattedValue () {
-                console.log(this.value, this.config.displayFormat)
-                return moment(this.value).format(this.config.displayFormat)
-            }
-        },
-    }
+    computed: {
+        formattedValue () {
+            return moment(this.value).format(this.config.momentDisplayFormat)
+        }
+    },
+}
 </script>

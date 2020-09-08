@@ -35,12 +35,12 @@
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-    @apply bg-gray-300;
+    @apply bg-gray-400;
     border-radius: 3px;
 }
 
 .custom-scroll::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500;
+    @apply bg-indigo-400;
 }
 
 .table__cell {

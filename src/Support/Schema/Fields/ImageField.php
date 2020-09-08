@@ -21,4 +21,9 @@ class ImageField extends FileField implements ExportsToApiAttributeContract
     {
         return 'image';
     }
+
+    protected function buildFieldValueInstance(string $fieldName, $value): FieldValue
+    {
+        return new ImageFieldValue($fieldName, $value, $this->isMultiple());
+    }
 }

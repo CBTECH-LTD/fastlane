@@ -1,8 +1,8 @@
 <template>
     <div tabindex="0" @keydown.esc="close">
         <div class="fixed top-0 left-0 w-full h-screen bg-black bg-opacity-50 flex items-center justify-center p-8 z-50">
-            <div class="w-full h-full bg-white shadow-lg rounded-lg">
-                <div class="flex items-center justify-between p-4">
+            <div class="relative w-full h-full bg-white shadow-lg rounded-lg">
+                <div class="absolute top-0 left-0 w-full h-16 flex items-center justify-between border-b border-gray-200 px-4">
                     <div>
                         <f-button @click="openUploadModal" size="lg" left-icon="cloud-upload-alt" :disabled="!uploadForm || isUploading">Upload</f-button>
                     </div>
@@ -11,9 +11,9 @@
                         <f-button @click="close" variant="minimal" size="lg" left-icon="close">Cancel</f-button>
                     </div>
                 </div>
-                <div class="p-4 border-t border-gray-200">
+                <div class="h-full py-16">
                     <template v-if="files.length">
-                        <transition-group name="files-list" tag="div" class="w-full flex flex-wrap">
+                        <transition-group name="files-list" tag="div" class="w-full h-full p-4 flex flex-wrap overflow-x-hidden overflow-y-auto custom-scroll">
                             <div v-for="file in files" :key="file.file" class="relative w-1/2 p-2">
                                 <div class="absolute top-0 left-0 z-10">
                                     <input v-if="canSelectFile(file)" type="checkbox" class="form-checkbox p-3" :checked="file.selected" @input="toggleFile(file)">
@@ -33,6 +33,9 @@
                             </div>
                         </transition-group>
                     </template>
+                </div>
+                <div class="absolute bottom-0 left-0 px-4 w-full h-16 border-t border-gray-200 flex items-center justify-center">
+                    <f-paginator v-if="meta" :meta="meta" :as-links="false" @changed="(url) => loadFiles(url)"/>
                 </div>
             </div>
         </div>
@@ -90,6 +93,7 @@ export default {
             id: uuidv4(),
             isUploading: false,
             files: [],
+            meta: {},
             uploadForm: null,
             uppy: null,
         }
@@ -146,8 +150,8 @@ export default {
             file.selected = !file.selected
         },
 
-        async loadFiles () {
-            const { data } = await axios.get(this.endpoint, {
+        async loadFiles (url) {
+            const { data } = await axios.get(url, {
                 params: {
                     'filter[types]': this.fileTypes,
                 }
@@ -160,6 +164,8 @@ export default {
                 selected: selected.indexOf(parseInt(f.id)) > -1,
                 id: f.id,
             }))
+
+            this.meta = data.meta
 
             const schema = filter(data.meta.entry_type.schema, f => f.name === 'file')
             this.uploadForm = new FormSchemaFactory({}, schema)
@@ -174,7 +180,7 @@ export default {
                         headers: { 'X-CSRF-TOKEN': this.csrfToken }
                     })
 
-                    await this.loadFiles()
+                    await this.loadFiles(this.endpoint)
                 } catch {}
 
                 this.isUploading = false
@@ -231,14 +237,14 @@ export default {
         })
 
         this.uppy.on('complete', async ({ successful }) => {
-            await this.loadFiles()
+            await this.loadFiles(this.endpoint)
 
             this.closeUploadModal()
             this.uppy.reset()
 
         })
 
-        this.loadFiles()
+        this.loadFiles(this.endpoint)
     },
 
     beforeDestroy () {
