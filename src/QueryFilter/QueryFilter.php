@@ -27,7 +27,6 @@ class QueryFilter implements QueryFilterContract
 
     public function withOrder(string $order): self
     {
-        $this->order = new Collection;
         $this->addOrder($order);
 
         return $this;
@@ -41,7 +40,6 @@ class QueryFilter implements QueryFilterContract
             : 'asc';
 
         $this->order->push(new OrderBy($field, $sort));
-
         return $this;
     }
 
@@ -55,8 +53,7 @@ class QueryFilter implements QueryFilterContract
     {
         return app(Pipeline::class)
             ->send($builder)
-            ->through($this->order->all())
-            ->through($this->filters->all())
+            ->through(array_merge($this->order->all(), $this->filters->all()))
             ->then(fn(Builder $builder) => $builder);
     }
 }
