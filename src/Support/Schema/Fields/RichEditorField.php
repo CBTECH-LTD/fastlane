@@ -2,7 +2,6 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\FileAttachment\DraftAttachment;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
@@ -20,16 +19,6 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
     public function getType(): string
     {
         return 'richEditor';
-    }
-
-    public function writeValue(EntryInstance $entryInstance, $value, array $requestData): void
-    {
-        if (is_callable($this->writeValueCallback)) {
-            call_user_func($this->writeValueCallback, $entryInstance, $value, $requestData);
-            return;
-        }
-
-        $entryInstance->model()->{$this->getName()} = $value;
     }
 
     public function getAcceptableMimetypes(): array
@@ -60,6 +49,7 @@ class RichEditorField extends AbstractBaseField implements ExportsToApiAttribute
     {
         $this->resolvedConfig = $this->resolvedConfig->merge([
             'acceptFiles' => $this->acceptFiles,
+            'csrfToken'   => csrf_token(),
             'links'       => [
                 'fileManager' => URL::relative("cp.file-manager.index"),
             ],

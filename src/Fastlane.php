@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane;
 
+use CbtechLtd\Fastlane\ContentBlocks\ContentBlock;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\EntryTypes\Content\ContentEntryType;
 use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
@@ -22,6 +23,7 @@ use Spatie\Permission\Models\Role;
 class Fastlane
 {
     protected Collection $entryTypes;
+    protected Collection $contentBlocks;
     protected Collection $routes;
     protected array $flashMessages = [];
     protected MenuManagerContract $menuManager;
@@ -31,6 +33,7 @@ class Fastlane
     public function __construct()
     {
         $this->registerEntryTypes();
+        $this->registerContentBlocks();
         $this->registerMenuManager();
         $this->registerTranslations();
     }
@@ -160,6 +163,11 @@ class Fastlane
         );
     }
 
+    public function contentBlocks(): Collection
+    {
+        return $this->contentBlocks;
+    }
+
     public function getAccessTokenAbilities(): array
     {
         return [
@@ -203,6 +211,16 @@ class Fastlane
 
             return $instance;
         });
+    }
+
+    protected function registerContentBlocks(): void
+    {
+        $this->contentBlocks = Collection::make(config('fastlane.content_blocks'))
+            ->mapWithKeys(function (string $class) {
+                return [
+                    $class::key() => $class,
+                ];
+            });
     }
 
     protected function registerMenuManager(): void

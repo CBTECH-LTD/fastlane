@@ -26,7 +26,7 @@ export default {
 
     mounted () {
         this.maskInstance = new Inputmask({
-            regex: '^[a-z0-9]+(?:-[a-z0-9]+)*$',
+            regex: '[a-z0-9]+(?:-[a-z0-9]+)*',
             onBeforeMask: (value) => {
                 return value.replace(/\s/g, '-').toLowerCase()
             }
@@ -34,7 +34,8 @@ export default {
 
         if (this.field.config.baseField && this.form) {
             this.form.$on(`${this.field.config.baseField}:value-changed`, (value) => {
-                this.field.value = value.replace(/\s/g, '-')
+                this.maskInstance.setValue(value)
+                this.onInput(this.maskInstance.el.value)
             })
         }
     }

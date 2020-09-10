@@ -2,47 +2,13 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\HasAttachments;
-use Illuminate\Support\Facades\URL;
-
-class BlockEditorField extends AbstractBaseField implements HasAttachments
+class BlockEditorField extends RichEditorField
 {
-    use HandlesAttachments;
-
     protected $default = [];
 
     public function getType(): string
     {
         return 'blockEditor';
-    }
-
-    protected function getTypeRules(): array
-    {
-        return [
-            $this->getName()                    => 'array',
-            $this->getName() . '.blocks'        => 'sometimes|array',
-            $this->getName() . '.blocks.*'      => "sometimes|array",
-            $this->getName() . '.blocks.*.type' => "required|string",
-            $this->getName() . '.blocks.*.data' => "required|array",
-            $this->getName() . '__draft_id'     => "required_with:{$this->getName()}|uuid",
-        ];
-    }
-
-    protected function resolveConfig(EntryInstanceContract $entryInstance, string $destination): void
-    {
-        $this->resolvedConfig = $this->resolvedConfig->merge([
-            'csrfToken' => csrf_token(),
-            'links'     => [
-                'fileManager' => URL::relative('cp.file-manager.index'),
-            ],
-        ]);
-    }
-
-    public function getAcceptableMimetypes(): array
-    {
-        return [];
     }
 
     protected function getMigrationMethod(): array
@@ -55,5 +21,10 @@ class BlockEditorField extends AbstractBaseField implements HasAttachments
         return [
             $this->getName() => 'array',
         ];
+    }
+
+    protected function buildFieldValueInstance(string $fieldName, $value): FieldValue
+    {
+        return new BlockFieldValue($fieldName, $value);
     }
 }

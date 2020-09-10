@@ -47,8 +47,9 @@ class SelectOption implements Arrayable
         $val = $this->getValue();
 
         return [
-            'label' => $this->getLabel(),
-            'value' => is_int($val) ? $val : $val,
+            'label'    => $this->getLabel(),
+            'value'    => is_int($val) ? $val : $val,
+            'selected' => $this->isSelected(),
         ];
     }
 }

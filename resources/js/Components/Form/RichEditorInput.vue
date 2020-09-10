@@ -4,142 +4,142 @@
         <div class="w-full">
             <!-- MENU BAR -->
             <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
-                <div class="menubar">
-                    <button type="button" class="menubar__button" :class="{ 'is-active': isActive.paragraph() }" @click="commands.paragraph">
+                <div class="rich-editor__menubar">
+                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.paragraph() }" @click="commands.paragraph">
                         <f-icon class="text-lg" name="paragraph"/>
                     </button>
 
-                    <button type="button" class="menubar__button" :class="{ 'is-active': isActive.heading({ level: 1 }) }" @click="commands.heading({ level: 1 })">
+                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.heading({ level: 1 }) }" @click="commands.heading({ level: 1 })">
                         H1
                     </button>
 
-                    <button type="button" class="menubar__button" :class="{ 'is-active': isActive.heading({ level: 2 }) }" @click="commands.heading({ level: 2 })">
+                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.heading({ level: 2 }) }" @click="commands.heading({ level: 2 })">
                         H2
                     </button>
 
-                    <button type="button" class="menubar__button" :class="{ 'is-active': isActive.heading({ level: 3 }) }" @click="commands.heading({ level: 3 })">
+                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.heading({ level: 3 }) }" @click="commands.heading({ level: 3 })">
                         H3
                     </button>
 
-                    <button type="button" class="menubar__button" :class="{ 'is-active': isActive.bullet_list() }" @click="commands.bullet_list">
+                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.bullet_list() }" @click="commands.bullet_list">
                         <f-icon class="text-lg" name="list-ul"/>
                     </button>
 
-                    <button type="button" class="menubar__button" :class="{ 'is-active': isActive.ordered_list() }" @click="commands.ordered_list">
+                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.ordered_list() }" @click="commands.ordered_list">
                         <f-icon class="text-lg" name="list-ol"/>
                     </button>
 
-                    <button type="button" class="menubar__button" :class="{ 'is-active': isActive.blockquote() }" @click="commands.blockquote">
+                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.blockquote() }" @click="commands.blockquote">
                         <f-icon class="text-lg" name="quote-left"/>
                     </button>
 
-                    <button type="button" class="menubar__button" @click="openFileManager">
+                    <button type="button" class="rich-editor__menubar__button" @click="openFileManager">
                         <f-icon class="text-lg" name="image"/>
                     </button>
                     <portal to="modals">
                         <f-file-manager  v-if="showFileManager" :endpoint="field.config.links.fileManager" :file-types="['image/*']" :csrf-token="$page.app.csrfToken" @files-selected="files => onFilesSelected(files, commands.image)" @close="closeFileManager" />
                     </portal>
 
-                    <button type="button" class="menubar__button" @click="commands.iframe">
+                    <button type="button" class="rich-editor__menubar__button" @click="commands.iframe">
                         <f-icon class="text-lg" name="film"/>
                     </button>
 
                     <!-- TABLES -->
                     <span class="inline-block flex items-center rounded" :class="{'border border-gray-300': isActive.table()}">
-                        <button type="button" class="menubar__button" @click="commands.createTable({rowsCount: 3, colsCount: 3, withHeaderRow: false })">
+                        <button type="button" class="rich-editor__menubar__button" @click="commands.createTable({rowsCount: 3, colsCount: 3, withHeaderRow: false })">
                             <f-icon class="text-lg" name="table"/>
                         </button>
                         <span v-if="isActive.table()" class="inline-block flex items-center">
-                            <button type="button" class="menubar__button" @click="commands.deleteTable">
+                            <button type="button" class="rich-editor__menubar__button" @click="commands.deleteTable">
                                 <f-icon class="text-lg" name="trash"/>
                             </button>
                             <span class="divider"></span>
-                            <button class="menubar__button" @click="commands.addColumnBefore">
+                            <button class="rich-editor__menubar__button" @click="commands.addColumnBefore">
                                 <f-icon class="text-lg" name="caret-square-left"/>
                             </button>
-                            <button type="button" class="menubar__button" @click="commands.addColumnAfter">
+                            <button type="button" class="rich-editor__menubar__button" @click="commands.addColumnAfter">
                                 <f-icon class="text-lg" name="caret-square-right"/>
                             </button>
-                            <button type="button" class="menubar__button" @click="commands.deleteColumn">
+                            <button type="button" class="rich-editor__menubar__button" @click="commands.deleteColumn">
                                 <f-icon class="text-lg" name="window-close"/>
                             </button>
-                            <span class="divider"></span>
-                            <button type="button" class="menubar__button" @click="commands.addRowBefore">
+                            <span class="rich-editor__menubar__divider"></span>
+                            <button type="button" class="rich-editor__menubar__button" @click="commands.addRowBefore">
                                 <f-icon class="text-lg" name="caret-square-up"/>
                             </button>
-                            <button type="button" class="menubar__button" @click="commands.addRowAfter">
+                            <button type="button" class="rich-editor__menubar__button" @click="commands.addRowAfter">
                                 <f-icon class="text-lg" name="caret-square-down"/>
                             </button>
-                            <button type="button" class="menubar__button" @click="commands.deleteRow">
+                            <button type="button" class="rich-editor__menubar__button" @click="commands.deleteRow">
                                 <f-icon class="text-lg" name="window-close"/>
                             </button>
-                            <span class="divider"></span>
-                            <button class="menubar__button" @click="commands.toggleCellMerge">
+                            <span class="rich-editor__menubar__divider"></span>
+                            <button class="rich-editor__menubar__button" @click="commands.toggleCellMerge">
                                 <f-icon class="text-lg" name="expand"/>
                             </button>
                         </span>
 					</span>
 
-                    <span class="divider"></span>
+                    <span class="rich-editor__menubar__divider"></span>
 
-                    <button type="button" class="menubar__button" :class="{ 'is-active': isActive.code_block() }" @click="commands.code_block">
+                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.code_block() }" @click="commands.code_block">
                         <f-icon class="text-lg" name="terminal"/>
                     </button>
 
-                    <button type="button" class="menubar__button" @click="commands.horizontal_rule">
+                    <button type="button" class="rich-editor__menubar__button" @click="commands.horizontal_rule">
                         <f-icon class="text-lg" name="ruler-horizontal"/>
                     </button>
 
-                    <button type="button" class="menubar__button" @click="commands.undo">
+                    <button type="button" class="rich-editor__menubar__button" @click="commands.undo">
                         <f-icon class="text-lg" name="undo"/>
                     </button>
 
-                    <button type="button" class="menubar__button" @click="commands.redo">
+                    <button type="button" class="rich-editor__menubar__button" @click="commands.redo">
                         <f-icon class="text-lg" name="redo"/>
                     </button>
                 </div>
             </editor-menu-bar>
 
             <!-- MENU BUBBLE -->
-            <editor-menu-bubble class="menububble" :editor="editor" @hide="hideLinkMenu" v-slot="{ commands, isActive, getMarkAttrs, menu }">
-                <div class="menububble" :class="{ 'is-active': menu.isActive }" :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`">
+            <editor-menu-bubble class="rich-editor__menububble" :editor="editor" @hide="hideLinkMenu" v-slot="{ commands, isActive, getMarkAttrs, menu }">
+                <div class="rich-editor__menububble" :class="{ 'is-active': menu.isActive }" :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`">
                     <!-- GENERAL -->
-                    <button type="button" class="menububble__button" :class="{ 'is-active': isActive.bold() }" @click="commands.bold">
+                    <button type="button" class="rich-editor__menububble__button" :class="{ 'is-active': isActive.bold() }" @click="commands.bold">
                         <f-icon class="text-lg" name="bold"/>
                     </button>
 
-                    <button type="button" class="menububble__button" :class="{ 'is-active': isActive.italic() }" @click="commands.italic">
+                    <button type="button" class="rich-editor__menububble__button" :class="{ 'is-active': isActive.italic() }" @click="commands.italic">
                         <f-icon class="text-lg" name="italic"/>
                     </button>
 
-                    <button type="button" class="menububble__button" :class="{ 'is-active': isActive.strike() }" @click="commands.strike">
+                    <button type="button" class="rich-editor__menububble__button" :class="{ 'is-active': isActive.strike() }" @click="commands.strike">
                         <f-icon class="text-lg" name="strikethrough"/>
                     </button>
 
-                    <button type="button" class="menububble__button" :class="{ 'is-active': isActive.underline() }" @click="commands.underline">
+                    <button type="button" class="rich-editor__menububble__button" :class="{ 'is-active': isActive.underline() }" @click="commands.underline">
                         <f-icon class="text-lg" name="underline"/>
                     </button>
 
-                    <button type="button" class="menububble__button" :class="{ 'is-active': isActive.code() }" @click="commands.code">
+                    <button type="button" class="rich-editor__menububble__button" :class="{ 'is-active': isActive.code() }" @click="commands.code">
                         <f-icon class="text-lg" name="code"/>
                     </button>
 
                     <!-- LINKS -->
-                    <form class="menububble__form" v-if="linkMenuIsActive" @submit.prevent="setLinkUrl(commands.link, linkUrl)">
-                        <input class="menububble__input" type="text" v-model="linkUrl" placeholder="https://" ref="linkInput" @keydown.esc="hideLinkMenu"/>
-                        <button class="menububble__button" @click="setLinkUrl(commands.link, null)" type="button">
+                    <form class="rich-editor__menububble__form" v-if="linkMenuIsActive" @submit.prevent="setLinkUrl(commands.link, linkUrl)">
+                        <input class="rich-editor__menububble__input" type="text" v-model="linkUrl" placeholder="https://" ref="linkInput" @keydown.esc="hideLinkMenu"/>
+                        <button class="rich-editor__menububble__button" @click="setLinkUrl(commands.link, null)" type="button">
                             <f-icon class="text-lg" name="trash"/>
                         </button>
                     </form>
                     <template v-else>
-                        <button class="menububble__button" @click="showLinkMenu(getMarkAttrs('link'))" :class="{ 'is-active': isActive.link() }">
+                        <button class="rich-editor__menububble__button" @click="showLinkMenu(getMarkAttrs('link'))" :class="{ 'is-active': isActive.link() }">
                             <f-icon class="text-lg" name="link"/>
                         </button>
                     </template>
                 </div>
             </editor-menu-bubble>
 
-            <editor-content class="editor__content form-input" :editor="editor"/>
+            <editor-content class="rich-editor__editor__content form-input" :editor="editor"/>
         </div>
     </f-form-field>
 </template>
@@ -205,12 +205,6 @@ export default {
          */
         commit (formObject) {
             formObject.put(this.field.name, this.field.value)
-        },
-
-        onInput (value) {
-            this.field.value = value
-
-            this.$emit('input', this.field.value)
         },
 
         async onFileAdded ({ attachment }) {
@@ -315,7 +309,7 @@ export default {
                 new Iframe(),
             ],
             onUpdate: ({ getHTML }) => {
-                this.field.value = getHTML()
+                this.onInput(getHTML())
             }
         })
     },

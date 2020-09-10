@@ -14,7 +14,6 @@ import Select from '../../Components/List/Select'
 import Toggle from '../../Components/List/Toggle'
 import DateTime from '../../Components/List/DateTime'
 import File from '../../Components/List/File'
-import BlockEditorInput from '../../Components/Form/BlockEditor/BlockEditorInput'
 import CurrencyInput from '../../Components/Form/CurrencyInput'
 import NumberInput from '../../Components/Form/NumberInput'
 import SlugInput from '../../Components/Form/SlugInput'
@@ -78,6 +77,6 @@ export default {
     },
     blockEditor: {
         list: Simple,
-        form: BlockEditorInput,
+        form: 'f-form-block-editor-input',
     }
 }

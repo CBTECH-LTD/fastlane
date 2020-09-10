@@ -21,6 +21,14 @@ return [
     ],
 
     /**
+     * Configure the Content Blocks which must be enabled
+     * in the Block Editor.
+     */
+    'content_blocks' => [
+        //
+    ],
+
+    /**
      * Control panel settings.
      */
     'control_panel'  => [

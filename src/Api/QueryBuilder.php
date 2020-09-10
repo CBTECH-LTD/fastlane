@@ -73,8 +73,14 @@ class QueryBuilder
             );
     }
 
-    public function first(): EntryInstance
+    public function first(): ?EntryInstance
     {
-        return $this->entryInstance->type()->newInstance($this->builder->first());
+        $model = $this->builder->first();
+
+        if (! $model) {
+            return null;
+        }
+
+        return $this->entryInstance->type()->newInstance($model);
     }
 }

@@ -7,7 +7,6 @@ import camelCase from 'lodash/camelCase'
 import components from './utils/schemaComponents'
 import FormObject from './FormObject'
 import { FormFieldFactory } from './FormField'
-import schemaComponents from './utils/schemaComponents'
 
 /**
  * Define methods to be accessible on the instance of FormSchema.

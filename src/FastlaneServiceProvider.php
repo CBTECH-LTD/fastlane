@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
@@ -188,6 +189,12 @@ class FastlaneServiceProvider extends ServiceProvider
             'logoImage'       => config('fastlane.asset_logo_img'),
             'loginBackground' => config('fastlane.asset_login_bg'),
         ]);
+
+        Inertia::share('contentBlocks', function () {
+            return app('fastlane')->contentBlocks()->map(
+                fn($class) => $class::make()
+            )->values()->toArray();
+        });
 
         Inertia::share('auth.user', function () {
             if (Auth::user()) {

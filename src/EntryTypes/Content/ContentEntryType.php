@@ -70,4 +70,9 @@ class ContentEntryType extends EntryType implements RenderableOnMenu
                 ]),
         ];
     }
+
+    public function apiBuilder(): QueryBuilder
+    {
+        return new QueryBuilder($this);
+    }
 }

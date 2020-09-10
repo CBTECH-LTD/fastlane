@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\ExportsToApiAttribute;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Sortable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute as ExportsToApiAttributeContract;
 
 class DateField extends AbstractBaseField implements ExportsToApiAttributeContract

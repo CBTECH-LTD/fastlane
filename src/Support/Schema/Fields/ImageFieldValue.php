@@ -17,7 +17,7 @@ class ImageFieldValue extends FieldValue
         if (! empty($this->value)) {
             dd($this->value);
         }
-        
+
         return '';
     }
 }

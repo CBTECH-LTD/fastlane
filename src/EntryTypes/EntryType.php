@@ -59,7 +59,7 @@ abstract class EntryType implements EntryTypeContract
 
     protected Gate $gate;
 
-    public static function load(): EntryTypeContract
+    public static function retrieve(): self
     {
         return app('fastlane')->getEntryTypeByClass(static::class);
     }

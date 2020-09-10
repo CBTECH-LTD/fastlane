@@ -2,6 +2,7 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 @import './utils/nprogress.css';
+@import './components/rich-editor.css';
 
 .custom-scroll {
     scrollbar-width: thin;

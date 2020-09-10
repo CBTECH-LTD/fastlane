@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 
 interface EntryType extends Hookable
 {
-    public static function load(): EntryType;
+    public static function retrieve(): self;
 
     public function newInstance(?Model $model): EntryInstance;
 

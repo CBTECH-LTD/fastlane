@@ -3,6 +3,7 @@ import FButton from './Components/Button'
 import FFormField from './Components/Form/Field'
 import FFormDateTimeInput from './Components/Form/DateTimeInput'
 import FFormRadioInput from './Components/Form/RadioInput'
+import FFormBlockEditorInput from './Components/Form/BlockEditorInput'
 import FFormRichEditorInput from './Components/Form/RichEditorInput'
 import FFormSelectInput from './Components/Form/SelectInput'
 import FFormStringInput from './Components/Form/StringInput'
@@ -59,6 +60,7 @@ export default {
         Vue.component('f-form-year-input', FFormYearInput)
         Vue.component('f-form-file-input', FFormFileInput)
         Vue.component('f-form-radio-input', FFormRadioInput)
+        Vue.component('f-form-block-editor-input', FFormBlockEditorInput)
         Vue.component('f-form-rich-editor-input', FFormRichEditorInput)
         Vue.component('f-form-single-choice-input', FFormSelectInput)
         Vue.component('f-form-string-input', FFormStringInput)
