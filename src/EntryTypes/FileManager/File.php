@@ -2,16 +2,11 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes\FileManager;
 
-use Altek\Accountant\Contracts\Recordable as RecordableContract;
-use Altek\Accountant\Recordable;
-use Altek\Eventually\Eventually;
-use Illuminate\Database\Eloquent\Model;
+use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
 use Illuminate\Support\Facades\Storage;
 
-class File extends Model implements RecordableContract
+class File extends BaseModel
 {
-    use Eventually, Recordable;
-
     protected $table = 'fastlane_files';
 
     protected $fillable = [

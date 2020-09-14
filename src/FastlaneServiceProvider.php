@@ -190,12 +190,6 @@ class FastlaneServiceProvider extends ServiceProvider
             'loginBackground' => config('fastlane.asset_login_bg'),
         ]);
 
-        Inertia::share('contentBlocks', function () {
-            return app('fastlane')->contentBlocks()->map(
-                fn($class) => $class::make()
-            )->values()->toArray();
-        });
-
         Inertia::share('auth.user', function () {
             if (Auth::user()) {
                 return [

@@ -6,8 +6,9 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Stringable;
 
-abstract class Field implements Arrayable
+abstract class Field implements Arrayable, Stringable
 {
     protected string $component;
     protected string $label;
@@ -126,6 +127,11 @@ abstract class Field implements Arrayable
             // TODO: Remove. It's here only to comply to current FormField implementation on admin frontend.
             'type'      => $this->component,
         ];
+    }
+
+    public function __toString()
+    {
+        return $this->get();
     }
 
     protected function resolveConfig(): void

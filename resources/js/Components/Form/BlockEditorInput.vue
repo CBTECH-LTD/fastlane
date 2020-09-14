@@ -54,11 +54,9 @@ export default {
          * so we can access it easily.
          */
         availableBlocks () {
-            const availableBlocks = {}
+            const availableBlocks = this.field.config.blocks
 
-            this.$page.contentBlocks.forEach(f => {
-                availableBlocks[f.key] = f
-            })
+            console.log(availableBlocks)
 
             return availableBlocks
         }
@@ -88,13 +86,16 @@ export default {
 
         removeBlock (block) {
             this.$delete(this.blocks, block.uuid)
+
+            this.$nextTick(() => {
+                this.updateContent()
+            })
         },
 
         updateContent () {
             const content = map(this.blocks, b => {
                 return {
                     block: b.key,
-                    uuid: b.uuid,
                     data: b.schema.toFormObject(false).all()
                 }
             })

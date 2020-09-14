@@ -2,10 +2,10 @@
 
 namespace CbtechLtd\Fastlane\QueryFilter\Pipes;
 
+use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use Closure;
-use Illuminate\Database\Eloquent\Builder;
 
 interface QueryPipeContract
 {
-    public function handle(Builder $query, Closure $next);
+    public function handle(QueryBuilder $query, Closure $next);
 }

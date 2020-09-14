@@ -2,9 +2,9 @@
 
 namespace CbtechLtd\Fastlane\QueryFilter;
 
+use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use CbtechLtd\Fastlane\QueryFilter\Pipes\OrderBy;
 use CbtechLtd\Fastlane\QueryFilter\Pipes\QueryPipeContract;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -49,11 +49,11 @@ class QueryFilter implements QueryFilterContract
         return $this;
     }
 
-    public function pipeThrough(Builder $builder): Builder
+    public function pipeThrough(QueryBuilder $builder): QueryBuilder
     {
         return app(Pipeline::class)
             ->send($builder)
             ->through(array_merge($this->order->all(), $this->filters->all()))
-            ->then(fn(Builder $builder) => $builder);
+            ->then(fn(QueryBuilder $builder) => $builder);
     }
 }

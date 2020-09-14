@@ -30,7 +30,7 @@ use ReflectionClass;
 
 abstract class EntryType implements EntryTypeContract
 {
-    use HandlesHooks, QueriesForContentAPI;
+    use HandlesHooks, QueriesModel;
 
     /** @description OnSavingHook */
     const HOOK_BEFORE_HYDRATING = 'beforeHydrating';
@@ -169,13 +169,11 @@ abstract class EntryType implements EntryTypeContract
         $query = ($queryFilter ?? new QueryFilter)
             ->addOrder('created_at')
             ->addOrder('id')
-            ->pipeThrough(
-                $this->newModelInstance()->newModelQuery()
-            );
+            ->pipeThrough($this->queryBuilder());
 
         $this->queryItemsForRelationField($query);
 
-        return $query->get()->map(fn(Model $model) => $this->newInstance($model));
+        return $query->get();
     }
 
     public function getItems(?QueryFilterContract $queryFilter = null): LengthAwarePaginator
@@ -187,28 +185,23 @@ abstract class EntryType implements EntryTypeContract
         $query = $queryFilter
             ->addOrder('created_at')
             ->addOrder('id')
-            ->pipeThrough(
-                $this->newModelInstance()->newModelQuery()
-            );
+            ->pipeThrough($this->queryBuilder());
 
         $this->queryItems($query);
 
-        $paginator = $query->paginate($this->getItemsPerPage());
-        $paginator->getCollection()->transform(fn(Model $model) => $this->newInstance($model));
-
-        return $paginator;
+        return $query->paginate($this->getItemsPerPage());
     }
 
     public function findItem(string $hashid): EntryInstanceContract
     {
-        $model = $this->newModelInstance();
-        $query = $model->newModelQuery();
+        $query = $this->queryBuilder();
         $this->querySingleItem($query, $hashid);
-        $entry = $query->where($model->getRouteKeyName(), $hashid)->firstOrFail();
 
-        $this->gate->authorize('show', $entry);
+        abort_if(! $entry = $query->routeKey($hashid)->first(), 404);
 
-        return $this->newInstance($entry);
+        $this->gate->authorize('show', $entry->model());
+
+        return $entry;
     }
 
     public function store(Request $request): EntryInstanceContract
@@ -251,20 +244,16 @@ abstract class EntryType implements EntryTypeContract
 
     public function update(Request $request, string $hashid): EntryInstanceContract
     {
-        $model = $this->newModelInstance();
-        $query = $model->newModelQuery();
+        $query = $this->queryBuilder();
         $this->querySingleItem($query, $hashid);
-        $entry = $query->where($model->getRouteKeyName(), $hashid)->firstOrFail();
+
+        abort_if(! $entryInstance = $query->routeKey($hashid)->first(), 404);
 
         // Check whether the authenticated user can update
         // the given entry instance.
         if ($this->policy()) {
-            $this->gate->authorize('update', $entry);
+            $this->gate->authorize('update', $entryInstance->model());
         }
-
-        // Create an Entry Instance based in the model we have
-        // just found in the database.
-        $entryInstance = $this->newInstance($entry);
 
         // Validate the request data against the update fields
         // and save the validated data in a new variable.
@@ -296,18 +285,17 @@ abstract class EntryType implements EntryTypeContract
 
     public function delete(string $hashid): EntryInstanceContract
     {
-        $model = $this->newModelInstance();
-        $query = $model->newModelQuery();
+        $query = $this->queryBuilder();
         $this->querySingleItem($query, $hashid);
-        $entry = $query->where($model->getRouteKeyName(), $hashid)->firstOrFail();
+        abort_if(! $entryInstance = $query->routeKey($hashid)->first(), 404);
 
         if ($this->policy()) {
-            $this->gate->authorize('delete', $entry);
+            $this->gate->authorize('delete', $entryInstance->model());
         }
 
-        $entry->delete();
+        $entryInstance->model()->delete();
 
-        return $this->newInstance($entry);
+        return $entryInstance;
     }
 
     public function newModelInstance(): Model
@@ -349,7 +337,7 @@ abstract class EntryType implements EntryTypeContract
         });
     }
 
-    protected function queryItemsForRelationField(Builder $query): void
+    protected function queryItemsForRelationField(QueryBuilder $query): void
     {
         //
     }
@@ -359,12 +347,12 @@ abstract class EntryType implements EntryTypeContract
 
     }
 
-    protected function queryItems(Builder $query): void
+    protected function queryItems(QueryBuilder $query): void
     {
         //
     }
 
-    protected function querySingleItem(Builder $query, string $hashid): void
+    protected function querySingleItem(QueryBuilder $query, string $hashid): void
     {
         //
     }

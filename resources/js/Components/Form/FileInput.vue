@@ -108,6 +108,12 @@ export default {
         },
 
         onFilesSelected (files) {
+            if (this.field.config.maxNumberOfFiles > 1) {
+                files = this.field.value && this.field.value.length
+                    ? this.field.value.concat(files)
+                    : files
+            }
+
             this.onInput(files)
             this.closeFileManager()
         },

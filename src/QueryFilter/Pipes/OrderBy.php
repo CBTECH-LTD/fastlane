@@ -2,8 +2,8 @@
 
 namespace CbtechLtd\Fastlane\QueryFilter\Pipes;
 
+use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use Closure;
-use Illuminate\Database\Eloquent\Builder;
 
 class OrderBy implements QueryPipeContract
 {
@@ -16,7 +16,7 @@ class OrderBy implements QueryPipeContract
         $this->sort = $sort;
     }
 
-    public function handle(Builder $query, Closure $next)
+    public function handle(QueryBuilder $query, Closure $next)
     {
         return $next(
             $query->orderBy($this->field, $this->sort)

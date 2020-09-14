@@ -2,8 +2,8 @@
 
 namespace CbtechLtd\Fastlane\QueryFilter\Pipes;
 
+use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use Closure;
-use Illuminate\Database\Eloquent\Builder;
 
 class Where implements QueryPipeContract
 {
@@ -18,10 +18,10 @@ class Where implements QueryPipeContract
         $this->value = $value;
     }
 
-    public function handle(Builder $query, Closure $next)
+    public function handle(QueryBuilder $query, Closure $next)
     {
         return $next(
-            $query->where($this->field, $this->condition, $this->value)
+            $query->getBuilder()->where($this->field, $this->condition, $this->value)
         );
     }
 }

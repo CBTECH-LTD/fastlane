@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\EntryTypes\FileManager;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
+use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use CbtechLtd\Fastlane\FileAttachment\Contracts\PersistentAttachmentHandler;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
@@ -164,10 +165,10 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
         return $entryInstance;
     }
 
-    protected function queryItems(Builder $query): void
+    protected function queryItems(QueryBuilder $query): void
     {
-        $query->when(request()->input('filter.types'), function (Builder $q, array $types) {
-            $q->where(function (Builder $q) use ($types) {
+        $query->when(request()->input('filter.types'), function (QueryBuilder $q, array $types) {
+            $q->getBuilder()->where(function (Builder $q) use ($types) {
                 foreach ($types as $type) {
                     if (Str::endsWith($type, '/*')) {
                         $q->orWhere('mimetype', 'like', Str::replaceLast('/*', '', $type) . '%');

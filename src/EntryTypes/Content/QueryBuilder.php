@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes\Content;
 
-class QueryBuilder extends \CbtechLtd\Fastlane\Api\QueryBuilder
+class QueryBuilder extends \CbtechLtd\Fastlane\EntryTypes\QueryBuilder
 {
     public function withSlug(string $slug): self
     {

@@ -88,7 +88,11 @@ class EntryInstance implements EntryInstanceContract
 
     public function toArray()
     {
-        return [];
+        return Collection::make($this->schema->getFields())
+            ->filter(fn(SchemaField $field) => $field instanceof ReadValue)
+            ->mapWithKeys(function (SchemaField $field) {
+                return $this->get($field->getName())->toArray();
+            })->toArray();
     }
 
     protected function resolve(): void

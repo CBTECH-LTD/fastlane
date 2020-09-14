@@ -9,7 +9,7 @@ class BlockFieldValue extends FieldValue
 {
     public function __construct(string $name, $value)
     {
-        parent::__construct($name, $this->prepareValue($value));
+        parent::__construct($name, $this->prepareValue($value ?? []));
     }
 
     public function get(string $data, $default = null)

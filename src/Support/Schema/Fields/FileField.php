@@ -102,6 +102,6 @@ class FileField extends AbstractBaseField implements ExportsToApiAttributeContra
 
     protected function buildFieldValueInstance(string $fieldName, $value): FieldValue
     {
-        return new FileFieldValue($fieldName, $value);
+        return new FileFieldValue($fieldName, $value, $this->isMultiple());
     }
 }

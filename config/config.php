@@ -13,6 +13,11 @@ return [
     'asset_login_bg' => 'vendor/fastlane/img/login-bg-black.jpg',
 
     /**
+     * Determine whether cache of models are enabled.
+     */
+    'cache'          => false,
+
+    /**
      * Configure the Entry Types which must be enabled
      * in Fastlane.
      */

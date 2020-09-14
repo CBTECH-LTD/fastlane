@@ -7,6 +7,7 @@ use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\RandomPasswordPipe;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\UpdateRolePipe;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
+use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
@@ -141,14 +142,14 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
         return $savingHook->entryInstance();
     }
 
-    protected function queryItems(Builder $query): void
+    protected function queryItems(QueryBuilder $query): void
     {
-        $query->except(Auth::user());
+        $query->except([Auth::user()->getKey()]);
     }
 
-    protected function querySingleItem(Builder $query, string $hashid): void
+    protected function querySingleItem(QueryBuilder $query, string $hashid): void
     {
-        $query->except(Auth::user());
+        $query->except([Auth::user()->getKey()]);
     }
 
     protected function menuGroup(): string

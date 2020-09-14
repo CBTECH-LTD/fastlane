@@ -201,6 +201,8 @@ class Fastlane
 
         // Iterate over every entry type, instantiate a base instance of  it using
         // the Laravel Container and register their policies as well.
+        $this->entryTypeModels = new Collection;
+
         $this->entryTypes = Collection::make($classes)->map(function ($typeClass) {
             /** @var EntryType $instance */
             $instance = app()->make($typeClass);

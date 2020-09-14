@@ -2,8 +2,8 @@
 
 namespace CbtechLtd\Fastlane\QueryFilter\Pipes;
 
+use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use Closure;
-use Illuminate\Database\Eloquent\Builder;
 
 class WhereIn implements QueryPipeContract
 {
@@ -16,10 +16,10 @@ class WhereIn implements QueryPipeContract
         $this->value = $value;
     }
 
-    public function handle(Builder $query, Closure $next)
+    public function handle(QueryBuilder $query, Closure $next)
     {
         return $next(
-            $query->whereIn($this->field, $this->value)
+            $query->getBuilder()->whereIn($this->field, $this->value)
         );
     }
 }
