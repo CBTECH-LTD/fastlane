@@ -10,10 +10,8 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiRelationship 
 use Closure;
 use Illuminate\Support\Collection;
 
-abstract class RelationField extends AbstractBaseField implements ExportsToApiRelationshipContract
+abstract class RelationField extends AbstractBaseField
 {
-    use ExportsToApiRelationship;
-
     protected $default = null;
     protected bool $multiple = false;
     protected bool $withTimestamps = true;

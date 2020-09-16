@@ -32,10 +32,13 @@ class Fastlane
 
     public function __construct()
     {
-        $this->registerEntryTypes();
-        $this->registerContentBlocks();
         $this->registerMenuManager();
         $this->registerTranslations();
+
+        app()->afterResolving('fastlane', function () {
+            $this->registerEntryTypes();
+            $this->registerContentBlocks();
+        });
     }
 
     public function setRequest(FastlaneRequest $request): self

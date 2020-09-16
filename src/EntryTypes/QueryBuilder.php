@@ -125,6 +125,12 @@ class QueryBuilder
         return $this;
     }
 
+    public function select(array $columns): self
+    {
+        $this->getBuilder()->select($columns);
+        return $this;
+    }
+
     public function paginate(int $itemsPerPage): LengthAwarePaginator
     {
         $fn = function () use ($itemsPerPage): LengthAwarePaginator {
