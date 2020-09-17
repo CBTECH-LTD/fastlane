@@ -116,7 +116,7 @@ class QueryBuilder
             }
             : null;
 
-        $okCb = function ($v) use ($callback) {
+        $okCb = function ($q, $v) use ($callback) {
             $callback($this, $v);
         };
 

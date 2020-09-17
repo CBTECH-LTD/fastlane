@@ -87,7 +87,7 @@ class EntryResource extends ResourceType
             ResourceLink::make('parent', ["cp.{$this->entryInstance->type()->identifier()}.index"]),
         ];
 
-        if ($this->entryInstance->model()->exists) {
+        if ($this->model->exists) {
             $links[] = ResourceLink::make('self', ["cp.{$this->entryInstance->type()->identifier()}.edit", $this->model]);
         }
 
