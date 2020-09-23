@@ -34,15 +34,14 @@
 
             <portal to="modals">
                 <f-file-manager v-if="showFileManager"
-                    :endpoint="field.config.links.fileManager"
-                    :selected="field.value"
-                    :max-file-size="field.config.maxFileSize"
-                    :min-number-of-files="field.config.minNumberOfFiles"
-                    :max-number-of-files="field.config.maxNumberOfFiles"
-                    :file-types="field.config.fileTypes"
-                    :csrf-token="$page.app.csrfToken"
-                    @files-selected="onFilesSelected"
-                    @close="closeFileManager"
+                                :endpoint="field.config.links.fileManager"
+                                :max-file-size="field.config.maxFileSize"
+                                :min-number-of-files="field.config.minNumberOfFiles"
+                                :max-number-of-files="field.config.maxNumberOfFiles"
+                                :file-types="field.config.fileTypes"
+                                :csrf-token="$page.app.csrfToken"
+                                @files-selected="onFilesSelected"
+                                @close="closeFileManager"
                 />
             </portal>
         </div>
@@ -108,7 +107,7 @@ export default {
         },
 
         onFilesSelected (files) {
-            if (this.field.config.maxNumberOfFiles > 1) {
+            if (this.field.config.maxNumberOfFiles !== 1) {
                 files = this.field.value && this.field.value.length
                     ? this.field.value.concat(files)
                     : files

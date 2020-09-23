@@ -15,7 +15,7 @@ class EntryResourceCollection extends ResourceTypeCollection
 
     public static function makeFromPaginator(LengthAwarePaginator $paginator): self
     {
-        $instance = new static($paginator->items());
+        $instance = new static($paginator->appends(request()->query())->items());
 
         $pages = Collection::make($paginator->getUrlRange($paginator->currentPage() - 3, $paginator->currentPage() + 3))
             ->filter(fn($v, $k) => $k > 0 && $k <= $paginator->lastPage())

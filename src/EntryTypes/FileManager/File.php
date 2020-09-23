@@ -17,6 +17,11 @@ class File extends BaseModel
         'mimetype',
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
     public function url(): string
     {
         return Storage::disk(config('fastlane.attachments.disk'))->url($this->file);

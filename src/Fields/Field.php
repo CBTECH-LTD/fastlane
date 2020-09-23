@@ -112,6 +112,23 @@ abstract class Field implements Arrayable, Stringable
         return $this->getConfig('panel', null);
     }
 
+    public function toShallowArray()
+    {
+        return [
+            'value'     => $this->get(),
+            'component' => $this->component,
+            'name'      => $this->attribute,
+            'label'     => $this->label,
+            'required'  => $this->isRequired(),
+            'sortable'  => $this->isSortable(),
+            'panel'     => $this->getPanel(),
+            'default'   => $this->getDefault(),
+            'config'    => $this->config->except('options')->toArray(),
+            // TODO: Remove. It's here only to comply to current FormField implementation on admin frontend.
+            'type'      => $this->component,
+        ];
+    }
+
     public function toArray()
     {
         return [

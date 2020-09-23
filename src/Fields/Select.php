@@ -3,23 +3,12 @@
 namespace CbtechLtd\Fastlane\Fields;
 
 use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOptionCollection;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 
 class Select extends Field
 {
     protected string $component = 'select';
-
-//    public function persistOnModel()
-//    {
-//        if (! $this->value) {
-//            return [];
-//        }
-//
-//        return $this->value->map(
-//            fn(SelectOption $opt) => $opt->getValue()
-//        )->values()->toArray();
-//    }
 
     public function get()
     {
@@ -30,7 +19,7 @@ class Select extends Field
     {
         $value = Arr::wrap($value);
 
-        $this->value = $this->getConfig('options', Collection::make())->filter(
+        $this->value = $this->getOptions()->resolveLazyLoad()->filter(
             function (SelectOption $opt) use ($value) {
                 return $opt->selected(in_array($opt->getValue(), $value))->isSelected();
             })->values();
@@ -48,8 +37,17 @@ class Select extends Field
         return $this->getConfig('multiple', false);
     }
 
-    public function withOptions(array $options): self
+    public function getOptions(): SelectOptionCollection
     {
-        return $this->setConfig('options', Collection::make($options));
+        return $this->getConfig('options', SelectOptionCollection::make());
+    }
+
+    /**
+     * @param SelectOptionCollection $collection
+     * @return $this
+     */
+    public function withOptions(SelectOptionCollection $collection): self
+    {
+        return $this->setConfig('options', $collection);
     }
 }

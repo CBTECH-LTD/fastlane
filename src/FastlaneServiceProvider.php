@@ -31,6 +31,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Translation\Translator;
 use Inertia\Inertia;
+use Spatie\ResponseCache\Middlewares\CacheResponse;
+use Spatie\ResponseCache\Middlewares\DoNotCacheResponse;
 
 class FastlaneServiceProvider extends ServiceProvider
 {
@@ -239,6 +241,14 @@ class FastlaneServiceProvider extends ServiceProvider
         /** @var Router $router */
         $router = $this->app['router'];
 
+        if (! in_array('fastlane.cacheResponse', $router->getMiddleware())) {
+            $router->aliasMiddleware('fastlane.cacheResponse', CacheResponse::class);
+        }
+
+        if (! in_array('fastlane.doNotCacheResponse', $router->getMiddleware())) {
+            $router->aliasMiddleware('fastlane.doNotCacheResponse', DoNotCacheResponse::class);
+        }
+
         if (! in_array('fastlane.auth', $router->getMiddleware())) {
             $router->aliasMiddleware('fastlane.auth', Authenticate::class);
         }
@@ -312,8 +322,10 @@ class FastlaneServiceProvider extends ServiceProvider
 
     protected function setupControlPanelRoutes(): void
     {
-        $middleware = array_merge(
-            config('fastlane.control_panel.middleware'), ['inertia:fastlane']);
+        $middleware = array_merge(config('fastlane.control_panel.middleware'), [
+            'inertia:fastlane',
+            'fastlane.doNotCacheResponse',
+        ]);
 
         Route::middleware($middleware)
             ->prefix(config('fastlane.control_panel.url_prefix'))

@@ -2,6 +2,7 @@
 
 return [
     'add'                      => 'Add',
+    'add_more'                 => 'Add more',
     'save'                     => 'Save',
     'new'                      => 'New',
     'settings'                 => 'Settings',

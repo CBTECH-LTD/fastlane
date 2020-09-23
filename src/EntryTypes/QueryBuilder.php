@@ -9,6 +9,7 @@ use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -67,6 +68,12 @@ class QueryBuilder
         return $this->addCacheKey("key[{$value}]");
     }
 
+    public function slug(string $value): self
+    {
+        $this->builder->where('slug', $value);
+        return $this->addCacheKey("slug[{$value}]");
+    }
+
     public function routeKey($value): self
     {
         $this->builder->where(
@@ -99,6 +106,12 @@ class QueryBuilder
         return $this->addCacheKey("related[{$relationshipName}]");
     }
 
+    public function withRelated(...$relationships): self
+    {
+        $this->builder->with($relationships);
+        return $this;
+    }
+
     public function query(Closure $callback, ?string $cacheKey = null): self
     {
         $callback($this->builder);
@@ -116,7 +129,7 @@ class QueryBuilder
             }
             : null;
 
-        $okCb = function ($v) use ($callback) {
+        $okCb = function ($_, $v) use ($callback) {
             $callback($this, $v);
         };
 
@@ -174,6 +187,17 @@ class QueryBuilder
             : $this->cache()->remember($this->generateCacheKey(), $this->cacheSeconds, $fn);
 
         return $this->entryInstance->type()->newInstance($model);
+    }
+
+    public function firstOrFail(): EntryInstance
+    {
+        $item = $this->first();
+
+        if ($item->model()->exists) {
+            return $item;
+        }
+
+        abort(Response::HTTP_NOT_FOUND);
     }
 
     protected function addCacheKey(string $key): self

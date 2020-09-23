@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 abstract class ContentBlock implements Arrayable
 {
     protected Collection $fieldsData;
+    protected string $destination = 'index';
 
     abstract public static function key(): string;
 
@@ -25,6 +26,12 @@ abstract class ContentBlock implements Arrayable
     public function __construct()
     {
         $this->resolveFields();
+    }
+
+    public function forDestination(string $destination): self
+    {
+        $this->destination = $destination;
+        return $this;
     }
 
     public function field(string $field): Field
@@ -47,10 +54,16 @@ abstract class ContentBlock implements Arrayable
 
     public function toArray(): array
     {
+        $fields = ($this->destination === 'index')
+            ? $this->fieldsData->map(function (Field $field) {
+                return $field->toShallowArray();
+            })->toArray()
+            : $this->fieldsData->toArray();
+
         return [
             'key'    => static::key(),
             'name'   => static::name(),
-            'fields' => $this->fieldsData->toArray(),
+            'fields' => $fields,
         ];
     }
 

@@ -60,7 +60,7 @@ class BlockEditorField extends RichEditorField
     protected function resolveConfig(EntryInstance $entryInstance, string $destination): void
     {
         $this->resolvedConfig->put('blocks', $this->blocks->mapWithKeys(
-            fn($blockClass) => [$blockClass::key() => $blockClass::make()]
+            fn($blockClass) => [$blockClass::key() => $blockClass::make()->forDestination($destination)]
         )->toArray());
     }
 }

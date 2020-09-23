@@ -27,6 +27,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use Spatie\ResponseCache\Facades\ResponseCache;
 
 abstract class EntryType implements EntryTypeContract
 {
@@ -239,6 +240,8 @@ abstract class EntryType implements EntryTypeContract
         $this->executeHooks(static::HOOK_AFTER_CREATING, $afterHook);
         $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
 
+        ResponseCache::clear();
+
         return $afterHook->entryInstance();
     }
 
@@ -280,6 +283,8 @@ abstract class EntryType implements EntryTypeContract
         $this->executeHooks(static::HOOK_AFTER_UPDATING, $afterHook);
         $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
 
+        ResponseCache::clear();
+
         return $afterHook->entryInstance();
     }
 
@@ -294,6 +299,8 @@ abstract class EntryType implements EntryTypeContract
         }
 
         $entryInstance->model()->delete();
+
+        ResponseCache::clear();
 
         return $entryInstance;
     }

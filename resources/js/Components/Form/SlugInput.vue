@@ -26,7 +26,7 @@ export default {
 
     mounted () {
         this.maskInstance = new Inputmask({
-            regex: '[a-z0-9]+(?:-[a-z0-9]+)*',
+            regex: '[a-z0-9\/]+(?:-[a-z0-9\/]+)*',
             onBeforeMask: (value) => {
                 return value.replace(/\s/g, '-').toLowerCase()
             }
