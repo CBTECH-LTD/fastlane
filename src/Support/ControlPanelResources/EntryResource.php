@@ -2,24 +2,24 @@
 
 namespace CbtechLtd\Fastlane\Support\ControlPanelResources;
 
-use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ReadValue;
+use CbtechLtd\Fastlane\Contracts\EntryType;
+use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 
 class EntryResource extends ResourceType
 {
-    protected EntryInstance $entryInstance;
-    protected string $destination;
+    protected EntryType $entry;
+    protected FieldCollection $fields;
+    protected FieldCollection $panels;
 
-    public function __construct(EntryInstance $entryInstance)
+    public function __construct(EntryType $entry)
     {
-        parent::__construct($entryInstance->model());
-        $this->entryInstance = $entryInstance;
+        parent::__construct($entry->modelInstance());
+        $this->entry = $entry;
     }
 
     public function type(): string
@@ -37,82 +37,71 @@ class EntryResource extends ResourceType
         return new ApiResource($this);
     }
 
-    public function toIndex(): self
+    public function toListing(): self
     {
-        $this->destination = 'index';
+        $this->fields = $this->entry->getFields()->onListing();
+        $this->panels = FieldCollection::make([]);
+
         return $this;
     }
 
     public function toCreate(): self
     {
-        $this->destination = 'create';
+        $this->fields = $this->entry->getFields()->onCreate();
+        $this->panels = $this->entry->getFields()->panels();
         return $this;
     }
 
     public function toUpdate(): self
     {
-        $this->destination = 'update';
+        $this->fields = $this->entry->getFields()->onUpdate();
+        $this->panels = $this->entry->getFields()->panels();
+
         return $this;
     }
 
     public function attributes(Request $request): array
     {
-        $fields = $this->getSchemaFields();
-
-        return Collection::make($fields)
-            ->filter(fn($field) => $field instanceof ReadValue)
-            ->mapWithKeys(
-                fn(ReadValue $field) => $field->readValue($this->entryInstance)->toArray()
-            )->all();
+        return $this->getFields()->getData();
     }
 
     protected function meta(): array
     {
         return [
-            ResourceMeta::make('item_label', $this->entryInstance->title()),
+            ResourceMeta::make('item_label', $this->entry->entryTitle()),
             ResourceMeta::make('entry_type', [
-                'schema'        => Collection::make($this->getSchemaFields()),
-                'panels'        => Collection::make($this->getSchemaPanels()),
-                'singular_name' => $this->entryInstance->type()->name(),
-                'plural_name'   => $this->entryInstance->type()->pluralName(),
-                'identifier'    => $this->entryInstance->type()->identifier(),
-                'icon'          => $this->entryInstance->type()->icon(),
+                'schema'        => $this->getFields()->flattenFields()->toArray(),
+                'panels'        => $this->getPanels()->toArray(),
+                'singular_name' => $this->entry::name(),
+                'plural_name'   => $this->entry::pluralName(),
+                'identifier'    => $this->entry::key(),
+                'icon'          => $this->entry::icon(),
             ]),
         ];
     }
 
     protected function links(): array
     {
-        $links = [
-            ResourceLink::make('parent', ["cp.{$this->entryInstance->type()->identifier()}.index"]),
-        ];
+        $links = [];
 
-        if ($this->model->exists) {
-            $links[] = ResourceLink::make('self', ["cp.{$this->entryInstance->type()->identifier()}.edit", $this->model]);
+        if ($this->entry::routes()->has('index')) {
+            $links[] = ResourceLink::make('parent', [$this->entry::routes()->get('index')->routeName()]);
+        }
+
+        if ($this->model->exists && $this->entry::routes()->has('edit')) {
+            $links[] = ResourceLink::make('self', [$this->entry::routes()->get('edit')->routeName(), $this->model]);
         }
 
         return $links;
     }
 
-    private function getSchemaFields()
+    private function getFields()
     {
-        if ($this->destination === 'update') {
-            return $this->entryInstance->schema()->getUpdateFields();
-        }
-
-        if ($this->destination === 'create') {
-            return $this->entryInstance->schema()->getCreateFields();
-        }
-
-        return $this->entryInstance->schema()->getIndexFields();
+        return $this->fields;
     }
 
-    private function getSchemaPanels()
+    private function getPanels()
     {
-        if ($this->destination === 'index') {
-            return [];
-        }
-
-        return $this->entryInstance->schema()->getPanels();
+        return $this->panels;
     }
 }

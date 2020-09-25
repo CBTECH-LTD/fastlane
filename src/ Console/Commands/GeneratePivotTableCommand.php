@@ -3,7 +3,7 @@
 namespace CbtechLtd\Fastlane\Console\Commands;
 
 use Carbon\Carbon;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;

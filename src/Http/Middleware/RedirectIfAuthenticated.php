@@ -26,6 +26,6 @@ class RedirectIfAuthenticated
 
     protected function getGuardRedirectionPath(): string
     {
-        return route('cp.dashboard');
+        return route('fastlane.cp.dashboard');
     }
 }

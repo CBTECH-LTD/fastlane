@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields\Concerns;
 
-use CbtechLtd\Fastlane\Support\Schema\Fields\Constraints\Unique;
+use CbtechLtd\Fastlane\Fields\Rules\Unique;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;

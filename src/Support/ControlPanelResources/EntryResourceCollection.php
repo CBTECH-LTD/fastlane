@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\ControlPanelResources;
 
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceTypeCollection;
@@ -54,21 +54,19 @@ class EntryResourceCollection extends ResourceTypeCollection
     protected function links(): array
     {
         return [
-            ResourceLink::make('create', ["cp.{$this->entryType->identifier()}.create"]),
+            ResourceLink::make('create', [$this->entryType::routes()->get('create')->routeName()]),
         ];
     }
 
     protected function meta(): array
     {
-        $dummyInstance = $this->entryType->newInstance($this->entryType->newModelInstance());
-
         return [
             ResourceMeta::make('entry_type', [
-                'schema'        => Collection::make($dummyInstance->schema()->getIndexFields()),
-                'singular_name' => $this->entryType->name(),
-                'plural_name'   => $this->entryType->pluralName(),
-                'identifier'    => $this->entryType->identifier(),
-                'icon'          => $this->entryType->icon(),
+                'schema'        => $this->entryType->getFields()->onListing()->flattenFields()->toArray(),
+                'singular_name' => $this->entryType::name(),
+                'plural_name'   => $this->entryType::pluralName(),
+                'identifier'    => $this->entryType::key(),
+                'icon'          => $this->entryType::icon(),
             ]),
         ];
     }

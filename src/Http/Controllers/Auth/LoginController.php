@@ -36,7 +36,7 @@ class LoginController extends Controller
     public function showLoginForm()
     {
         return $this->render('Auth/Login', [
-            'url' => route('cp.login'),
+            'url' => route('fastlane.cp.login'),
         ]);
     }
 
@@ -49,12 +49,12 @@ class LoginController extends Controller
 
     public function redirectPath()
     {
-        return route('cp.dashboard');
+        return route('fastlane.cp.dashboard');
     }
 
     protected function loggedOut(Request $request)
     {
-        return Redirect::route('cp.login');
+        return Redirect::route('fastlane.cp.login');
     }
 
     protected function guard()

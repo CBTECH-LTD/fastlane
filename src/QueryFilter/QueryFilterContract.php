@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane\QueryFilter;
 
-use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
+use CbtechLtd\Fastlane\Contracts\QueryBuilder;
 use CbtechLtd\Fastlane\QueryFilter\Pipes\QueryPipeContract;
 
 interface QueryFilterContract

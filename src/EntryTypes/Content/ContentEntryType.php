@@ -3,8 +3,8 @@
 namespace CbtechLtd\Fastlane\EntryTypes\Content;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
-use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
-use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
+use CbtechLtd\Fastlane\EntryTypes\RendersOnMenu\RendersOnMenu;
+use CbtechLtd\Fastlane\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Support\Schema\Fields\BlockEditorField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
 use CbtechLtd\Fastlane\Support\Schema\Fields\SlugField;
@@ -71,7 +71,7 @@ class ContentEntryType extends EntryType implements RenderableOnMenu
         ];
     }
 
-    public function queryBuilder(): QueryBuilder
+    public function query(): QueryBuilder
     {
         return new QueryBuilder($this);
     }

@@ -3,7 +3,7 @@
 namespace CbtechLtd\Fastlane\ContentBlocks;
 
 use CbtechLtd\Fastlane\Fields\Field;
-use CbtechLtd\Fastlane\Fields\Slug;
+use CbtechLtd\Fastlane\Fields\Types\Slug;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 

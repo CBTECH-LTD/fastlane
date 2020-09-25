@@ -2,24 +2,24 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers\Account;
 
-use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
-use Illuminate\Http\Request;
+use CbtechLtd\Fastlane\Fastlane;
+use CbtechLtd\Fastlane\Http\Requests\AccountUpdateRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 
 class AccountSecurityController extends AbstractAccountsController
 {
-    public function edit()
+    public function edit(AccountUpdateRequest $request)
     {
         return $this->render('Settings/SecurityEdit', [
             'links'       => [
-                'form' => route('cp.account.security'),
+                'form' => route('fastlane.cp.account.security'),
             ],
             'sidebarMenu' => $this->sidebarMenu(),
         ]);
     }
 
-    public function update(Request $request)
+    public function update(AccountUpdateRequest $request)
     {
         $data = $request->validate([
             'password' => 'required|min:8|confirmed',
@@ -27,18 +27,11 @@ class AccountSecurityController extends AbstractAccountsController
 
         Auth::user()->setPasswordAttribute($data['password'])->save();
 
-        app('fastlane')->flashSuccess(
-            'Your account password was updated successfully.',
+        Fastlane::flashSuccess(
+            __('fastlane::core.flash.password_updated'),
             'thumbs-up'
         );
 
-        return Redirect::route('cp.account.profile');
-    }
-
-    protected function entryType(): BackendUserEntryType
-    {
-        return app('fastlane')->getEntryTypeByClass(BackendUserEntryType::class)
-            ->new(Auth::user())
-            ->resolve([]);
+        return Redirect::route('fastlane.cp.account.profile');
     }
 }

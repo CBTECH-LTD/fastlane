@@ -16,17 +16,17 @@ class TokenResource extends ResourceType
     public function attributes(Request $request): array
     {
         return [
-            'name' => $this->model->name,
+            'name'         => $this->model->name,
             'last_used_at' => $this->model->last_used_at,
-            'abilities' => $this->model->abilities,
+            'abilities'    => $this->model->abilities,
         ];
     }
 
     protected function links(): array
     {
         return [
-            ResourceLink::make('self', ['cp.account.tokens.destroy', $this->model]),
-            ResourceLink::make('top', ['cp.account.tokens.index']),
+            ResourceLink::make('self', ['fastlane.cp.account.tokens.destroy', $this->model]),
+            ResourceLink::make('top', ['fastlane.cp.account.tokens.index']),
         ];
     }
 

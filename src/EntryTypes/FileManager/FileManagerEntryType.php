@@ -9,7 +9,7 @@ use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Contracts\WithCollectionLinks;
 use CbtechLtd\Fastlane\Support\Contracts\WithCustomController;
-use CbtechLtd\Fastlane\Support\Contracts\WithCustomViews;
+use CbtechLtd\Fastlane\Contracts\WithCustomViews;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldValue;
@@ -34,12 +34,12 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
         return __('fastlane::core.file_manager.identifier');
     }
 
-    public function model(): string
+    public static function model(): string
     {
         return File::class;
     }
 
-    public function name(): string
+    public static function name(): string
     {
         return __('fastlane::core.file_manager.singular_name');
     }
@@ -96,7 +96,7 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
         ];
     }
 
-    public function getIndexView(): ?string
+    public function getListingView(): ?string
     {
         return 'FileManager/Index';
     }

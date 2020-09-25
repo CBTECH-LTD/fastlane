@@ -12,7 +12,7 @@ interface ModelPolicy
 
     public function create($user);
 
-    public function show($user, Model $model);
+    public function view($user, Model $model);
 
     public function update($user, Model $model);
 

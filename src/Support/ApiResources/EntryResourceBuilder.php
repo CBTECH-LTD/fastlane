@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\ApiResources;
 
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\JsonApiTransformer\ApiResources\ApiResource;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;

@@ -22,17 +22,25 @@
 import AccountSettings from './Shared/AccountSettings'
 import { FormSchemaFactory } from '../../Support/FormSchema'
 
-function makeField (label, name, type) {
+function makeField (label, attribute, component) {
     return {
-        label,
-        name,
-        type,
-        config: {},
-        default: null,
-        listWidth: 0,
-        panel: null,
-        placeholder: label,
-        required: true,
+        value: '',
+        field: {
+            attribute,
+            component,
+            config: {
+                label,
+                default: null,
+                panel: null,
+                placeholder: label,
+                required: true,
+                unique: false,
+                sortable: false,
+                listing: {
+                    colWidth: 0,
+                }
+            },
+        },
     }
 }
 
@@ -54,10 +62,10 @@ export default {
     data () {
         return {
             isUpdating: false,
-            form: new FormSchemaFactory({}, [
-                makeField(this.$l('core.account_settings.security_new_password'), 'password', 'password'),
-                makeField(this.$l('core.account_settings.security_confirm_new_password'), 'password_confirmation', 'password'),
-            ])
+            form: new FormSchemaFactory({
+                password: makeField(this.$l('core.account_settings.security_new_password'), 'password', 'password'),
+                password_confirmation: makeField(this.$l('core.account_settings.security_confirm_new_password'), 'password_confirmation', 'password'),
+            })
         }
     },
 

@@ -3,7 +3,7 @@
 namespace CbtechLtd\Fastlane\EntryTypes;
 
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Contracts\EntrySchema as EntrySchemaContract;
 use CbtechLtd\Fastlane\Support\Schema\EntrySchema;

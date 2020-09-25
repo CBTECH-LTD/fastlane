@@ -20,18 +20,9 @@ class User extends BaseModel implements
     AuthorizableContract,
     CanResetPasswordContract
 {
-    protected bool $attributesFromSchema = false;
-    protected bool $relationsFromSchema = false;
-
     use Notifiable, Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasRoles, HasApiTokens;
 
     protected $table = 'fastlane_users';
-
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
 
     /**
      * The attributes that should be hidden for arrays.

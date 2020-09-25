@@ -14,7 +14,7 @@
 <script>
     window.fastlane = {
         locale: '{{ config('app.locale', 'en') }}',
-        translations: @json(app('fastlane')->getTranslations())
+        translations: @json(\CbtechLtd\Fastlane\Fastlane::getTranslations())
     }
 </script>
 

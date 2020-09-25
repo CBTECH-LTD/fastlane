@@ -2,15 +2,15 @@
 
 namespace CbtechLtd\Fastlane\Http\Requests\Concerns;
 
-use CbtechLtd\Fastlane\FastlaneFacade;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\EntryType;
+use CbtechLtd\Fastlane\Fastlane;
 use Illuminate\Database\Eloquent\Model;
 
 trait HasEntryType
 {
     public function entryType(): EntryType
     {
-        return FastlaneFacade::getRequestEntryType();
+        return Fastlane::getRequest()->getEntry();
     }
 
     public function hasEntry(): bool
@@ -20,7 +20,7 @@ trait HasEntryType
 
     public function entry(): ?Model
     {
-        return FastlaneFacade::getRequestEntry();
+        return Fastlane::getRequest()->getEntryInstance();
     }
 
     public function authorize()

@@ -5,7 +5,7 @@
                 <div class="flex flex-col justify-center items-center">
                     <img :src="$asset($page.app.assets.logoImage)" alt="" class="w-20 mb-8">
                     <h2 class="text-center text-3xl leading-9 font-extrabold text-gray-900">
-                        Sign in to your account
+                        {{ $l('core.login.title') }}
                     </h2>
                 </div>
 
@@ -26,20 +26,20 @@
                     </transition>
 
                     <f-form-field stacked>
-                        <span slot="label">Email Address</span>
-                        <input type="email" name="email" required autofocus class="form-input w-full" placeholder="Email address" v-model="email">
+                        <span slot="label">{{ $l('core.login.email') }}</span>
+                        <input type="email" name="email" required autofocus class="form-input w-full" :placeholder="$l('core.login.email')" v-model="email">
                     </f-form-field>
                     <f-form-field stacked>
-                        <span slot="label">Password</span>
-                        <input type="password" name="password" required class="form-input w-full" placeholder="Password" v-model="password">
+                        <span slot="label">{{ $l('core.login.password') }}</span>
+                        <input type="password" name="password" required class="form-input w-full" :placeholder="$l('core.login.password')" v-model="password">
                     </f-form-field>
                     <div class="py-2 text-right text-sm leading-5">
                         <f-link as="a" href="#" color="gray">
-                            Forgot your password?
+                            {{ $l('core.login.forgot') }}
                         </f-link>
                     </div>
                     <div class="mt-2">
-                        <f-button :loading="isAttemptingLogin" submit full size="lg" color="black">Login</f-button>
+                        <f-button :loading="isAttemptingLogin" submit full size="lg" color="black">{{ $l('core.login.button') }}</f-button>
                     </div>
                 </form>
             </div>

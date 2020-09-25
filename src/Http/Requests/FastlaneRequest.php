@@ -2,63 +2,64 @@
 
 namespace CbtechLtd\Fastlane\Http\Requests;
 
-use CbtechLtd\Fastlane\QueryFilter\QueryFilter;
-use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
-use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
+use CbtechLtd\Fastlane\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Facades\EntryType as EntryTypeFacade;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Response;
 
-class FastlaneRequest extends Request
+abstract class FastlaneRequest extends FormRequest
 {
-    private EntryTypeContract $entryType;
-    private EntryInstanceContract $entryInstance;
+    protected EntryTypeContract $entryType;
 
     /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    abstract public function rules();
+
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    abstract public function authorize(): bool;
+
+    /**
+     * Make an instance of the entry type.
+     *
+     * @param EntryTypeContract $class
      * @return EntryTypeContract
      */
-    public function getEntryType(): EntryTypeContract
+    abstract protected function makeEntryType($class): EntryTypeContract;
+
+    /**
+     * Get the requested entry type.
+     *
+     * @return EntryTypeContract
+     */
+    public function entryType(): EntryTypeContract
     {
         return $this->entryType;
     }
 
     /**
-     * @param EntryTypeContract $entryType
-     * @return FastlaneRequest
+     * Load the requested entry type and its instance.
      */
-    public function setEntryType(EntryTypeContract $entryType): self
+    protected function prepareForValidation()
     {
-        $this->entryType = $entryType;
-        return $this;
+        $this->entryType = $this->makeEntryType($this->findEntryTypeClass());
     }
 
-    public function setEntryInstance(EntryInstanceContract $entryInstance): self
+    /**
+     * @return EntryTypeContract|string
+     */
+    protected function findEntryTypeClass(): string
     {
-        $this->entryInstance = $entryInstance;
-        return $this;
-    }
+        if (! preg_match('/^fastlane\.cp\.(.+)\.(.+)$/', $this->route()->getName(), $matches)) {
+            abort(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
-    public function getEntryInstance(): EntryInstanceContract
-    {
-        return $this->entryInstance;
-    }
-
-    public function buildQueryFilter(): QueryFilterContract
-    {
-        return tap(new QueryFilter(), function (QueryFilter $qf) {
-            if ($order = $this->input('order')) {
-                $fieldName = Str::replaceFirst('-', '', $order);
-
-                $sortable = Collection::make($this->getEntryInstance()->schema()->getIndexFields())
-                    ->filter(fn(SchemaField $field) => $field->isSortable())
-                    ->first(fn(SchemaField $field) => $field->isSortable() && $field->getName() === $fieldName);
-
-                if ($sortable) {
-                    $qf->withOrder($order);
-                }
-            }
-        });
+        return EntryTypeFacade::findByKey($matches[1]);
     }
 }

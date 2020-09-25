@@ -6,7 +6,7 @@ use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Http\Controllers\Controller;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceBuilder;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollectionBuilder;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 

@@ -2,8 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Support\ApiResources;
 
-use CbtechLtd\Fastlane\FastlaneFacade;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\EntryType;
+use CbtechLtd\Fastlane\Facades\EntryType as EntryTypeFacade;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiAttribute;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiRelationship;
@@ -69,15 +69,15 @@ class EntryResource extends ResourceType
 
     protected function getEntryType(): EntryType
     {
-        return FastlaneFacade::getEntryTypeByClass($this->getEntryTypeClass());
+        return EntryTypeFacade::getEntryTypeByClass($this->getEntryTypeClass());
     }
 
-    protected function getEntryTypeClass(): string
+    protected static function getEntryTypeClass(): string
     {
         $class = Str::replaceLast(
             'Resource',
             'EntryType',
-            (new \ReflectionClass($this))->getName()
+            (new \ReflectionClass(static::class))->getName()
         );
 
         if (! class_exists($class)) {

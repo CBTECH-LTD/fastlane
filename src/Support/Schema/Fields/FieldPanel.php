@@ -5,7 +5,7 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\Makeable;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Panelizable;
+use CbtechLtd\Fastlane\Contracts\Panelizable;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\Resolvable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;

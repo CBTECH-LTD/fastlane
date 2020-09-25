@@ -83,4 +83,21 @@ return [
             'turn_off' => 'Click to turn off',
         ],
     ],
+
+    // Login page
+    'login'                    => [
+        'title'    => 'Sign in to your account',
+        'email'    => 'Email Address',
+        'password' => 'Password',
+        'forgot'   => 'Forgot your password?',
+        'button'   => 'Login',
+    ],
+
+    // Flash messages
+    'flash'                    => [
+        'created'          => ':name created successfully',
+        'updated'          => ':name updated successfully',
+        'deleted'          => ':name deleted successfully',
+        'password_updated' => 'Your account password was updated successfully.',
+    ],
 ];

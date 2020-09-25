@@ -1,6 +1,6 @@
 <template>
-    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
-        <template v-if="field.label" v-slot:label>{{ field.label }}</template>
+    <f-form-field :errors="$page.errors.get(field.attribute)" :required="field.config.required" :stacked="stacked">
+        <template v-if="field.config.label" v-slot:label>{{ field.config.label }}</template>
         <div class="w-full">
             <input ref="input"
                    type="text"

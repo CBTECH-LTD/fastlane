@@ -1,12 +1,13 @@
 <template>
-    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
-        <template v-if="field.label" v-slot:label>{{ field.label }}</template>
+    <f-form-field :errors="$page.errors.get(field.attribute)" :required="field.required" :stacked="stacked">
+        <template v-if="field.config.label" v-slot:label>{{ field.config.label }}</template>
         <div class="w-full">
             <input
                 type="password"
                 class="w-full form-input"
                 v-bind="$attrs"
-                v-model="field.value"
+                :value="field.value"
+                @input="onInput($event.target.value)"
             />
         </div>
     </f-form-field>

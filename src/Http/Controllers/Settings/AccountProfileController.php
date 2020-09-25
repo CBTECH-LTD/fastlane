@@ -2,41 +2,33 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers\Account;
 
-use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
+use CbtechLtd\Fastlane\Fastlane;
+use CbtechLtd\Fastlane\Http\Requests\AccountUpdateRequest;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 
 class AccountProfileController extends AbstractAccountsController
 {
-    public function edit()
+    public function edit(AccountUpdateRequest $request)
     {
-        $instance = $this->entryType()->newInstance(Auth::user());
-
         return $this->render('Settings/ProfileEdit', [
-            'item'        => (new EntryResource($instance))->toUpdate()->transform(),
+            'item'        => (new EntryResource($request->entryType()))->toUpdate()->transform(),
             'links'       => [
-                'form' => route('cp.account.profile'),
+                'form' => route('fastlane.cp.account.profile'),
             ],
             'sidebarMenu' => $this->sidebarMenu(),
         ]);
     }
 
-    public function update(Request $request)
+    public function update(AccountUpdateRequest $request)
     {
-        $this->entryType()->updateAuthenticatedUser($request);
+        $request->entryType()->update($request->all());
 
-        app('fastlane')->flashSuccess(
-            'fastlane::core.account_settings.profile_success_msg',
+        Fastlane::flashSuccess(
+            __('fastlane::core.account_settings.profile_success_msg'),
             'thumbs-up'
         );
 
         return Redirect::back();
-    }
-
-    protected function entryType(): BackendUserEntryType
-    {
-        return app('fastlane')->getEntryTypeByClass(BackendUserEntryType::class);
     }
 }

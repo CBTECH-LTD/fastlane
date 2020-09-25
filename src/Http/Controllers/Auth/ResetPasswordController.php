@@ -23,7 +23,7 @@ class ResetPasswordController extends Controller
 
     public function redirectPath()
     {
-        return route('cp.dashboard');
+        return route('fastlane.cp.dashboard');
     }
 
     protected function guard()

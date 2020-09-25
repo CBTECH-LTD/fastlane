@@ -6,7 +6,7 @@ use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
+use CbtechLtd\Fastlane\Fields\Support\SelectOption;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 

@@ -32,13 +32,13 @@ class ConfirmPasswordController extends Controller
 
     public function redirectPath()
     {
-        return route('cp.dashboard');
+        return route('fastlane.cp.dashboard');
     }
 
     public function showConfirmForm()
     {
         return $this->render('Auth/ConfirmPassword', [
-            'url' => route('cp.password.confirm'),
+            'url' => route('fastlane.cp.password.confirm'),
         ]);
     }
 }

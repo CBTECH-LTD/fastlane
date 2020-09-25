@@ -34,6 +34,6 @@ class VerificationController extends Controller
 
     public function redirectPath()
     {
-        return route('cp.dashboard');
+        return route('fastlane.cp.dashboard');
     }
 }

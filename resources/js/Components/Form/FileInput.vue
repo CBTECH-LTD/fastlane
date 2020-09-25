@@ -96,7 +96,7 @@ export default {
 
     methods: {
         commit (formObject) {
-            formObject.put(this.field.name, this.field.value.map(f => f.id))
+            formObject.put(this.field.attribute, this.field.value.map(f => f.id))
         },
 
         openFileManager () {

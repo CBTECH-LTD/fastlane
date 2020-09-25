@@ -53,11 +53,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "CbtechLtd\\Fastlane\\FastlaneServiceProvider"
-            ],
-            "aliases": {
-                "Fastlane": "CbtechLtd\\Fastlane\\FastlaneFacade"
-            }
+                "CbtechLtd\\Fastlane\\Providers\\FastlaneServiceProvider"
+            ]
         }
     }
 }

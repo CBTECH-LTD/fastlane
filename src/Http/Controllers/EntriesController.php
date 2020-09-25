@@ -2,54 +2,48 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers;
 
+use CbtechLtd\Fastlane\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\QueryBuilder;
+use CbtechLtd\Fastlane\Contracts\WithCustomViews;
 use CbtechLtd\Fastlane\Fastlane;
-use CbtechLtd\Fastlane\FastlaneFacade;
-use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Http\Requests\CreateRequest;
+use CbtechLtd\Fastlane\Http\Requests\DeleteRequest;
+use CbtechLtd\Fastlane\Http\Requests\UpdateRequest;
+use CbtechLtd\Fastlane\Http\Requests\IndexRequest;
 use CbtechLtd\Fastlane\Support\Contracts\WithCollectionLinks;
 use CbtechLtd\Fastlane\Support\Contracts\WithCollectionMeta;
-use CbtechLtd\Fastlane\Support\Contracts\WithCustomViews;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;
+use Exception;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Str;
+use Inertia\Response;
 
 class EntriesController extends Controller
 {
-    protected Fastlane $fastlane;
-
-    public function __construct()
+    /**
+     * @param IndexRequest $request
+     * @return RedirectResponse|Response
+     */
+    public function index(IndexRequest $request)
     {
-        $this->fastlane = app('fastlane');
-    }
-
-    protected function entryType(): EntryType
-    {
-        return $this->fastlane->getRequest()->getEntryType();
-    }
-
-    protected function entryInstance(): ?EntryInstance
-    {
-        return $this->fastlane->getRequest()->getEntryInstance();
-    }
-
-    public function index()
-    {
-        /** @var LengthAwarePaginator $paginator */
-        $paginator = $this->entryType()->getItems(
-            $this->fastlane->getRequest()->buildQueryFilter()
-        );
+        $paginator = $request->entryType()::queryListing(function (QueryBuilder $builder) use ($request) {
+            return $request->buildQueryFilter()
+                ->addOrder('created_at')
+                ->addOrder('id')
+                ->pipeThrough($builder);
+        });
 
         // Redirect to the first pagination page if the requested page
         // is bigger than the maximum existent page in the paginator.
         if ($paginator->currentPage() > $paginator->lastPage()) {
             return redirect()->route(
-                "cp.{$this->entryType()->identifier()}.index",
+                $request->entryType()::routes()->get('index')->routeName(),
                 Collection::make(request()->query())->except(['page'])->all()
             );
         }
@@ -57,30 +51,29 @@ class EntriesController extends Controller
         // Transform the paginator collection, which is composed of
         // entry instances, into a collection of entry resources ready
         // to be transformed to our front-end application.
-        $paginator->getCollection()
-            ->transform(
-                fn(EntryInstance $entry) => (new EntryResource($entry))->toIndex()
-            );
+        $paginator->getCollection()->transform(
+            fn(EntryType $entry) => (new EntryResource($entry))->toListing()
+        );
 
         $collection = EntryResourceCollection::makeFromPaginator($paginator)
-            ->forEntryType($this->entryType())
+            ->forEntryType($request->entryType())
             ->withMeta([
-                ResourceMeta::make('order', $this->fastlane->getRequest()->input('order')),
+                ResourceMeta::make('order', $request->input('order')),
             ]);
 
-        if ($this->entryType() instanceof WithCollectionLinks) {
-            $collection->withLinks($this->entryType()->collectionLinks());
+        if ($request->entryType() instanceof WithCollectionLinks) {
+            $collection->withLinks($request->entryType()->collectionLinks());
         }
 
-        if ($this->entryType() instanceof WithCollectionMeta) {
-            $collection->withMeta($this->entryType()->collectionMeta());
+        if ($request->entryType() instanceof WithCollectionMeta) {
+            $collection->withMeta($request->entryType()->collectionMeta());
         }
 
         // Return the transformed collection and some important information like
         // entry type schema, names and links.
-        $view = function () {
-            return $this->entryType() instanceof WithCustomViews
-                ? $this->entryType()->getIndexView()
+        $view = function () use ($request) {
+            return $request->entryType() instanceof WithCustomViews
+                ? $request->entryType()->getListingView()
                 : null;
         };
 
@@ -89,77 +82,100 @@ class EntriesController extends Controller
         ]);
     }
 
-    public function create()
+    /**
+     * @param CreateRequest $request
+     * @return Response
+     */
+    public function create(CreateRequest $request)
     {
-        if ($this->entryType()->policy()) {
-            $this->authorize('create', $this->entryType()->model());
-        }
-
-        $view = function () {
-            return $this->entryType() instanceof WithCustomViews
-                ? $this->entryType()->getCreateView()
+        $view = function () use ($request) {
+            return $request->entryType() instanceof WithCustomViews
+                ? $request->entryType()->getCreateView()
                 : null;
         };
 
         return $this->render($view() ?? 'Entries/Create', [
-            'item'      => (new EntryResource($this->entryInstance()))->toCreate()->transform(),
+            'item'      => (new EntryResource($request->entryType()))->toCreate()->transform(),
             'entryType' => [
-                'schema'        => $this->entryInstance()->schema()->getCreateFields(),
-                'panels'        => Collection::make($this->entryInstance()->schema()->getPanels()),
-                'singular_name' => $this->entryType()->name(),
-                'plural_name'   => Str::plural($this->entryType()->name()),
+                'schema'        => $request->entryType()->getFields()->onCreate(),
+                'panels'        => $request->entryType()->getFields()->panels(),
+                'singular_name' => $request->entryType()::name(),
+                'plural_name'   => $request->entryType()::pluralName(),
             ],
             'links'     => [
-                'form'   => URL::relative("cp.{$this->entryType()->identifier()}.store"),
-                'parent' => URL::relative("cp.{$this->entryType()->identifier()}.index"),
+                'form'   => $request->entryType()::routes()->get('store')->url(null, false),
+                'parent' => $request->entryType()::routes()->get('index')->url(null, false),
             ],
         ]);
     }
 
-    public function store(Request $request)
+    /**
+     * @param CreateRequest $request
+     * @return Application|RedirectResponse|Redirector
+     */
+    public function store(CreateRequest $request)
     {
-        $entry = $this->entryType()->store($request);
+        $entry = $request->entryType()->store($request->all());
 
-        FastlaneFacade::flashSuccess($this->entryType()->name() . ' created successfully.', 'thumbs-up');
+        Fastlane::flashSuccess(
+            __('fastlane::core.flash.created', ['name' => $request->entryType()::name()]),
+            'thumbs-up'
+        );
 
-        return Redirect::route("cp.{$this->entryType()->identifier()}.edit", [$entry->model()]);
+        return redirect(
+            $request->entryType()::routes()
+                ->get('edit')
+                ->url([$entry->modelInstance()])
+        );
     }
 
-    public function edit()
+    /**
+     * @param UpdateRequest $request
+     * @return Response
+     */
+    public function edit(UpdateRequest $request)
     {
-        if ($this->entryType()->policy()) {
-            $this->authorize('update', $this->entryInstance()->model());
-        }
-
-        $view = function () {
-            return $this->entryType() instanceof WithCustomViews
-                ? $this->entryType()->getEditView()
+        $view = function () use ($request) {
+            return $request->entryType() instanceof WithCustomViews
+                ? $request->entryType()->getEditView()
                 : null;
         };
 
         return $this->render($view() ?? 'Entries/Edit', [
-            'item' => (new EntryResource($this->entryInstance()))->toUpdate()->transform(),
+            'item' => (new EntryResource($request->entryType()))->toUpdate()->transform(),
         ]);
     }
 
-    public function update(Request $request, string $id)
+    /**
+     * @param UpdateRequest $request
+     * @return RedirectResponse
+     */
+    public function update(UpdateRequest $request)
     {
-        $this->entryType()->update($request, $id);
+        $request->entryType()->update($request->all());
 
-        $this->fastlane->flashSuccess(
-            $this->entryType()->name() . ' updated successfully.',
+        Fastlane::flashSuccess(
+            __('fastlane::core.flash.updated', ['name' => $request->entryType()::name()]),
             'thumbs-up'
         );
 
         return Redirect::back();
     }
 
-    public function delete(Request $request, string $id)
+    /**
+     * @param DeleteRequest $request
+     * @return Application|RedirectResponse|Redirector
+     * @throws Exception
+     */
+    public function delete(DeleteRequest $request)
     {
-        $this->entryType()->delete($id);
+        $request->entryType()->delete();
 
-        FastlaneFacade::flashSuccess($this->entryType()->name() . ' deleted successfully.', 'trash');
+        Fastlane::flashSuccess(
+            __('fastlane::core.flash.deleted', ['name' => $request->entryType()::name()]),
+            'trash'
+        );
 
-        return Redirect::route("cp.{$this->entryType()->identifier()}.index");
+        return redirect($request->entryType()::routes()->get('index')->url());
     }
 }

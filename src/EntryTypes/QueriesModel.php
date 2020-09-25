@@ -6,7 +6,7 @@ use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 
 trait QueriesModel
 {
-    public function queryBuilder(): QueryBuilder
+    public function query(): QueryBuilder
     {
         return new QueryBuilder($this);
     }

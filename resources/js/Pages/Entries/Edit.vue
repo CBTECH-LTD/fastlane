@@ -64,9 +64,7 @@ export default {
     data () {
         return {
             isUpdating: false,
-            form: new FormSchemaFactory(
-                this.item.attributes, this.item.meta.entry_type.schema
-            )
+            form: new FormSchemaFactory(this.item.attributes)
         }
     },
 
@@ -77,12 +75,6 @@ export default {
     },
 
     methods: {
-        getFieldSlot (field) {
-            return field.panel
-                ? `${field.panel}____${field.name}`
-                : `default_panel____${field.name}`
-        },
-
         async submitForm () {
             const formObject = this.form.toFormObject()
 

@@ -48,7 +48,7 @@ function generateMethods (form, $bus) {
                 return tap(new FormObject(), formObject => {
                     each(items, (field) => {
                         if (!field.commitCallback) {
-                            throw new Error('No Commit Callback set on the field ' + field.name)
+                            throw new Error('No Commit Callback set on the field ' + field.attribute)
                         }
 
                         field.commitCallback(formObject)
@@ -59,7 +59,7 @@ function generateMethods (form, $bus) {
     })
 
     each(form, field => {
-        Object.defineProperty(obj, field.name, {
+        Object.defineProperty(obj, field.attribute, {
             get () {
                 return field.value
             },
@@ -74,27 +74,31 @@ function generateMethods (form, $bus) {
  * Generate a new Form Schema instance.
  *
  * @param data
- * @param schema
  */
-export function FormSchemaFactory (data, schema) {
+export function FormSchemaFactory (data) {
     const $bus = new Vue
     const __fields = {}
 
-    each(schema, field => {
-        const component = components[camelCase(field.type)].form
+    each(data, item => {
+        const component = components[camelCase(item.field.component)].form
 
-        const value = data.hasOwnProperty(field.name)
-            ? data[field.name]
-            : field.default
+        const value = data.hasOwnProperty(item.field.attribute)
+            ? data[item.field.attribute]
+            : item.field.config.default
 
-        __fields[field.name] = Vue.observable(
+        __fields[item.field.attribute] = Vue.observable(
             !!component.buildForSchema
-                ? component.buildForSchema({ field, component, value, data })
-                : FormFieldFactory(field, component, value, {})
+                ? component.buildForSchema({
+                    field: item.field,
+                    value: item.value,
+                    component,
+                    data
+                })
+                : FormFieldFactory(item.field, component, item.value, {})
         )
 
-        __fields[field.name].onValueChanged((value) => {
-            $bus.$emit(`${field.name}:value-changed`, value)
+        __fields[item.field.attribute].onValueChanged((value) => {
+            $bus.$emit(`${item.field.attribute}:value-changed`, value)
         })
     })
 

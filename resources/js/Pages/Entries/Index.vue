@@ -3,7 +3,7 @@
         <template v-slot:title>{{ items.meta.entry_type.plural_name }}</template>
         <template v-slot:actions>
             <slot name="actions">
-                <f-button v-if="items.links.create" :href="items.links.create" left-icon="plus" size="lg">{{ $l('core.add') }} {{ items.meta.entry_type.singular_name }}</f-button>
+                <f-button v-if="items.links.create" :href="items.links.create" left-icon="plus" size="lg">{{ $l('core.add') }}</f-button>
             </slot>
         </template>
 
@@ -11,10 +11,10 @@
 
         <f-table-card :items="items.data" auto>
             <template v-slot:columns>
-                <th v-for="field in listSchema" :key="field.name" class="table__column" :width="field.listWidth || 'auto'">
+                <th v-for="field in listSchema" :key="field.attribute" class="table__column" :width="field.config.listing.colWidth || 'auto'">
                     <span class="flex items-center">
-                        {{ field.label }}
-                        <f-button v-if="field.sortable" @click="orderBy(field)" variant="minimal" :color="orderField === field.name ? 'black' : 'gray'" class="ml-2">
+                        {{ field.config.label }}
+                        <f-button v-if="field.config.sortable" @click="orderBy(field)" variant="minimal" :color="orderField === field.attribute ? 'black' : 'gray'" class="ml-2">
                             <f-icon v-if="orderDirection === 'asc'" name="sort-alpha-down"/>
                             <f-icon v-if="orderDirection === 'desc'" name="sort-alpha-down-alt"/>
                         </f-button>
@@ -23,14 +23,11 @@
                 <th width="80"></th>
             </template>
             <template v-slot:item="{ item }">
-                <td v-for="field in listSchema" :key="field.name" class="table__cell">
-                    <slot :name="`item-content-${field.name}`" :field="field" :item="item" :value="item.attributes[field.name]">
+                <td v-for="field in listSchema" :key="field.attribute" class="table__cell">
+                    <slot :name="`item-content-${field.attribute}`" :field="field" :item="item" :value="item.attributes[field.attribute]">
                         <component :is="field.component"
-                                   :type="field.type"
-                                   :name="field.name"
-                                   :label="field.label"
-                                   :config="field.config"
-                                   :value="item.attributes[field.name]"
+                                   :field="field"
+                                   :value="item.attributes[field.attribute].value"
                                    :loading="isPerformingActionFor[item.id]"
                                    @input="value => onInput(item, field, value)"
                         ></component>
@@ -94,7 +91,7 @@ export default {
 
                 try {
                     await this.$inertia.patch(item.links.self, {
-                        [field.name]: value,
+                        [field.attribute]: value,
                     })
                 } catch {}
 
@@ -109,7 +106,7 @@ export default {
 
             this.$inertia.visit(this.items.meta.firstPageUrl, {
                 data: {
-                    order: `${dir}${field.name}`,
+                    order: `${dir}${field.attribute}`,
                 }
             })
         }

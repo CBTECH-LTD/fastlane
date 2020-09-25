@@ -24,7 +24,7 @@
                     {{ $l('core.account_settings.personal_access_tokens_last_used_at') }} {{ token.attributes.last_used_at }}
                 </div>
                 <div class="flex-shrink flex items-center">
-                    <f-button :href="items.links.create" color="danger" size="sm" variant="outline">
+                    <f-button :href="token.links.self" method="delete" color="danger" size="sm" variant="outline">
                         {{ $l('core.account_settings.personal_access_tokens_revoke') }}
                     </f-button>
                 </div>

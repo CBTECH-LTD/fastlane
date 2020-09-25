@@ -2,7 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Http\Requests;
 
-use CbtechLtd\Fastlane\FastlaneFacade;
+use CbtechLtd\Fastlane\Fastlane;
+use Illuminate\Foundation\Http\FormRequest;
 
 class AccountTokensRequest extends FormRequest
 {
@@ -20,7 +21,7 @@ class AccountTokensRequest extends FormRequest
         return [
             'name'        => 'required|string|min:3',
             'abilities'   => 'required|array',
-            'abilities.*' => 'required|in:' . implode(',', FastlaneFacade::getAccessTokenAbilities()),
+            'abilities.*' => 'required|in:' . implode(',', Fastlane::getAccessTokenAbilities()),
         ];
     }
 }

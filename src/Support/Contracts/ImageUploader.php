@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Contracts;
 
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use Illuminate\Http\UploadedFile;
 
 interface ImageUploader

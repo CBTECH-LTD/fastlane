@@ -2,8 +2,8 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes;
 
-use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\QueryBuilder as Contract;
 use Closure;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -12,10 +12,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
-class QueryBuilder
+class QueryBuilder implements Contract
 {
     protected Builder $builder;
-    protected EntryInstance $entryInstance;
+    protected EntryType $entryType;
     protected int $cacheSeconds = 86400;
     protected array $cacheKey = [];
     protected bool $shouldCache;
@@ -24,12 +24,10 @@ class QueryBuilder
     {
         $this->shouldCache = (bool)config('fastlane.cache');
 
-        $this->entryInstance = $entryType->newInstance(
-            $entryType->newModelInstance()
-        );
+        $this->entryType = $entryType;
 
-        $this->builder = $this->entryInstance->model()->newModelQuery();
-        $this->cacheKey = [$entryType->identifier()];
+        $this->builder = $this->entryType::model()::query();
+        $this->cacheKey = [$entryType::key()];
     }
 
     public function getBuilder(): Builder
@@ -69,8 +67,10 @@ class QueryBuilder
 
     public function routeKey($value): self
     {
+        $model = app()->make($this->entryType::model());
+
         $this->builder->where(
-            $this->entryInstance->model()->getRouteKeyName(),
+            $model->getRouteKeyName(),
             $value
         );
 
@@ -131,10 +131,10 @@ class QueryBuilder
         return $this;
     }
 
-    public function paginate(int $itemsPerPage): LengthAwarePaginator
+    public function paginate(?int $itemsPerPage = null): LengthAwarePaginator
     {
         $fn = function () use ($itemsPerPage): LengthAwarePaginator {
-            return $this->builder->paginate($itemsPerPage);
+            return $this->builder->paginate($itemsPerPage ?? $this->getItemsPerPage());
         };
 
         $paginator = empty($cacheKey)
@@ -142,7 +142,7 @@ class QueryBuilder
             : Cache::remember($this->generateCacheKey(), $this->cacheSeconds, $fn);
 
         $paginator->getCollection()->transform(
-            fn(Model $model) => $this->entryInstance->type()->newInstance($model)
+            fn(Model $model) => $this->entryType::newInstance($model)
         );
 
         return $paginator;
@@ -159,11 +159,11 @@ class QueryBuilder
             : $this->cache()->rememberForever($this->generateCacheKey(), $fn);
 
         return $items->map(
-            fn(Model $model) => $this->entryInstance->type()->newInstance($model)
+            fn(Model $model) => $this->entryType::newInstance($model)
         );
     }
 
-    public function first(): ?EntryInstance
+    public function first(): ?EntryType
     {
         $fn = function () {
             return $this->builder->first();
@@ -173,7 +173,11 @@ class QueryBuilder
             ? $fn()
             : $this->cache()->remember($this->generateCacheKey(), $this->cacheSeconds, $fn);
 
-        return $this->entryInstance->type()->newInstance($model);
+        if (! $model) {
+            return null;
+        }
+
+        return $this->entryType::newInstance($model);
     }
 
     protected function addCacheKey(string $key): self
@@ -192,7 +196,7 @@ class QueryBuilder
     protected function cache()
     {
         if ($this->isCacheTaggable()) {
-            return Cache::tags(['fastlane', $this->entryInstance->type()->identifier()]);
+            return Cache::tags(['fastlane', $this->entryType::key()]);
         }
 
         return Cache::store();
@@ -204,5 +208,10 @@ class QueryBuilder
     protected function isCacheTaggable(): bool
     {
         return Cache::getStore() instanceof TaggableStore;
+    }
+
+    protected function getItemsPerPage(): int
+    {
+        return config('fastlane.control_panel.pagination_per_page');
     }
 }

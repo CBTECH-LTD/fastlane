@@ -64,7 +64,7 @@ export default {
 
     methods: {
         commit (formObject) {
-            formObject.put(this.field.name, this.field.value)
+            formObject.put(this.field.attribute, this.field.value)
         },
 
         addBlock (block) {

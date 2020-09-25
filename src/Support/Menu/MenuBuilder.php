@@ -2,9 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Support\Menu;
 
-use CbtechLtd\Fastlane\FastlaneFacade;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
-use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
+use CbtechLtd\Fastlane\Contracts\RenderableOnMenu;
+use CbtechLtd\Fastlane\Facades\EntryType as EntryTypeFacade;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\Menu;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuItem;
 use Illuminate\Support\Collection;
@@ -14,21 +13,29 @@ class MenuBuilder implements Menu
     public function items(): array
     {
         $menu = Collection::make([
-            MenuLink::make(route('cp.dashboard'), 'Dashboard')->icon('dashboard'),
+            MenuLink::make(route('fastlane.cp.dashboard'), 'Dashboard')->icon('dashboard'),
         ]);
 
         // Generate links to entry types.
-        FastlaneFacade::entryTypes()->each(function (EntryType $entryType) use ($menu) {
-            if (! $entryType instanceof RenderableOnMenu) {
-                return;
+        foreach (EntryTypeFacade::all() as $entryTypeClass) {
+//            if (is_a($entryTypeClass, RenderableOnMenu::class)) {
+//                $item = MenuLink::make($entryTypeClass::routes()->index(), $entryTypeClass::pluralName())
+//                    ->group($entryTypeClass::group())
+//                    ->icon($entryTypeClass::icon())
+//                    ->when(function ($user) use ($entryTypeClass) {
+//                        return $user->can('list', $entryTypeClass::model());
+//                    });
+//
+//                $menu->push($item);
+//            }
+            if (is_a($entryTypeClass, RenderableOnMenu::class, true) && $entryTypeClass::isVisibleOnMenu()) {
+                $entryTypeClass::renderOnMenu($menu);
             }
-
-            $entryType->renderOnMenu($menu);
-        });
+        }
 
         return $menu
             ->push(
-                MenuLink::make(route('cp.account'), __('fastlane::core.account_settings.title'))
+                MenuLink::make(route('fastlane.cp.account'), __('fastlane::core.account_settings.title'))
                     ->icon('user-cog')
                     ->group(__('fastlane::core.menu.system_group'))
             )

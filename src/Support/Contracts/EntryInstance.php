@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Support\Contracts;
 
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\Schema\Contracts\EntrySchema;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;

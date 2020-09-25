@@ -1,11 +1,8 @@
 <?php
 
-use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
-use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\Http\Controllers\Account\AccountProfileController;
 use CbtechLtd\Fastlane\Http\Controllers\Account\AccountSecurityController;
 use CbtechLtd\Fastlane\Http\Controllers\Account\AccountTokensController;
-use CbtechLtd\Fastlane\Http\Controllers\API\FileManagerController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\ConfirmPasswordController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\ForgotPasswordController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\LoginController;
@@ -52,23 +49,23 @@ Route::middleware(['fastlane.auth:fastlane-cp', 'verified'])->group(function ($r
     $router->get('dashboard', [DashboardController::class, 'show'])->name('dashboard');
 
     $router->get('account', function () {
-        return redirect()->route('cp.account.profile');
+        return redirect()->route('fastlane.cp.account.profile');
     })->name('account');
     $router->get('account/profile', [AccountProfileController::class, 'edit'])->name('account.profile');
     $router->patch('account/profile', [AccountProfileController::class, 'update']);
-    $router->get('account/security', [AccountSecurityController::class, 'edit'])->name('account.security')->middleware('password.confirm:cp.password.confirm');
+    $router->get('account/security', [AccountSecurityController::class, 'edit'])->name('account.security')->middleware('password.confirm:fastlane.cp.password.confirm');
     $router->patch('account/security', [AccountSecurityController::class, 'update']);
 
     $router->get('account/tokens', [AccountTokensController::class, 'index'])->name('account.tokens.index');
-    $router->get('account/tokens/new', [AccountTokensController::class, 'create'])->name('account.tokens.create')->middleware('password.confirm:cp.password.confirm');
+    $router->get('account/tokens/new', [AccountTokensController::class, 'create'])->name('account.tokens.create')->middleware('password.confirm:fastlane.cp.password.confirm');
     $router->post('account/tokens', [AccountTokensController::class, 'store'])->name('account.tokens.store');
     $router->delete('account/tokens/{token}', [AccountTokensController::class, 'destroy'])->name('account.tokens.destroy');
 
-    $router->middleware('fastlane.resolve:' . app()->make(FileManagerEntryType::class)->identifier())->group(function () use ($router) {
-        $router->get('file-manager/files', [FileManagerController::class, 'index'])->name('file-manager.index');
-        $router->post('file-manager/files', [FileManagerController::class, 'store'])->name('file-manager.store');
-    });
+//    $router->middleware('fastlane.resolve:' . app()->make(FileManagerEntryType::class)->identifier())->group(function () use ($router) {
+//        $router->get('file-manager/files', [FileManagerController::class, 'index'])->name('file-manager.index');
+//        $router->post('file-manager/files', [FileManagerController::class, 'store'])->name('file-manager.store');
+//    });
 
     // Register Entry Types routes
-    FastlaneFacade::registerControlPanelRoutes($router);
+    \CbtechLtd\Fastlane\Fastlane::registerControlPanelRoutes($router);
 });

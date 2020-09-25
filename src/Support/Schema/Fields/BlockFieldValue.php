@@ -24,7 +24,7 @@ class BlockFieldValue extends FieldValue
             return $block;
         }
 
-        return $block->field(array_shift($parts))->get();
+        return $block->field(array_shift($parts))->getValue();
     }
 
     public function blocks(): Collection

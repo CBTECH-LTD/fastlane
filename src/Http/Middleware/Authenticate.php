@@ -10,7 +10,7 @@ class Authenticate extends Middleware
     protected function unauthenticated($request, array $guards)
     {
         throw new AuthenticationException(
-            'Unauthenticated.', $guards, route('cp.login'),
+            'Unauthenticated.', $guards, route('fastlane.cp.login'),
         );
     }
 }

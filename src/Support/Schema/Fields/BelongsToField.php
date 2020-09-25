@@ -5,7 +5,7 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use CbtechLtd\Fastlane\Exceptions\NotAModelInstanceException;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Config\SelectOption;
+use CbtechLtd\Fastlane\Fields\Support\SelectOption;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;

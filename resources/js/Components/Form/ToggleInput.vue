@@ -1,6 +1,6 @@
 <template>
-    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
-        <template v-if="field.label" v-slot:label>{{ field.label }}</template>
+    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required" :stacked="stacked">
+        <template v-if="field.config.label" v-slot:label>{{ field.config.label }}</template>
         <div class="w-full flex items-center my-2">
             <f-list-item-action v-if="field.value === true" @click="() => onInput(false)" icon="toggle-on" color="green" :title="$l('core.fields.toggle.turn_off')"/>
             <f-list-item-action v-else @click="() => onInput(true)" icon="toggle-off" color="black" :title="$l('core.fields.toggle.turn_on')"/>

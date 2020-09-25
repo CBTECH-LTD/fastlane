@@ -1,6 +1,6 @@
 <template>
-    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
-        <template v-if="field.label" v-slot:label>{{ field.label }}</template>
+    <f-form-field :errors="$page.errors.get(field.attribute)" :required="field.config.required" :stacked="stacked">
+        <template v-if="field.config.label" v-slot:label>{{ field.config.label }}</template>
         <div class="w-full relative">
             <div class="absolute flex items-center justify-center top-0 left-0 h-full bg-gray-200 text-gray-600 text-sm font-semibold border border-gray-400 p-2 rounded-l">
                 {{ field.config.currency }}
@@ -36,7 +36,7 @@ export default {
         commit (formObject) {
             const val = this.maskInstance.unmaskedvalue() * 100
 
-            formObject.put(this.field.name, val)
+            formObject.put(this.field.attribute, val)
         },
 
         buildOptions () {
@@ -49,6 +49,8 @@ export default {
             if (this.field.config.max) {
                 opts.max = this.field.config.max
             }
+
+            return opts
         }
     },
 

@@ -39,9 +39,9 @@ class BackendUserResource extends EntryResource
 
         return tap($links, function (Collection $l) {
             if (Auth::user()->is($this->model)) {
-                $l->push(ResourceLink::make('profile', ['cp.account.profile']));
-                $l->push(ResourceLink::make('security', ['cp.account.security']));
-                $l->push(ResourceLink::make('user', ['cp.account.tokens.index']));
+                $l->push(ResourceLink::make('profile', ['fastlane.cp.account.profile']));
+                $l->push(ResourceLink::make('security', ['fastlane.cp.account.security']));
+                $l->push(ResourceLink::make('user', ['fastlane.cp.account.tokens.index']));
             }
         })->all();
     }

@@ -1,6 +1,6 @@
 <template>
-    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
-        <template v-if="field.label" v-slot:label>{{ field.label }}</template>
+    <f-form-field :errors="$page.errors.get(field.attribute)" :required="field.config.required" :stacked="stacked">
+        <template v-if="field.config.label" v-slot:label>{{ field.config.label }}</template>
         <div class="w-full">
             <!-- Render checkboxes or radios instead of select if type is set for checkbox -->
             <template v-if="field.config.type === 'checkbox'">
@@ -45,7 +45,7 @@ export default {
 
     methods: {
         commit (formObject) {
-            formObject.put(this.field.name, this.prepareValueForCommit())
+            formObject.put(this.field.attribute, this.prepareValueForCommit())
         },
 
         prepareValueForCommit () {
@@ -99,7 +99,7 @@ export default {
         return FormFieldFactory(
             field,
             component,
-            filteredValue || field.default,
+            filteredValue || field.config.default,
             {}
         )
     }

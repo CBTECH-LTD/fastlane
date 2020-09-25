@@ -3,7 +3,7 @@
 namespace CbtechLtd\Fastlane\EntryTypes\Hooks;
 
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use Illuminate\Database\Eloquent\Model;
 
 class BeforeHydratingHook

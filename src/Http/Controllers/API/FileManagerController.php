@@ -5,7 +5,7 @@ namespace CbtechLtd\Fastlane\Http\Controllers\API;
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Http\Controllers\Controller;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;
@@ -34,7 +34,7 @@ class FileManagerController extends Controller
         // to be transformed to our front-end application.
         $paginator->getCollection()
             ->transform(
-                fn(EntryInstance $entry) => (new EntryResource($entry))->toIndex()
+                fn(EntryInstance $entry) => (new EntryResource($entry))->toListing()
             );
 
         $collection = EntryResourceCollection::makeFromPaginator($paginator)
@@ -55,6 +55,6 @@ class FileManagerController extends Controller
 
     protected function entryType(): EntryType
     {
-        return $this->fastlane->getRequest()->getEntryType();
+        return $this->fastlane->getRequest()->getEntry();
     }
 }

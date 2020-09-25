@@ -2,108 +2,75 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes;
 
-use CbtechLtd\Fastlane\EntryTypes\Hooks\BeforeHydratingHook;
-use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
+use CbtechLtd\Fastlane\Contracts\EntryType as EntryTypeContract;
+use CbtechLtd\Fastlane\Contracts\Panelizable;
+use CbtechLtd\Fastlane\Contracts\QueryBuilder;
+use CbtechLtd\Fastlane\Contracts\QueryBuilder as QueryBuilderContract;
+use CbtechLtd\Fastlane\Contracts\Transformable;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
-use CbtechLtd\Fastlane\FastlaneFacade;
-use CbtechLtd\Fastlane\QueryFilter\QueryFilter;
-use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
-use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
-use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollection;
-use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
-use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
-use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
-use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
-use Illuminate\Contracts\Auth\Access\Gate;
+use CbtechLtd\Fastlane\Exceptions\InvalidArgumentException;
+use CbtechLtd\Fastlane\Exceptions\InvalidModelException;
+use CbtechLtd\Fastlane\Exceptions\UnknownEventException;
+use CbtechLtd\Fastlane\Fastlane;
+use CbtechLtd\Fastlane\Fields\Field;
+use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
+use CbtechLtd\Fastlane\Fields\Value;
+use CbtechLtd\Fastlane\Http\Controllers\EntriesController;
+use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use ReflectionClass;
 
 abstract class EntryType implements EntryTypeContract
 {
-    use HandlesHooks, QueriesModel;
+    const EVENT_QUERY_LISTING = 'query-listing';
+    const EVENT_QUERY_ENTRY = 'query-entry';
+    const EVENT_CREATING = 'creating';
+    const EVENT_CREATED = 'created';
+    const EVENT_UPDATING = 'updating';
+    const EVENT_UPDATED = 'updated';
+    const EVENT_SAVING = 'saving';
+    const EVENT_SAVED = 'saved';
+    const EVENT_DELETING = 'deleting';
+    const EVENT_DELETED = 'deleted';
 
-    /** @description OnSavingHook */
-    const HOOK_BEFORE_HYDRATING = 'beforeHydrating';
-    /** @description OnSavingHook */
-    const HOOK_BEFORE_CREATING = 'beforeCreating';
-    /** @description OnSavingHook */
-    const HOOK_BEFORE_UPDATING = 'beforeUpdating';
-    /** @description OnSavingHook */
-    const HOOK_BEFORE_SAVING = 'beforeSaving';
-    /** @description OnSavingHook */
-    const HOOK_AFTER_CREATING = 'afterCreating';
-    /** @description OnSavingHook */
-    const HOOK_AFTER_UPDATING = 'afterUpdating';
-    /** @description OnSavingHook */
-    const HOOK_AFTER_SAVING = 'afterSaving';
+    protected Model $entry;
+    protected FieldCollection $fields;
 
-    protected array $hooks = [
-        self::HOOK_BEFORE_HYDRATING => [],
-        self::HOOK_BEFORE_CREATING  => [],
-        self::HOOK_BEFORE_UPDATING  => [],
-        self::HOOK_BEFORE_SAVING    => [],
-        self::HOOK_AFTER_CREATING   => [],
-        self::HOOK_AFTER_UPDATING   => [],
-        self::HOOK_AFTER_SAVING     => [],
-    ];
-
-    protected Gate $gate;
-
-    public static function retrieve(): self
+    public function __construct(Model $model)
     {
-        return app('fastlane')->getEntryTypeByClass(static::class);
+        $this->entry = $model;
+        $this->fields = (new FieldCollection(static::fields()))->setEntryType($this);
     }
 
-    public function __construct(Gate $gate)
+    /**
+     * Determine a unique identifier.
+     *
+     * @return string
+     */
+    public static function key(): string
     {
-        $this->gate = $gate;
-    }
-
-    public function newInstance(?Model $model): EntryInstanceContract
-    {
-        return new EntryInstance($this, $model ?? $this->newModelInstance());
-    }
-
-    public function name(): string
-    {
-        $reflector = new ReflectionClass($this);
-
-        $name = $reflector->getShortName();
-
-        return Str::title(Str::snake(Str::replaceLast('EntryType', '', $name), ' '));
-    }
-
-    public function pluralName(): string
-    {
-        return Str::plural($this->name());
-    }
-
-    public function identifier(): string
-    {
-        $reflector = new ReflectionClass($this);
+        $reflector = new ReflectionClass(static::class);
         $name = Str::replaceLast('EntryType', '', $reflector->getShortName());
 
         return Str::kebab(Str::plural($name));
     }
 
-    public function icon(): string
+    /**
+     * The model used by the entry type.
+     *
+     * @return string
+     */
+    public static function model(): string
     {
-        return 'list';
-    }
-
-    public function model(): string
-    {
-        $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName());
+        $name = Str::replaceLast('EntryType', '', (new ReflectionClass(static::class))->getName());
 
         if (! class_exists($name)) {
             ClassDoesNotExistException::model($name);
@@ -112,33 +79,48 @@ abstract class EntryType implements EntryTypeContract
         return $name;
     }
 
-    public function apiResource(): string
+    /**
+     * The singular name of the entry type.
+     *
+     * @return string
+     */
+    public static function name(): string
     {
-        /** @var ResourceType $name */
-        $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'Resource';
+        $reflector = new ReflectionClass(static::class);
 
-        if (! class_exists($name)) {
-            return EntryResource::class;
-        }
+        $name = $reflector->getShortName();
 
-        return $name;
+        return Str::title(Str::snake(Str::replaceLast('EntryType', '', $name), ' '));
     }
 
-    public function apiResourceCollection(): string
+    /**
+     * The plural name of the entry type.
+     *
+     * @return string
+     */
+    public static function pluralName(): string
     {
-        /** @var ResourceType $name */
-        $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'ResourceCollection';
-
-        if (! class_exists($name)) {
-            return EntryResourceCollection::class;
-        }
-
-        return $name;
+        return Str::plural(static::name());
     }
 
-    public function policy(): ?string
+    /**
+     * The icon to be used or empty for no icon.
+     *
+     * @return string
+     */
+    public static function icon(): string
     {
-        $name = Str::replaceLast('EntryType', '', (new ReflectionClass($this))->getName()) . 'Policy';
+        return 'list';
+    }
+
+    /**
+     * The authorization policy to be registered.
+     *
+     * @return string|null
+     */
+    public static function policy(): ?string
+    {
+        $name = Str::replaceLast('EntryType', '', (new ReflectionClass(static::class))->getName()) . 'Policy';
 
         if (! class_exists($name)) {
             return null;
@@ -147,242 +129,369 @@ abstract class EntryType implements EntryTypeContract
         return $name;
     }
 
-    public function fields(): array
+    /**
+     * Determine the controller used by the entry type.
+     *
+     * @param Model|null $model
+     * @return EntryTypeContract
+     * @throws \Exception
+     */
+    public static function newInstance(?Model $model = null): EntryTypeContract
     {
-        return [];
-    }
+        $modelClass = static::model();
 
-    public function install(): void
-    {
-        $this->installRolesAndPermissions();
-    }
-
-    public function isVisibleOnMenu(): bool
-    {
-        return true;
-    }
-
-    public function getItemsForRelationField(?QueryFilterContract $queryFilter = null): Collection
-    {
-        $this->gate->authorize('list', $this->model());
-
-        $query = ($queryFilter ?? new QueryFilter)
-            ->addOrder('created_at')
-            ->addOrder('id')
-            ->pipeThrough($this->queryBuilder());
-
-        $this->queryItemsForRelationField($query);
-
-        return $query->get();
-    }
-
-    public function getItems(?QueryFilterContract $queryFilter = null): LengthAwarePaginator
-    {
-        $this->gate->authorize('list', $this->model());
-
-        $this->prepareQueryFilter($queryFilter ?? new QueryFilter);
-
-        $query = $queryFilter
-            ->addOrder('created_at')
-            ->addOrder('id')
-            ->pipeThrough($this->queryBuilder());
-
-        $this->queryItems($query);
-
-        return $query->paginate($this->getItemsPerPage());
-    }
-
-    public function findItem(string $hashid): EntryInstanceContract
-    {
-        $query = $this->queryBuilder();
-        $this->querySingleItem($query, $hashid);
-
-        abort_if(! $entry = $query->routeKey($hashid)->first(), 404);
-
-        $this->gate->authorize('show', $entry->model());
-
-        return $entry;
-    }
-
-    public function store(Request $request): EntryInstanceContract
-    {
-        // Check whether the authenticated user can create an
-        // instance of the given entry type.
-        if ($this->policy()) {
-            $this->gate->authorize('create', $this->model());
+        if ($model && ! is_a($model, $modelClass)) {
+            throw new \Exception("Argument 1 expected {$modelClass} but got " . get_class($model));
         }
 
-        $entryInstance = $this->newInstance(null);
-
-        // Validate the request data against the create fields
-        // and save the validated data in a new variable.
-        $fields = $entryInstance->schema()->getCreateFields();
-
-        $rules = Collection::make($fields)
-            ->filter(fn(SchemaField $f) => $f instanceof WithRules)
-            ->mapWithKeys(fn(WithRules $f) => $f->getCreateRules())
-            ->all();
-
-        $data = Validator::make($request->all(), $rules)->validated();
-
-        // Pass the validated date through all fields, call hooks before saving,
-        // then call more hooks after model has been saved.
-        $this->hydrateFields($entryInstance, $fields, $data);
-
-        $beforeHook = new OnSavingHook($entryInstance, $data);
-        $this->executeHooks(static::HOOK_BEFORE_CREATING, $beforeHook);
-        $this->executeHooks(static::HOOK_BEFORE_SAVING, $beforeHook);
-
-        $beforeHook->entryInstance()->saveModel();
-
-        $afterHook = new OnSavingHook($beforeHook->entryInstance(), $data);
-        $this->executeHooks(static::HOOK_AFTER_CREATING, $afterHook);
-        $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
-
-        return $afterHook->entryInstance();
+        return new static($model ?? new $modelClass);
     }
 
-    public function update(Request $request, string $hashid): EntryInstanceContract
+    /**
+     * @inheritDoc
+     */
+    public static function boot(): void
     {
-        $query = $this->queryBuilder();
-        $this->querySingleItem($query, $hashid);
+        static::bootModel();
+    }
 
-        abort_if(! $entryInstance = $query->routeKey($hashid)->first(), 404);
+    /**
+     * @return QueryBuilderContract
+     * @throws \Exception
+     */
+    public static function query(): QueryBuilderContract
+    {
+        // By resolving the Query Builder instance using the Laravel IoC,
+        // we enable developers to override the Query Builder implementation.
+        $inst = static::newInstance();
 
-        // Check whether the authenticated user can update
+        return app()->make(QueryBuilderContract::class, [
+            'entryType' => static::newInstance(),
+        ]);
+    }
+
+    /**
+     * Get an instance of the entry type query builder
+     * to fetch items to the listing page.
+     *
+     * @param callable|null $callback
+     * @return LengthAwarePaginator
+     * @throws \Exception
+     */
+    public static function queryListing(?callable $callback = null): LengthAwarePaginator
+    {
+        if (static::policy()) {
+            Gate::authorize('index', static::model());
+        }
+
+        $query = static::query();
+
+        if ($callback) {
+            $query = call_user_func($callback, $query);
+        }
+
+        static::fireEvent(static::EVENT_QUERY_LISTING, [$query]);
+
+        return $query->paginate();
+    }
+
+    /**
+     * @inheritDoc
+     * @throws \Exception
+     */
+    public static function queryEntry($id, ?callable $callback = null): ?EntryTypeContract
+    {
+        $query = static::query()->routeKey($id);
+
+        if ($callback) {
+            $query = call_user_func($callback, $id, $query);
+        }
+
+        return $query->first();
+    }
+
+    /**
+     * Determine the controller used by the entry type.
+     *
+     * @return string
+     */
+    public static function controller(): string
+    {
+        return EntriesController::class;
+    }
+
+    /**
+     * Determine the available route of the entry type.
+     *
+     * @return EntryTypeRouteCollection
+     */
+    public static function routes(): EntryTypeRouteCollection
+    {
+        return EntryTypeRouteCollection::make(static::key(), [
+            EntryTypeRoute::get(static::class, '/', 'index'),
+            EntryTypeRoute::get(static::class, '/new', 'create'),
+            EntryTypeRoute::post(static::class, '/', 'store'),
+            EntryTypeRoute::get(static::class, '/{id}', 'edit'),
+            EntryTypeRoute::patch(static::class, '/{id}', 'update'),
+            EntryTypeRoute::delete(static::class, '/{id}', 'delete'),
+        ]);
+    }
+
+    public static function install(): void
+    {
+        static::installRolesAndPermissions();
+    }
+
+    /**
+     * Get the underlying Model instance.
+     *
+     * @return Model
+     */
+    public function modelInstance(): Model
+    {
+        return $this->entry;
+    }
+
+    /**
+     * Get the key (ID) of the underlying model.
+     *
+     * @return mixed
+     */
+    public function entryKey()
+    {
+        return $this->entry->getKey();
+    }
+
+    /**
+     * Generate a string to be used as the description
+     * of the underlying model.
+     *
+     * @return string
+     */
+    public function entryTitle(): string
+    {
+        // If the model has a toString method we just use it
+        // to generate the title.
+        if (method_exists($this->entry, 'toString')) {
+            return $this->entry->toString();
+        }
+
+        /**
+         * Otherwise we just get the first field we find and
+         * use it to generate the title.
+         *
+         * @var Field $field
+         */
+        $field = $this->getFields()->first(function (Field $field) {
+            return ! $field instanceof Panelizable;
+        });
+
+        $value = ! is_null($field)
+            ? $this->modelInstance()->getAttribute($field->getAttribute())
+            : null;
+
+        return $value ?? '';
+    }
+
+    /**
+     * @inheritDoc
+     * @return FieldCollection
+     */
+    public function getFields(): FieldCollection
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function store(array $data): EntryTypeContract
+    {
+        // Check whether the authenticated user can create
         // the given entry instance.
         if ($this->policy()) {
-            $this->gate->authorize('update', $entryInstance->model());
+            Gate::authorize('create', static::model());
         }
 
         // Validate the request data against the update fields
         // and save the validated data in a new variable.
-        $fields = $entryInstance->schema()->getUpdateFields();
+        $fields = $this->getFields()->onCreate();
 
-        $rules = Collection::make($fields)
-            ->filter(fn(SchemaField $f) => $f instanceof WithRules)
-            ->mapWithKeys(fn(WithRules $f) => $f->getUpdateRules())
-            ->all();
+        $data = $this->validateAndTransformData($data, $fields->getCreateRules($data));
 
-        $data = Validator::make($request->all(), $rules)->validated();
+        // Create the new model...
+        $model = tap(app()->make(static::model()), function (Model $model) use ($data) {
+            $model->fill($data);
 
-        // Pass the validated date through all fields, call hooks before saving,
-        // then call more hooks after model has been saved.
-        $this->hydrateFields($entryInstance, $fields, $data);
+            static::fireEvent(static::EVENT_CREATING, [$model, $data]);
+            $model->save($data);
+            static::fireEvent(static::EVENT_CREATED, [$model]);
+        });
 
-        $beforeHook = new OnSavingHook($entryInstance, $data);
-        $this->executeHooks(static::HOOK_BEFORE_UPDATING, $beforeHook);
-        $this->executeHooks(static::HOOK_BEFORE_SAVING, $beforeHook);
 
-        $beforeHook->entryInstance()->saveModel();
-
-        $afterHook = new OnSavingHook($beforeHook->entryInstance(), $data);
-        $this->executeHooks(static::HOOK_AFTER_UPDATING, $afterHook);
-        $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
-
-        return $afterHook->entryInstance();
+        return static::newInstance($model);
     }
 
-    public function delete(string $hashid): EntryInstanceContract
+    /**
+     * @inheritDoc
+     */
+    public function update(array $data): self
     {
-        $query = $this->queryBuilder();
-        $this->querySingleItem($query, $hashid);
-        abort_if(! $entryInstance = $query->routeKey($hashid)->first(), 404);
-
-        if ($this->policy()) {
-            $this->gate->authorize('delete', $entryInstance->model());
+        // Check whether the authenticated user can update
+        // the given entry instance.
+        if (Gate::getPolicyFor(static::model())) {
+            Gate::authorize('update', $this->modelInstance());
         }
 
-        $entryInstance->model()->delete();
+        // Validate the request data against the update fields
+        // and save the validated data in a new variable.
+        $fields = $this->getFields()->onUpdate();
 
-        return $entryInstance;
+        $data = $this->validateAndTransformData($data, $fields);
+
+        // Fill and save the model!
+        $this->modelInstance()->fill($data)->save();
+
+        return $this;
     }
 
-    public function newModelInstance(): Model
+    /**
+     * Delete the instance of the underlying model.
+     *
+     * @return $this
+     * @throws \Exception
+     */
+    public function delete(): self
     {
-        return app()->make($this->model());
+        // Check whether the authenticated user can delete
+        // the given entry instance.
+        if ($this->policy()) {
+            Gate::authorize('delete', $this->modelInstance());
+        }
+
+        $this->modelInstance()->delete();
+
+        return $this;
     }
 
-    protected function installRolesAndPermissions(): void
+    protected function validateAndTransformData(array $data, FieldCollection $fields): array
     {
-        $reflector = new ReflectionClass($this);
+        $data = Validator::make($data, $fields->getUpdateRules($data))->validated();
+
+        return $fields->getCollection()->map(function (Field $field) use ($data) {
+            if ($value = Arr::get($data, $field->getAttribute())) {
+                if ($field instanceof Transformable) {
+                    return $field->transformer()->fromRequest($this, $value);
+                }
+
+                return new Value($this, $value);
+            }
+
+            return null;
+        })->filter()->all();
+    }
+
+    protected static function installRolesAndPermissions(): void
+    {
+        $reflector = new ReflectionClass(static::class);
         $constants = Collection::make($reflector->getConstants());
 
         // Create permissions for all constants starting with PERM_.
-        $this->installPermissions(
+        static::installPermissions(
             $constants->filter(function ($value, $key) {
                 return Str::startsWith($key, 'PERM_');
             })
         );
 
         // Create roles for all constants starting with ROLE_.
-        $this->installRoles(
+        static::installRoles(
             $constants->filter(function ($value, $key) {
                 return Str::startsWith($key, 'ROLE_');
             })
         );
     }
 
-    protected function installPermissions(Collection $permissions): void
+    protected static function installPermissions(Collection $permissions): void
     {
         $permissions->each(function ($value) {
-            FastlaneFacade::createPermission($value);
+            Fastlane::createPermission($value);
         });
     }
 
-    protected function installRoles(Collection $roles): void
+    protected static function installRoles(Collection $roles): void
     {
         $roles->each(function ($value) {
-            FastlaneFacade::createRole($value);
+            Fastlane::createRole($value);
         });
-    }
-
-    protected function queryItemsForRelationField(QueryBuilder $query): void
-    {
-        //
-    }
-
-    protected function prepareQueryFilter(QueryFilterContract $queryFilter): void
-    {
-
-    }
-
-    protected function queryItems(QueryBuilder $query): void
-    {
-        //
-    }
-
-    protected function querySingleItem(QueryBuilder $query, string $hashid): void
-    {
-        //
     }
 
     /**
-     * @param EntryInstanceContract $entryInstance
-     * @param SchemaField[]         $fields
-     * @param array                 $data
+     * Listen to an entry type event.
+     *
+     * @param string   $event
+     * @param callable $callback
+     * @throws UnknownEventException
      */
-    protected function hydrateFields(EntryInstanceContract $entryInstance, array $fields, array $data): void
+    protected static function listen(string $event, callable $callback): void
     {
-        $hookClass = new BeforeHydratingHook($entryInstance, $fields, $data);
+        $keys = static::getEventKeys();
 
-        $this->executeHooks(
-            static::HOOK_BEFORE_HYDRATING,
-            $hookClass
-        );
+        if (! in_array($event, $keys)) {
+            throw UnknownEventException::make($event);
+        }
 
-        Collection::make($fields)
-            ->each(function (SchemaField $field) use ($hookClass, $entryInstance, $data) {
-                if ($field instanceof WriteValue) {
-                    if (Arr::has($hookClass->data, $field->getName())) {
-                        $field->writeValue($entryInstance, Arr::get($hookClass->data, $field->getName()), $data);
-                    }
-                }
-            });
+        Event::listen("fastlane.{$event}: " . static::class, $callback);
     }
 
-    protected function getItemsPerPage(): int
+    /**
+     * Dispatch a entry type event.
+     *
+     * @param string $key
+     * @param array  $params
+     */
+    protected static function fireEvent(string $key, array $params = []): void
     {
-        return config('fastlane.control_panel.pagination_per_page');
+        $keys = static::getEventKeys();
+
+        if (! in_array($key, $keys)) {
+            throw UnknownEventException::make($key);
+        }
+
+        Event::until("fastlane.{$key}: " . static::class, $params);
+    }
+
+    /**
+     * Get the available event keys.
+     *
+     * @return array
+     */
+    protected static function getEventKeys(): array
+    {
+        return array_values(
+            (new ReflectionClass(static::class))->getConstants()
+        );
+    }
+
+    /**
+     * Boot the model.
+     *
+     * @return void
+     */
+    protected static function bootModel(): void
+    {
+        // Check whether the model extends our BaseModel class
+        // then set its entry type.
+        if (! is_a(static::model(), BaseModel::class, true)) {
+            InvalidModelException::invalid(static::model());
+        }
+
+        static::model()::withEntryType(static::class);
+
+        // Check whether the entry type has set up a policy
+        // to its model. Policies may be registered using
+        // the default Laravel way as well.
+        if (static::policy()) {
+            Gate::policy(static::model(), static::policy());
+        }
     }
 }

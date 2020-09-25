@@ -3,7 +3,7 @@
 namespace CbtechLtd\Fastlane\Tests;
 
 use Orchestra\Testbench\TestCase;
-use CbtechLtd\Fastlane\FastlaneServiceProvider;
+use CbtechLtd\Fastlane\Providers\FastlaneServiceProvider;
 
 class ExampleTest extends TestCase
 {
@@ -12,7 +12,7 @@ class ExampleTest extends TestCase
     {
         return [FastlaneServiceProvider::class];
     }
-    
+
     /** @test */
     public function true_is_true()
     {

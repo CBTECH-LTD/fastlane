@@ -3,7 +3,6 @@
 namespace CbtechLtd\Fastlane\Support\Eloquent\Concerns;
 
 use CbtechLtd\Fastlane\Exceptions\ActiveStateException;
-use Illuminate\Support\Arr;
 
 trait Activable
 {
@@ -11,10 +10,6 @@ trait Activable
     {
         if (! in_array('is_active', $this->fillable)) {
             $this->fillable[] = 'is_active';
-        }
-
-        if (! Arr::has($this->casts, 'is_active')) {
-            $this->casts['is_active'] = 'boolean';
         }
     }
 

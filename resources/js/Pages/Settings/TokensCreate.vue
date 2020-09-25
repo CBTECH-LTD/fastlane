@@ -41,34 +41,49 @@ export default {
     data () {
         return {
             isCreating: false,
-            form: new FormSchemaFactory({}, [
-                {
-                    config: {},
-                    default: null,
-                    label: 'Token name',
-                    listWidth: 0,
-                    name: 'name',
-                    panel: null,
-                    placeholder: 'Name',
-                    required: true,
-                    type: 'string'
-                },
-                {
-                    config: {
-                        options: map(this.abilities, a => ({ label: a, value: a })),
-                        multiple: true,
-                        type: 'checkbox'
+            form: new FormSchemaFactory({
+                name: {
+                    value: '',
+                    field: {
+                        attribute: 'name',
+                        component: 'string',
+                        config: {
+                            label: 'Token name',
+                            placeholder: 'Name',
+                            required: true,
+                            default: null,
+                            panel: null,
+                            unique: false,
+                            sortable: false,
+                            listing: {
+                                listWidth: 0,
+                            }
+                        }
                     },
-                    default: null,
-                    label: 'Token Abilities',
-                    listWidth: 0,
-                    name: 'abilities',
-                    panel: null,
-                    placeholder: 'Abilities',
-                    required: true,
-                    type: 'select'
                 },
-            ])
+                abilities: {
+                    value: '',
+                    field: {
+                        attribute: 'abilities',
+                        component: 'select',
+                        config: {
+                            label: 'Token Abilities',
+                            default: null,
+                            placeholder: 'Abilities',
+                            required: true,
+                            unique: false,
+                            sortable: false,
+                            multiple: true,
+                            type: 'checkbox',
+                            panel: null,
+                            options: map(this.abilities, a => ({ label: a, value: a })),
+                            listing: {
+                                colWidth: 0,
+                            },
+                        }
+                    }
+                },
+            })
         }
     },
 

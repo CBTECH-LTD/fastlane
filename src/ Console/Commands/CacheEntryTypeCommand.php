@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Console\Commands;
 
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -46,7 +46,7 @@ class CacheEntryTypeCommand extends Command
             throw new \Exception('Entry Type is not registered.');
         }
 
-        $entryType->queryBuilder()
+        $entryType->query()
             ->disableCache()
             ->getBuilder()
             ->cursor()

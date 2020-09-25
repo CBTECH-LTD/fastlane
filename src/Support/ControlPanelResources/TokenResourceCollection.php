@@ -15,7 +15,7 @@ class TokenResourceCollection extends ResourceTypeCollection
     protected function links(): array
     {
         return [
-            ResourceLink::make('create', ['cp.account.tokens.create']),
+            ResourceLink::make('create', ['fastlane.cp.account.tokens.create']),
         ];
     }
 }

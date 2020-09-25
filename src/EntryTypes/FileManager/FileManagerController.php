@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes\FileManager;
 
-use CbtechLtd\Fastlane\FastlaneFacade;
+use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Http\Controllers\EntriesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -18,7 +18,7 @@ class FileManagerController extends EntriesController
     {
         $this->entryType()->storeMany($request);
 
-        FastlaneFacade::flashSuccess($this->entryType()->name() . ' created successfully.', 'thumbs-up');
+        Fastlane::flashSuccess(__('fastlane::core.flash.created', ['name' => $this->entryType()->name()]), 'thumbs-up');
 
         return Redirect::route("cp.{$this->entryType()->identifier()}.index");
     }

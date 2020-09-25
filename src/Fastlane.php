@@ -2,95 +2,108 @@
 
 namespace CbtechLtd\Fastlane;
 
-use CbtechLtd\Fastlane\ContentBlocks\ContentBlock;
-use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
-use CbtechLtd\Fastlane\EntryTypes\Content\ContentEntryType;
-use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
-use CbtechLtd\Fastlane\Exceptions\EntryTypeNotRegisteredException;
-use CbtechLtd\Fastlane\Http\Controllers;
-use CbtechLtd\Fastlane\Http\Requests\FastlaneRequest;
-use CbtechLtd\Fastlane\Support\Contracts\EntryType;
-use CbtechLtd\Fastlane\Support\Contracts\WithCustomController;
-use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuManager as MenuManagerContract;
-use CbtechLtd\Fastlane\Support\Menu\MenuManager;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Lang;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class Fastlane
 {
-    protected Collection $entryTypes;
-    protected Collection $contentBlocks;
-    protected Collection $routes;
-    protected array $flashMessages = [];
-    protected MenuManagerContract $menuManager;
-    protected FastlaneRequest $request;
-    protected array $translations = [];
+    protected static array $flashMessages = [];
+    protected static array $translations = [];
 
-    public function __construct()
+    /**
+     * Add a success message to the session.
+     *
+     * @param string      $message
+     * @param string|null $icon
+     */
+    public static function flashSuccess(string $message, ?string $icon = null): void
     {
-        $this->registerMenuManager();
-        $this->registerTranslations();
-
-        app()->afterResolving('fastlane', function () {
-            $this->registerEntryTypes();
-            $this->registerContentBlocks();
-        });
-    }
-
-    public function setRequest(FastlaneRequest $request): self
-    {
-        $this->request = $request;
-        return $this;
-    }
-
-    public function getRequest(): FastlaneRequest
-    {
-        return $this->request;
-    }
-
-    public function flashSuccess(string $message, ?string $icon = null): void
-    {
-        $this->flashMessages[] = [
+        static::$flashMessages[] = [
             'type'    => 'success',
             'message' => $message,
             'icon'    => $icon,
         ];
 
-        session()->flash('fastlane-messages', $this->flashMessages);
+        session()->flash('fastlane-messages', static::$flashMessages);
     }
 
-    public function flashAlert(string $message, ?string $icon = null): void
+    /**
+     * Add an alert message to the session.
+     *
+     * @param string      $message
+     * @param string|null $icon
+     */
+    public static function flashAlert(string $message, ?string $icon = null): void
     {
-        $this->flashMessages[] = [
+        static::$flashMessages[] = [
             'type'    => 'alert',
             'message' => $message,
             'icon'    => $icon,
         ];
 
-        session()->flash('fastlane-messages', $this->flashMessages);
+        session()->flash('fastlane-messages', static::$flashMessages);
     }
 
-    public function flashDanger(string $message, ?string $icon = null): void
+    /**
+     * Add a danger message to the session.
+     *
+     * @param string      $message
+     * @param string|null $icon
+     */
+    public static function flashDanger(string $message, ?string $icon = null): void
     {
-        $this->flashMessages[] = [
+        static::$flashMessages[] = [
             'type'    => 'danger',
             'message' => $message,
             'icon'    => $icon,
         ];
 
-        session()->flash('fastlane-messages', $this->flashMessages);
+        session()->flash('fastlane-messages', static::$flashMessages);
     }
 
-    public function getFlashMessages(): array
+    /**
+     * Get all flash messages in the session.
+     *
+     * @return array
+     */
+    public static function getFlashMessages(): array
     {
-        return $this->flashMessages;
+        return static::$flashMessages;
     }
 
-    public function createPermission(string $name, string $guard = 'fastlane-cp'): void
+    /**
+     * Build a full route name for Fastlane Control Panel
+     * based on the given name.
+     *
+     * @param string $name
+     * @return string
+     */
+    public static function makeCpRouteName(string $name): string
+    {
+        return "fastlane.cp.{$name}";
+    }
+
+    /**
+     * Return a route for the Fastlane Control Panel based on
+     * the given route name.
+     *
+     * @param string $name
+     * @param null   $params
+     * @param bool   $absolute
+     * @return string
+     */
+    public static function cpRoute(string $name, $params = null, bool $absolute = true): string
+    {
+        return route(static::makeCpRouteName($name), $params, $absolute);
+    }
+
+    /**
+     * @param string $name
+     * @param string $guard
+     */
+    public static function createPermission(string $name, string $guard = 'fastlane-cp'): void
     {
         Permission::firstOrCreate([
             'name'       => $name,
@@ -98,7 +111,12 @@ class Fastlane
         ]);
     }
 
-    public function createRole(string $name, array $permissions = ['*'], $guard = 'fastlane-cp'): void
+    /**
+     * @param string         $name
+     * @param array|string[] $permissions
+     * @param string         $guard
+     */
+    public static function createRole(string $name, array $permissions = ['*'], $guard = 'fastlane-cp'): void
     {
         /** @var Role $role */
         $role = Role::firstOrCreate([
@@ -113,129 +131,37 @@ class Fastlane
         );
     }
 
-    public function registerControlPanelRoutes(Router $router): void
+    /**
+     * @param Router $router
+     */
+    public static function registerControlPanelRoutes(Router $router): void
     {
-        $this->entryTypes->each(function (EntryType $entryType) use ($router) {
-            $controller = $entryType instanceof WithCustomController
-                ? $entryType->getController()
-                : Controllers\EntriesController::class;
-
-            $router
-                ->middleware('fastlane.resolve:' . $entryType->identifier())
-                ->group(fn() => $router->fastlaneControlPanel(
-                    $entryType->identifier(),
-                    $controller
-                ));
-        });
-    }
-
-    public function registerApiRoutes(Router $router): void
-    {
-        $this->entryTypes->each(function (EntryType $entryType) use ($router) {
-            $router
-                ->middleware('fastlane.resolve:api')
-                ->group(fn() => $router->fastlaneContentApi(
-                    $entryType->identifier(),
-                    Controllers\API\EntriesController::class
-                ));
-        });
-    }
-
-    public function entryTypes(): Collection
-    {
-        return $this->entryTypes;
-    }
-
-    public function getEntryTypeByIdentifier(string $identifier): EntryType
-    {
-        $item = $this->entryTypes->first(
-            fn(EntryType $entryType) => $entryType->identifier() === $identifier
-        );
-
-        if (! $item) {
-            throw new EntryTypeNotRegisteredException;
+        foreach (Facades\EntryType::all() as $entryType) {
+            $router->fastlaneControlPanel($entryType::key(), $entryType::routes());
         }
-
-        return $item;
     }
 
-    public function getEntryTypeByClass(string $class): EntryType
-    {
-        return $this->entryTypes->first(
-            fn(EntryType $entryType) => $entryType instanceof $class
-        );
-    }
-
-    public function contentBlocks(): Collection
-    {
-        return $this->contentBlocks;
-    }
-
-    public function getAccessTokenAbilities(): array
+    /**
+     * Get a list of abilities registered for the Fastlane API.
+     *
+     * @return string[]
+     */
+    public static function getAccessTokenAbilities(): array
     {
         return [
             'entries:read',
         ];
     }
 
-    public function getTranslations(): array
+    /**
+     * Get an associative array with the translations to be
+     * used in the Control Panel frontend.
+     *
+     * @return array
+     */
+    public static function getTranslations(): array
     {
-        return $this->translations;
-    }
-
-    public function getMenuManager(): MenuManagerContract
-    {
-        return $this->menuManager;
-    }
-
-    protected function registerEntryTypes(): void
-    {
-        // Merge the user-defined types with the built-in types.
-        // We don't add built-in types to the default config file because
-        // it would error prone (devs could just remove it), but for now
-        // we require all these built-in types to be correctly registered.
-        $builtinTypes = [
-            ContentEntryType::class,
-            FileManagerEntryType::class,
-            BackendUserEntryType::class,
-        ];
-
-        $classes = array_merge(config('fastlane.entry_types'), $builtinTypes);
-
-        // Iterate over every entry type, instantiate a base instance of  it using
-        // the Laravel Container and register their policies as well.
-        $this->entryTypeModels = new Collection;
-
-        $this->entryTypes = Collection::make($classes)->map(function ($typeClass) {
-            /** @var EntryType $instance */
-            $instance = app()->make($typeClass);
-
-            if ($instance->policy()) {
-                Gate::policy($instance->model(), $instance->policy());
-            }
-
-            return $instance;
-        });
-    }
-
-    protected function registerContentBlocks(): void
-    {
-        $this->contentBlocks = Collection::make(config('fastlane.content_blocks'))
-            ->mapWithKeys(function (string $class) {
-                return [
-                    $class::key() => $class,
-                ];
-            });
-    }
-
-    protected function registerMenuManager(): void
-    {
-        $this->menuManager = new MenuManager;
-    }
-
-    protected function registerTranslations(): void
-    {
-        $this->translations = [
+        return [
             'core' => Lang::get('fastlane::core'),
         ];
     }

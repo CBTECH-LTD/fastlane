@@ -1,6 +1,5 @@
 <?php
 
-use CbtechLtd\Fastlane\FastlaneFacade;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -10,6 +9,5 @@ Route::get('/', function () {
 });
 
 Route::middleware(['fastlane.auth:fastlane-api'])->group(function (\Illuminate\Routing\Router $router) {
-    // Register Entry Types routes
-    FastlaneFacade::registerApiRoutes($router);
+    // TODO: Register Entry Types routes
 });
