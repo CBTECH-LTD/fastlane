@@ -28,7 +28,7 @@ class EntriesController extends Controller
 {
     /**
      * @param IndexRequest $request
-     * @return RedirectResponse|Response
+     * @return Application|\Illuminate\Contracts\View\Factory|RedirectResponse|\Illuminate\View\View|Response
      */
     public function index(IndexRequest $request)
     {
@@ -48,37 +48,17 @@ class EntriesController extends Controller
             );
         }
 
-        // Transform the paginator collection, which is composed of
-        // entry instances, into a collection of entry resources ready
-        // to be transformed to our front-end application.
-        $paginator->getCollection()->transform(
-            fn(EntryType $entry) => (new EntryResource($entry))->toListing()
-        );
-
-        $collection = EntryResourceCollection::makeFromPaginator($paginator)
-            ->forEntryType($request->entryType())
-            ->withMeta([
-                ResourceMeta::make('order', $request->input('order')),
-            ]);
-
-        if ($request->entryType() instanceof WithCollectionLinks) {
-            $collection->withLinks($request->entryType()->collectionLinks());
-        }
-
-        if ($request->entryType() instanceof WithCollectionMeta) {
-            $collection->withMeta($request->entryType()->collectionMeta());
-        }
-
-        // Return the transformed collection and some important information like
-        // entry type schema, names and links.
+        // Use a custom view if the entry type defines one, otherwise
+        // just use the default entries view.
         $view = function () use ($request) {
             return $request->entryType() instanceof WithCustomViews
                 ? $request->entryType()->getListingView()
                 : null;
         };
 
-        return $this->render($view() ?? 'Entries/Index', [
-            'items' => $collection->transform(),
+        return view($view() ?? 'fastlane::entries.index', [
+            'paginator' => $paginator,
+            'type'      => $request->entryType(),
         ]);
     }
 

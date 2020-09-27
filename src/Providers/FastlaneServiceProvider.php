@@ -12,5 +12,6 @@ class FastlaneServiceProvider extends AggregateServiceProvider
         EntryTypesServiceProvider::class,
         ContentBlocksServiceProvider::class,
         RouteServiceProvider::class,
+        ViewServiceProvider::class,
     ];
 }

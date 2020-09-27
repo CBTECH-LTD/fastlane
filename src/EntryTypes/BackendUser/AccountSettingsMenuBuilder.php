@@ -3,7 +3,7 @@
 namespace CbtechLtd\Fastlane\EntryTypes\BackendUser;
 
 use CbtechLtd\Fastlane\Support\Menu\Contracts\Menu;
-use CbtechLtd\Fastlane\Support\Menu\MenuLink;
+use CbtechLtd\Fastlane\View\Components\MenuLink;
 
 class AccountSettingsMenuBuilder implements Menu
 {

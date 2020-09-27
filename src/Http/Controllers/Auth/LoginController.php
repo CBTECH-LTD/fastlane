@@ -35,7 +35,7 @@ class LoginController extends Controller
 
     public function showLoginForm()
     {
-        return $this->render('Auth/Login', [
+        return view('fastlane::auth.login', [
             'url' => route('fastlane.cp.login'),
         ]);
     }

@@ -1,6 +1,7 @@
 <?php declare(strict_types = 1);
 
 return [
+    'control_panel'            => 'Control Panel',
     'add'                      => 'Add',
     'save'                     => 'Save',
     'new'                      => 'New',

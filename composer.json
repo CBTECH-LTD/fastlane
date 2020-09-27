@@ -27,7 +27,8 @@
         "laravel/sanctum": "^2.4",
         "laravel/ui": "^2.0",
         "league/flysystem-aws-s3-v3": "~1.0",
-        "inertiajs/inertia-laravel": "^0.2.5"
+        "inertiajs/inertia-laravel": "^0.2.5",
+        "livewire/livewire": "^2.2.7"
     },
     "require-dev": {
         "orchestra/testbench": "^5.0",

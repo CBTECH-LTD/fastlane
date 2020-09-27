@@ -1,0 +1,25 @@
+.spinner {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+}
+
+.spinner:after {
+    content: " ";
+    display: block;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 3px solid theme('colors.info.500');
+    border-color: theme('colors.info.500') transparent theme('colors.info.500') transparent;
+    animation: spinner-animation 1.2s linear infinite;
+}
+
+@keyframes spinner-animation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

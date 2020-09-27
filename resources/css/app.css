@@ -3,31 +3,17 @@
 @import "tailwindcss/utilities";
 @import './utils/nprogress.css';
 @import './components/rich-editor.css';
+@import './components/spinner.css';
+@import './components/title-bar.css';
+@import './components/flash-messages.css';
+@import './components/form.css';
+@import './components/table.css';
+@import './components/codex.css';
+@import './components/menu.css';
 
 .custom-scroll {
     scrollbar-width: thin;
     scrollbar-color: transparent theme('colors.brand.400');
-}
-
-.form-input.v-select .vs__dropdown-toggle {
-    padding: 0;
-    border: none;
-    border-radius: 0;
-}
-
-.form-input.v-select .vs__selected,
-.form-input.v-select .vsl__combobox {
-    padding: 0;
-    margin: 0;
-    color: #000;
-}
-
-.form-checkbox {
-    @apply w-4 h-4 mr-4;
-}
-
-.form-radio {
-    @apply mr-4;
 }
 
 .custom-scroll::-webkit-scrollbar {
@@ -42,58 +28,4 @@
 
 .custom-scroll::-webkit-scrollbar-thumb:hover {
     @apply bg-indigo-400;
-}
-
-.table__cell {
-    @apply table-fixed p-4 text-base text-gray-700 overflow-hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.table__row {
-    @apply border-b border-gray-200 text-base text-gray-700;
-}
-
-.table__column-group {
-    @apply border-gray-200;
-}
-
-thead .table__column-group {
-    @apply border-b;
-}
-
-tfoot .table__column-group {
-    @apply border-t;
-}
-
-.table__column {
-    @apply p-4 text-left text-xs text-gray-500 uppercase tracking-wider font-semibold;
-}
-
-/**
- * Codex editor styles
- */
-
-.codex-editor h1 {
-    @apply text-2xl font-bold;
-}
-
-.codex-editor h2 {
-    @apply text-xl font-bold;
-}
-
-.codex-editor h3 {
-    @apply text-lg font-bold;
-}
-
-.codex-editor h4 {
-    @apply text-base font-bold uppercase;
-}
-
-.codex-editor h5 {
-    @apply text-base font-bold;
-}
-
-.codex-editor h6 {
-    @apply text-sm font-bold uppercase;
 }

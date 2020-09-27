@@ -137,15 +137,9 @@ class QueryBuilder implements Contract
             return $this->builder->paginate($itemsPerPage ?? $this->getItemsPerPage());
         };
 
-        $paginator = empty($cacheKey)
+        return empty($cacheKey)
             ? $fn()
             : Cache::remember($this->generateCacheKey(), $this->cacheSeconds, $fn);
-
-        $paginator->getCollection()->transform(
-            fn(Model $model) => $this->entryType::newInstance($model)
-        );
-
-        return $paginator;
     }
 
     public function get(): Collection

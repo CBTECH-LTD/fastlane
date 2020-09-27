@@ -5,7 +5,7 @@ namespace CbtechLtd\Fastlane\Support\Menu;
 use CbtechLtd\Fastlane\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Facades\EntryType as EntryTypeFacade;
 use CbtechLtd\Fastlane\Support\Menu\Contracts\Menu;
-use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuItem;
+use CbtechLtd\Fastlane\View\Components\MenuLink;
 use Illuminate\Support\Collection;
 
 class MenuBuilder implements Menu
@@ -18,16 +18,6 @@ class MenuBuilder implements Menu
 
         // Generate links to entry types.
         foreach (EntryTypeFacade::all() as $entryTypeClass) {
-//            if (is_a($entryTypeClass, RenderableOnMenu::class)) {
-//                $item = MenuLink::make($entryTypeClass::routes()->index(), $entryTypeClass::pluralName())
-//                    ->group($entryTypeClass::group())
-//                    ->icon($entryTypeClass::icon())
-//                    ->when(function ($user) use ($entryTypeClass) {
-//                        return $user->can('list', $entryTypeClass::model());
-//                    });
-//
-//                $menu->push($item);
-//            }
             if (is_a($entryTypeClass, RenderableOnMenu::class, true) && $entryTypeClass::isVisibleOnMenu()) {
                 $entryTypeClass::renderOnMenu($menu);
             }
@@ -35,22 +25,23 @@ class MenuBuilder implements Menu
 
         return $menu
             ->push(
-                MenuLink::make(route('fastlane.cp.account'), __('fastlane::core.account_settings.title'))
+                \CbtechLtd\Fastlane\View\Components\MenuLink::make(route('fastlane.cp.account'), __('fastlane::core.account_settings.title'))
                     ->icon('user-cog')
                     ->group(__('fastlane::core.menu.system_group'))
             )
-            ->mapToGroups(function (MenuItem $item) {
+            ->mapToGroups(function ($item) {
                 return ($item->getGroup() === '')
                     ? ['__top' => $item]
                     : [$item->getGroup() => $item];
             })
-            ->flatMap(function (Collection $data, $key) {
+            ->flatMap(function ($items, $key) {
                 if ($key === '__top') {
-                    return $data->all();
+                    return $items->all();
                 }
 
-                return [MenuGroup::make($key)->children($data->all())];
+                return [\CbtechLtd\Fastlane\View\Components\MenuGroup::make($key, $items->all())];
             })
+            ->values()
             ->all();
     }
 }

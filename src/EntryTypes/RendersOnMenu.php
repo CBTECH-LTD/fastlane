@@ -3,7 +3,7 @@
 namespace CbtechLtd\Fastlane\EntryTypes;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
-use CbtechLtd\Fastlane\Support\Menu\MenuLink;
+use CbtechLtd\Fastlane\View\Components\MenuLink;
 use Illuminate\Support\Collection;
 
 trait RendersOnMenu
