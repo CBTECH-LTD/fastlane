@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Http\Controllers\API;
 
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Http\Controllers\Controller;
+use CbtechLtd\Fastlane\QueryFilter\Pipes\WhereIn;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
@@ -24,20 +25,25 @@ class FileManagerController extends Controller
 
     public function index(Request $request)
     {
-        $queryFilter = $this->fastlane->getRequest()->buildQueryFilter();
+        $queryFilter = $this->fastlane->getRequest()->buildQueryFilter()
+            ->addOrder('name', 'asc')
+            ->addOrder('created_at', 'desc');
 
-        /** @var LengthAwarePaginator $paginator */
-        $paginator = $this->entryType()->getItems($queryFilter);
+        if ($types = $request->input('filter.types')) {
+            $queryFilter->addFilter(new WhereIn('mimetype', $types));
+        }
 
-        // Transform the paginator collection, which is composed of
-        // entry instances, into a collection of entry resources ready
-        // to be transformed to our front-end application.
-        $paginator->getCollection()
-            ->transform(
+        $items = $queryFilter
+            ->pipeThrough($this->entryType()->queryBuilder())
+            ->get()
+            ->map(
                 fn(EntryInstance $entry) => (new EntryResource($entry))->toIndex()
             );
 
-        $collection = EntryResourceCollection::makeFromPaginator($paginator)
+        /** @var LengthAwarePaginator $paginator */
+//        $paginator = $this->entryType()->getItems($queryFilter);
+
+        $collection = EntryResourceCollection::make($items->all())
             ->forEntryType($this->entryType())
             ->withMeta([
                 ResourceMeta::make('order', $this->fastlane->getRequest()->input('order')),

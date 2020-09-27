@@ -15,6 +15,8 @@ class DateField extends AbstractBaseField implements ExportsToApiAttributeContra
     protected bool $enableTime = false;
     protected bool $enableSeconds = false;
 
+    protected int $listWidth = 180;
+
     public function getType(): string
     {
         return 'date';

@@ -18,8 +18,8 @@ class WhereIn implements QueryPipeContract
 
     public function handle(QueryBuilder $query, Closure $next)
     {
-        return $next(
-            $query->getBuilder()->whereIn($this->field, $this->value)
-        );
+        $query->getBuilder()->whereIn($this->field, $this->value);
+
+        return $next($query);
     }
 }

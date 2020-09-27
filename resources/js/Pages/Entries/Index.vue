@@ -9,7 +9,7 @@
 
         <slot name="before-table"/>
 
-        <f-table-card :items="items.data" auto>
+        <f-table-card :items="items.data">
             <template v-slot:columns>
                 <th v-for="field in listSchema" :key="field.name" class="table__column" :width="field.listWidth || 'auto'">
                     <span class="flex items-center">

@@ -26,8 +26,8 @@ import FSpinner from './Components/Spinner'
 import FTableCard from './Components/TableCard'
 import FTheAppLayout from './Components/TheAppLayout'
 import FTrix from './Components/Trix'
-
 import FFileManager from './Components/FileManager'
+import UmamiWidget from './Components/Widgets/Umami'
 
 export default {
     install (Vue) {
@@ -66,5 +66,8 @@ export default {
         Vue.component('f-form-string-input', FFormStringInput)
         Vue.component('f-form-text-input', FFormTextInput)
         Vue.component('f-form-toggle-input', FFormToggleInput)
+
+        // Built-in Widgets
+        Vue.component('umami-widget', UmamiWidget)
     }
 }
