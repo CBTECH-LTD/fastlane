@@ -2,26 +2,21 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers;
 
-use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Contracts\QueryBuilder;
 use CbtechLtd\Fastlane\Contracts\WithCustomViews;
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Http\Requests\CreateRequest;
 use CbtechLtd\Fastlane\Http\Requests\DeleteRequest;
-use CbtechLtd\Fastlane\Http\Requests\UpdateRequest;
 use CbtechLtd\Fastlane\Http\Requests\IndexRequest;
-use CbtechLtd\Fastlane\Support\Contracts\WithCollectionLinks;
-use CbtechLtd\Fastlane\Support\Contracts\WithCollectionMeta;
+use CbtechLtd\Fastlane\Http\Requests\UpdateRequest;
 use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
-use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
-use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Inertia\Response;
 
 class EntriesController extends Controller
@@ -56,9 +51,19 @@ class EntriesController extends Controller
                 : null;
         };
 
+        $columns = $request->entryType()
+            ->getFields()
+            ->onListing()
+            ->flattenFields()
+            ->all();
+
         return view($view() ?? 'fastlane::entries.index', [
-            'paginator' => $paginator,
-            'type'      => $request->entryType(),
+            'items'          => $paginator->items(),
+            'columns'        => $columns,
+            'paginator'      => $paginator,
+            'type'           => $request->entryType(),
+            'orderBy'        => $request->input('order'),
+            'orderDirection' => Str::startsWith($request->input('order'), '-') ? 'desc' : 'asc',
         ]);
     }
 

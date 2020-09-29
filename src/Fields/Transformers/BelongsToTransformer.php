@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Fields\Transformers;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Contracts\Transformer;
+use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Support\SelectOption;
 use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
 use CbtechLtd\Fastlane\Fields\Types\BelongsTo;
@@ -34,11 +35,11 @@ class BelongsToTransformer implements Transformer
         }
     }
 
-    public function fromRequest(EntryType $entryType, $value): Value
+    public function toValueObject(EntryType $entryType, Field $field, $value): Value
     {
         $entry = $this->field->getRelatedEntryType()::query()->key($value)->first();
 
-        return new Value($entryType, $entry->modelInstance(), $this->field);
+        return new Value($entryType, $entry->modelInstance(), $this->field, $field);
     }
 
     /**

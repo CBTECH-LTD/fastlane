@@ -3,7 +3,6 @@
 namespace CbtechLtd\Fastlane\View\Components;
 
 use Illuminate\Support\Collection;
-use Illuminate\View\Component;
 
 class MenuWrapper extends Component
 {

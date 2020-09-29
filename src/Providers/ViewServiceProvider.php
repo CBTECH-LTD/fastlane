@@ -8,13 +8,17 @@ use CbtechLtd\Fastlane\View\Components\Button;
 use CbtechLtd\Fastlane\View\Components\Field;
 use CbtechLtd\Fastlane\View\Components\Icon;
 use CbtechLtd\Fastlane\View\Components\Link;
+use CbtechLtd\Fastlane\View\Components\Listing;
+use CbtechLtd\Fastlane\View\Components\ListingItemAction;
 use CbtechLtd\Fastlane\View\Components\MenuLink;
 use CbtechLtd\Fastlane\View\Components\MenuWrapper;
+use CbtechLtd\Fastlane\View\Components\Paginator;
+use CbtechLtd\Fastlane\View\Components\ReactiveComponent;
 use CbtechLtd\Fastlane\View\Components\Spinner;
 use CbtechLtd\Fastlane\View\Components\TableCard;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
+use Livewire\Livewire;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -29,6 +33,8 @@ class ViewServiceProvider extends ServiceProvider
             Icon::class,
             Link::class,
             Spinner::class,
+            ListingItemAction::class,
+            Paginator::class,
 
             // Cards
             BoxedCard::class,
@@ -40,12 +46,23 @@ class ViewServiceProvider extends ServiceProvider
 
             // Form components
             Field::class,
+
+            // Listing components
+            Listing\RowCellRenderer::class,
+            Listing\Boolean::class,
+            Listing\ShortText::class,
+
+            // Reactive components
+            Listing\ReactiveToggle::class,
         ];
 
         foreach ($components as $component) {
-            $class = (new \ReflectionClass($component))->getShortName();
+            if (is_a($component, ReactiveComponent::class, true)) {
+                Livewire::component($component::tag(), $component);
+                continue;
+            }
 
-            Blade::component($component, 'fl-' . Str::snake($class, '-'));
+            Blade::component($component, $component::tag());
         }
     }
 }

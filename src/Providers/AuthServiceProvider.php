@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Providers;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -41,6 +42,13 @@ class AuthServiceProvider extends ServiceProvider
             'table'    => 'fastlane_password_resets',
             'expire'   => 60,
             'throttle' => 60,
+        ]);
+
+        // Hijack the Livewire middleware group to allow the authenticated user
+        // to use reactive components.
+        Config::set('livewire.middleware_group', [
+            ...Arr::wrap(Config::get('livewire.middleware_group', [])),
+            'auth:fastlane-cp',
         ]);
     }
 }

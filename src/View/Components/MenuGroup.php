@@ -4,7 +4,6 @@ namespace CbtechLtd\Fastlane\View\Components;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\Component;
 use Webmozart\Assert\Assert;
 
 class MenuGroup extends Component

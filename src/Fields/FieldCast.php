@@ -12,20 +12,21 @@ class FieldCast implements CastsAttributes
     {
         $field = $this->field($model, $key);
 
-        return new Value(
-            $model->getEntryType(),
-            $value,
-            $field instanceof Transformable ? $field : null
-        );
+        if ($field instanceof Transformable) {
+            return $field->transformer()->toValueObject($model->getEntryType(), $field, $value);
+        }
+
+        return new Value($model->getEntryType(), $value, null);
     }
 
     public function set($model, string $key, $value, array $attributes)
     {
         $field = $this->field($model, $key);
 
-        return ($field instanceof Transformable)
-            ? $field->transformer()->set($model->getEntryType(), $value)
-            : $value;
+        return $field->transformer()->set(
+            $model->getEntryType(),
+            $value
+        );
     }
 
     /**

@@ -2,8 +2,6 @@
 
 namespace CbtechLtd\Fastlane\View\Components;
 
-use Illuminate\View\Component;
-
 class Field extends Component
 {
     public bool $required;

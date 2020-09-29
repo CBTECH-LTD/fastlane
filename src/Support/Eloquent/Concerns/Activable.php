@@ -36,9 +36,4 @@ trait Activable
 
         return $this;
     }
-
-    public function setIsActiveAttribute(bool $state): self
-    {
-        return $this->setActiveStateTo($state);
-    }
 }

@@ -3,7 +3,6 @@
 namespace CbtechLtd\Fastlane\View\Components;
 
 use CbtechLtd\Fastlane\Support\Menu\MenuBuilder;
-use Illuminate\View\Component;
 
 class AppLayout extends Component
 {

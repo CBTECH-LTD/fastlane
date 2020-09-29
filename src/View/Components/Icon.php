@@ -2,18 +2,24 @@
 
 namespace CbtechLtd\Fastlane\View\Components;
 
-use Illuminate\View\Component;
-
 class Icon extends Component
 {
-    public function __construct()
+    public string $name;
+
+    public function __construct(?string $name = null)
     {
+        $this->name = $name ?? '';
+    }
+
+    public function shouldRender()
+    {
+        return isset($this->name);
     }
 
     public function render()
     {
         return <<<'blade'
-            <i $attributes></i>
+            <i {{ $attributes->merge(['class' =>'la la-'.$name]) }}></i>
         blade;
     }
 }

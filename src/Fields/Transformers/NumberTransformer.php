@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Fields\Transformers;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Contracts\Transformer;
+use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Types\Numeric;
 use CbtechLtd\Fastlane\Fields\Value;
 
@@ -31,8 +32,8 @@ class NumberTransformer implements Transformer
         return $value->value();
     }
 
-    public function fromRequest(EntryType $entryType, $value): Value
+    public function toValueObject(EntryType $entryType, Field $field, $value): Value
     {
-        return new Value($entryType, $value);
+        return new Value($entryType, $value, $field);
     }
 }

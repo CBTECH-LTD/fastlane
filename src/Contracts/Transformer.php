@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Contracts;
 
+use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Value;
 
 interface Transformer
@@ -28,8 +29,9 @@ interface Transformer
      * Transform the value coming from the request.
      *
      * @param EntryType $entryType
+     * @param Field     $field
      * @param           $value
      * @return mixed
      */
-    public function fromRequest(EntryType $entryType, $value): Value;
+    public function toValueObject(EntryType $entryType, Field $field, $value): Value;
 }

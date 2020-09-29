@@ -8,6 +8,7 @@ use CbtechLtd\Fastlane\Contracts\Transformer;
 use CbtechLtd\Fastlane\Fields\Rules\Unique;
 use CbtechLtd\Fastlane\Fields\Transformers\StringTransformer;
 use CbtechLtd\Fastlane\Fields\Types\Panel;
+use CbtechLtd\Fastlane\View\Components\Listing\ShortText;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -58,11 +59,27 @@ abstract class Field implements Arrayable, Transformable
     }
 
     /**
+     * Determine the component used to render the field in
+     * the listing page.
+     *
+     * @return string
+     */
+    public function listingComponent(): string
+    {
+        return ShortText::class;
+    }
+
+    /**
      * @return string
      */
     public function getAttribute(): string
     {
         return $this->config->get('attribute');
+    }
+
+    public function getLabel(): string
+    {
+        return $this->getConfig('label');
     }
 
     /**
@@ -292,6 +309,20 @@ abstract class Field implements Arrayable, Transformable
     }
 
     /**
+     * @return ?string
+     */
+    public function getListingColWidth(): ?string
+    {
+        $width = $this->listingColWidth;
+
+        if ($width === 0) {
+            return null;
+        }
+
+        return $width . 'px';
+    }
+
+    /**
      * Check whether the field is visible on listing pages.
      *
      * @return bool
@@ -367,9 +398,10 @@ abstract class Field implements Arrayable, Transformable
     public function toArray()
     {
         return [
-            'attribute' => $this->getConfig('attribute'),
-            'component' => $this->component,
-            'config'    => $this->config->except('attribute')->toArray(),
+            'attribute'        => $this->getConfig('attribute'),
+            'listingComponent' => $this->listingComponent(),
+            'component'        => $this->component,
+            'config'           => $this->config->except('attribute')->toArray(),
         ];
     }
 

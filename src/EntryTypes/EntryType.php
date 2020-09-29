@@ -287,7 +287,7 @@ abstract class EntryType implements EntryTypeContract
         });
 
         $value = ! is_null($field)
-            ? $this->modelInstance()->getAttribute($field->getAttribute())
+            ? $this->modelInstance()->getAttributeValue($field->getAttribute())
             : null;
 
         return $value ?? '';
@@ -339,7 +339,7 @@ abstract class EntryType implements EntryTypeContract
     {
         // Check whether the authenticated user can update
         // the given entry instance.
-        if (Gate::getPolicyFor(static::model())) {
+        if ($policy = Gate::getPolicyFor(static::model())) {
             Gate::authorize('update', $this->modelInstance());
         }
 
@@ -350,7 +350,9 @@ abstract class EntryType implements EntryTypeContract
         $data = $this->validateAndTransformData($data, $fields);
 
         // Fill and save the model!
-        $this->modelInstance()->fill($data)->save();
+        $this->modelInstance()->fill($data);
+
+        $this->modelInstance()->save();
 
         return $this;
     }
@@ -379,9 +381,11 @@ abstract class EntryType implements EntryTypeContract
         $data = Validator::make($data, $fields->getUpdateRules($data))->validated();
 
         return $fields->getCollection()->map(function (Field $field) use ($data) {
-            if ($value = Arr::get($data, $field->getAttribute())) {
+            if (Arr::exists($data, $field->getAttribute())) {
+                $value = Arr::get($data, $field->getAttribute());
+
                 if ($field instanceof Transformable) {
-                    return $field->transformer()->fromRequest($this, $value);
+                    return $field->transformer()->toValueObject($this, $field, $value);
                 }
 
                 return new Value($this, $value);

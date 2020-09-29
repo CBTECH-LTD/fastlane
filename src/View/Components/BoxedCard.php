@@ -2,8 +2,6 @@
 
 namespace CbtechLtd\Fastlane\View\Components;
 
-use Illuminate\View\Component;
-
 class BoxedCard extends Component
 {
     public string $icon;

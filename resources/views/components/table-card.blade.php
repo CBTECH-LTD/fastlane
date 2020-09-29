@@ -23,9 +23,9 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($items as $item)
+            @foreach ($items as $key => $item)
                 <tr class="table__row">
-                    {{ ${'item_'.$item->getKey()} }}
+                    {{ ${'row_'.$key} ?? '' }}
                 </tr>
             @endforeach
             </tbody>

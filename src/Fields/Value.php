@@ -54,7 +54,7 @@ class Value implements Arrayable
     {
         return [
             'value' => $this->value(),
-            'field' => $this->field()->toArray(),
+            'field' => optional($this->field())->toArray(),
         ];
     }
 }

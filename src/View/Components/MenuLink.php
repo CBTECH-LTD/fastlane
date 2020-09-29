@@ -4,7 +4,6 @@ namespace CbtechLtd\Fastlane\View\Components;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Illuminate\View\Component;
 
 class MenuLink extends Component
 {

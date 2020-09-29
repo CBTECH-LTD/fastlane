@@ -20,13 +20,6 @@
 
 @stack('modals')
 
-<script>
-    window.fastlane = {
-        locale: '{{ config('app.locale', 'en') }}',
-        translations: @json(\CbtechLtd\Fastlane\Fastlane::getTranslations())
-    }
-</script>
-
 <livewire:scripts/>
 
 <script src="{{ mix('manifest.js', 'vendor/fastlane') }}"></script>

@@ -3,10 +3,8 @@
 namespace CbtechLtd\Fastlane\Fields\Types;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
-use CbtechLtd\Fastlane\Contracts\Transformable;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Value;
-use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 

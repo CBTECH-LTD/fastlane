@@ -3,7 +3,6 @@
 namespace CbtechLtd\Fastlane\View\Components;
 
 use Illuminate\Support\Collection;
-use Illuminate\View\Component;
 
 class Button extends Component
 {
@@ -40,7 +39,7 @@ class Button extends Component
         return $this->disabled || $this->loading;
     }
 
-    public function tag(): string
+    public function buttonTag(): string
     {
         if ($this->attributes && $this->attributes->get('href')) {
             return 'a';

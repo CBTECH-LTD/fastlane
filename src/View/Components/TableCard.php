@@ -2,8 +2,6 @@
 
 namespace CbtechLtd\Fastlane\View\Components;
 
-use Illuminate\View\Component;
-
 class TableCard extends Component
 {
     public array $items;
