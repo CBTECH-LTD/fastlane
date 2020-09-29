@@ -51,6 +51,7 @@ class ViewServiceProvider extends ServiceProvider
             Listing\RowCellRenderer::class,
             Listing\Boolean::class,
             Listing\ShortText::class,
+            Listing\Select::class,
 
             // Reactive components
             Listing\ReactiveToggle::class,

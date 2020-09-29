@@ -21,12 +21,12 @@
                     <span class="flex items-center">
                         {{ $column->getLabel() }}
                         @if ($column->isSortable())
-                            <x-fl-button @click="orderBy(field)" variant="minimal" color="{{ $orderBy === $column->getAttribute() ? 'black' : 'gray' }}" class="ml-2">
-                                @if ($orderDirection === 'asc')
-                                    <x-fl-icon name="sort-alpha-down"></x-fl-icon>
-                                @endif
-                                @if ($orderDirection === 'desc')
+                            <x-fl-button href="{{ request()->fullUrlWithQuery(['page' => 1, 'order' => ($orderDesc ? '' : '-') . $column->getAttribute()]) }}" variant="minimal"
+                                         color="{{ $orderBy === $column->getAttribute() ? 'black' : 'gray' }}" class="ml-2">
+                                @if ($orderDesc)
                                     <x-fl-icon name="sort-alpha-down-alt"></x-fl-icon>
+                                @else
+                                    <x-fl-icon name="sort-alpha-down"></x-fl-icon>
                                 @endif
                             </x-fl-button>
                         @endif
@@ -39,7 +39,7 @@
         @foreach ($items as $key => $item)
             <x-slot :name="'row_'.$key">
                 @foreach ($columns as $column)
-                    <td class="table_ex_cell">
+                    <td class="table__cell">
                         <x-fl-row-cell-renderer :model="$item" :field="$column"></x-fl-row-cell-renderer>
                     </td>
                 @endforeach

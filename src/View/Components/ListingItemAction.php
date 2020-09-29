@@ -18,7 +18,7 @@ class ListingItemAction extends Component
         $this->icon = $icon;
         $this->color = $color;
         $this->onClick = $onClick;
-        $this->loading = $loading;
+        $this->loading = $loading;  
     }
 
     public function render()

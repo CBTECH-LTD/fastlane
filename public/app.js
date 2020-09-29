@@ -1911,6 +1911,27 @@
 
 /***/ }),
 
+/***/ "./resources/js/Components/spinner.js":
+/*!********************************************!*\
+  !*** ./resources/js/Components/spinner.js ***!
+  \********************************************/
+/*! exports provided: Spinner */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Spinner", function() { return Spinner; });
+function Spinner() {
+  return {
+    active: false,
+    setStatus: function setStatus(status) {
+      this.active = status;
+    }
+  };
+}
+
+/***/ }),
+
 /***/ "./resources/js/Components/sticky-title-bar.js":
 /*!*****************************************************!*\
   !*** ./resources/js/Components/sticky-title-bar.js ***!
@@ -1951,10 +1972,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/alpine.js");
 /* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(alpinejs__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Components_sticky_title_bar__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Components/sticky-title-bar */ "./resources/js/Components/sticky-title-bar.js");
+/* harmony import */ var _Components_spinner__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Components/spinner */ "./resources/js/Components/spinner.js");
+
 
 
 window.Comps = {
-  StickyTitleBar: _Components_sticky_title_bar__WEBPACK_IMPORTED_MODULE_1__["StickyTitleBar"]
+  StickyTitleBar: _Components_sticky_title_bar__WEBPACK_IMPORTED_MODULE_1__["StickyTitleBar"],
+  Spinner: _Components_spinner__WEBPACK_IMPORTED_MODULE_2__["Spinner"]
 };
 
 /***/ }),

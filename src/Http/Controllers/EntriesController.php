@@ -58,12 +58,12 @@ class EntriesController extends Controller
             ->all();
 
         return view($view() ?? 'fastlane::entries.index', [
-            'items'          => $paginator->items(),
-            'columns'        => $columns,
-            'paginator'      => $paginator,
-            'type'           => $request->entryType(),
-            'orderBy'        => $request->input('order'),
-            'orderDirection' => Str::startsWith($request->input('order'), '-') ? 'desc' : 'asc',
+            'items'     => $paginator->items(),
+            'columns'   => $columns,
+            'paginator' => $paginator,
+            'type'      => $request->entryType(),
+            'orderBy'   => Str::replaceFirst('-', '', $request->input('order')),
+            'orderDesc' => Str::startsWith($request->input('order'), '-'),
         ]);
     }
 
@@ -116,7 +116,7 @@ class EntriesController extends Controller
 
     /**
      * @param UpdateRequest $request
-     * @return Response
+     * @return Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View|Response
      */
     public function edit(UpdateRequest $request)
     {
@@ -126,8 +126,10 @@ class EntriesController extends Controller
                 : null;
         };
 
-        return $this->render($view() ?? 'Entries/Edit', [
-            'item' => (new EntryResource($request->entryType()))->toUpdate()->transform(),
+        return view($view() ?? 'fastlane::entries.edit', [
+            'type'   => $request->entryType(),
+            'item'   => $request->entryType()->modelInstance(),
+            'fields' => $request->entryType()->getFields()->onUpdate()->getCollection(),
         ]);
     }
 

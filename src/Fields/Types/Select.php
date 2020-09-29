@@ -25,6 +25,11 @@ class Select extends Field
         ]);
     }
 
+    public function listingComponent(): string
+    {
+        return \CbtechLtd\Fastlane\View\Components\Listing\Select::class;
+    }
+
     /**
      * @inheritDoc
      */

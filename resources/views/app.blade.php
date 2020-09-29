@@ -13,6 +13,8 @@
     <livewire:styles/>
 
     @stack('styles')
+
+    <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js" data-turbolinks-eval="false"></script>
 </head>
 <body class="font-sans antialiased h-screen bg-white">
 

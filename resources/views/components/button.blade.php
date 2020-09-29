@@ -5,9 +5,7 @@
         </span>
 @endif
 
-<span class="{{ $loading ? 'opacity-0' : '' }}">
-    {{ $slot }}
-</span>
+<span>{{ $slot }}</span>
 
 @if(!empty($rightIcon))
     <span class="btn-icon btn-icon-r {{ $loading ? 'opacity-0' : '' }}">
@@ -15,9 +13,5 @@
         </span>
 @endif
 
-@if ($loading)
-    <span class="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-            <x-fl-spinner color="info"></x-fl-spinner>
-        </span>
-@endif
+<x-fl-spinner wire:loading.class.remove="hidden"></x-fl-spinner>
 </{{ $buttonTag }}>
