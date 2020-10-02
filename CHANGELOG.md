@@ -2,11 +2,12 @@
 
 All notable changes to `fastlane` will be documented in this file
 
-## [Unreleased]
+## [0.9.0] - 2020-10-02
 
 ## Added
 - File manager.
 - Slug field.
+- Content block.
 
 ## Changed
 - More options to File field, like file size, min and max number of files.
