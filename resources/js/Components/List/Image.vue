@@ -13,12 +13,12 @@
 
         computed: {
             backgroundStyles () {
-                if (! this.value) {
+                if (! this.value || ! this.value.length) {
                     return {}
                 }
 
                 return {
-                    backgroundImage: `url(${this.value})`,
+                    backgroundImage: `url(${this.value[0].url})`,
                 }
             }
         },

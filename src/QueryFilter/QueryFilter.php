@@ -2,8 +2,9 @@
 
 namespace CbtechLtd\Fastlane\QueryFilter;
 
+use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use CbtechLtd\Fastlane\QueryFilter\Pipes\OrderBy;
-use Illuminate\Database\Eloquent\Builder;
+use CbtechLtd\Fastlane\QueryFilter\Pipes\QueryPipeContract;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -11,10 +12,12 @@ use Illuminate\Support\Str;
 class QueryFilter implements QueryFilterContract
 {
     protected Collection $order;
+    protected Collection $filters;
 
     public function __construct()
     {
         $this->order = new Collection;
+        $this->filters = new Collection;
     }
 
     public static function make(): self
@@ -24,7 +27,6 @@ class QueryFilter implements QueryFilterContract
 
     public function withOrder(string $order): self
     {
-        $this->order = new Collection;
         $this->addOrder($order);
 
         return $this;
@@ -38,15 +40,20 @@ class QueryFilter implements QueryFilterContract
             : 'asc';
 
         $this->order->push(new OrderBy($field, $sort));
-
         return $this;
     }
 
-    public function pipeThrough(Builder $builder): Builder
+    public function addFilter(QueryPipeContract $queryPipe): self
+    {
+        $this->filters->push($queryPipe);
+        return $this;
+    }
+
+    public function pipeThrough(QueryBuilder $builder): QueryBuilder
     {
         return app(Pipeline::class)
             ->send($builder)
-            ->through($this->order->all())
-            ->then(fn(Builder $builder) => $builder);
+            ->through(array_merge($this->order->all(), $this->filters->all()))
+            ->then(fn(QueryBuilder $builder) => $builder);
     }
 }

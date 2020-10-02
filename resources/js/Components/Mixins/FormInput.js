@@ -9,6 +9,10 @@ export default {
         stacked: {
             type: Boolean,
             default: false,
+        },
+        form: {
+            type: Object | undefined,
+            default: undefined,
         }
     },
 

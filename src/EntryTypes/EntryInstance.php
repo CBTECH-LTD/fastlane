@@ -9,6 +9,7 @@ use CbtechLtd\Fastlane\Support\Schema\Contracts\EntrySchema as EntrySchemaContra
 use CbtechLtd\Fastlane\Support\Schema\EntrySchema;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ReadValue;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
+use CbtechLtd\Fastlane\Support\Schema\Fields\FieldValue;
 use CbtechLtd\Fastlane\Support\Schema\Fields\RelationField;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -54,6 +55,17 @@ class EntryInstance implements EntryInstanceContract
         return $this->type;
     }
 
+    public function get(string $field, $default = null): FieldValue
+    {
+        $field = $this->schema()->findField($field);
+
+        if ($field instanceof ReadValue) {
+            return $field->readValue($this);
+        }
+
+        return new FieldValue($field, null);
+    }
+
     public function model(): Model
     {
         return $this->model;
@@ -68,6 +80,7 @@ class EntryInstance implements EntryInstanceContract
     {
         if ($this->model()->isDirty()) {
             $this->model()->save();
+            $this->model()->refresh();
         }
 
         return $this;
@@ -75,7 +88,11 @@ class EntryInstance implements EntryInstanceContract
 
     public function toArray()
     {
-        return [];
+        return Collection::make($this->schema->getFields())
+            ->filter(fn(SchemaField $field) => $field instanceof ReadValue)
+            ->mapWithKeys(function (SchemaField $field) {
+                return $this->get($field->getName())->toArray();
+            })->toArray();
     }
 
     protected function resolve(): void

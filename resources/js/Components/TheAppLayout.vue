@@ -17,23 +17,23 @@
                 </f-button>
             </div>
         </div>
-        <div class="mt-20 w-full flex-grow flex">
+        <div class="mt-20 w-full flex">
+            <!-- Navigation items -->
             <div class="flex flex-col bg-white h-screen sticky overflow-hidden" style="width: 320px; top: 80px;">
-                <!-- Navigation items -->
                 <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scroll">
                     <f-navigation-list class="my-6 px-2" :items="this.$page.menu"/>
                 </div>
             </div>
 
             <!-- Main area -->
-            <div class="flex-1 flex flex-row px-4">
+            <div class="w-full flex flex-row overflow-x-hidden px-4">
                 <div v-if="$slots.hasOwnProperty('page-sidebar')">
                     <slot name="page-sidebar"/>
                 </div>
-                <div class="flex-grow mb-8" style="border-radius: 2rem">
+                <div class="w-full mb-8" style="border-radius: 2rem">
                     <div v-if="$slots.hasOwnProperty('title')" ref="sticky" class="title-bar-wrapper" :class="stickyBarClass">
                         <div class="title-bar">
-                            <div class="div">
+                            <div class="w-4/6">
                                 <h1 class="title-bar__title">
                                     <slot name="title"/>
                                 </h1>
@@ -58,12 +58,16 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 mb-12 px-12">
+                    <div class="mt-4 mb-12 px-8 w-full">
                         <slot/>
                     </div>
                 </div>
             </div>
         </div>
+
+        <portal-target name="modals">
+
+        </portal-target>
     </div>
 </template>
 

@@ -21,7 +21,8 @@
                 :clearable="false"
                 :options="field.config.options"
                 :multiple="field.config.multiple"
-                v-model="field.value">
+                :value="field.value"
+                @input="onInput">
             </v-select>
         </div>
     </f-form-field>
@@ -35,6 +36,7 @@ import { FormField, FormFieldFactory } from '../../Support/FormField'
 import filter from 'lodash/filter'
 import find from 'lodash/find'
 import map from 'lodash/map'
+import isObject from 'lodash/isObject'
 
 export default {
     name: 'SelectInput',
@@ -72,26 +74,33 @@ export default {
     },
 
     buildForSchema ({ field, component, value }) {
-        const getValue = () => {
+        const selectedIds = (() => {
             if (!value) {
                 return []
             }
 
             if (field.config.multiple === true) {
-                return map(value, v => v.value)
+                return map(value, v => {
+                    if (isObject(v)) {
+                        return v.value
+                    }
+
+                    return v
+                })
             }
 
-            return [value[0].value] || []
-        }
+            return value.length ? [value[0].value] : []
+        })()
 
         const filteredValue = filter(field.config.options, o => {
-            return getValue().includes(o.value)
+            return selectedIds.includes(o.value)
         })
 
         return FormFieldFactory(
             field,
             component,
-            filteredValue || field.default
+            filteredValue || field.default,
+            {}
         )
     }
 }

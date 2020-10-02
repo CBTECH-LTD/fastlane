@@ -7,15 +7,24 @@ import camelCase from 'lodash/camelCase'
 import components from './utils/schemaComponents'
 import FormObject from './FormObject'
 import { FormFieldFactory } from './FormField'
-import schemaComponents from './utils/schemaComponents'
 
 /**
  * Define methods to be accessible on the instance of FormSchema.
  */
-function generateMethods (form) {
+function generateMethods (form, $bus) {
     const obj = {}
 
     Object.defineProperties(obj, {
+        $on: {
+            value: (eventName, callback) => {
+                $bus.$on(eventName, callback)
+            }
+        },
+        $emit: {
+            value: (eventName, data) => {
+                $bus.$emit(eventName, data)
+            }
+        },
         isDirty: {
             value: () => some(form, field => field.isDirty()),
         },
@@ -68,6 +77,7 @@ function generateMethods (form) {
  * @param schema
  */
 export function FormSchemaFactory (data, schema) {
+    const $bus = new Vue
     const __fields = {}
 
     each(schema, field => {
@@ -80,10 +90,13 @@ export function FormSchemaFactory (data, schema) {
         __fields[field.name] = Vue.observable(
             !!component.buildForSchema
                 ? component.buildForSchema({ field, component, value, data })
-                : FormFieldFactory(field, component, value)
+                : FormFieldFactory(field, component, value, {})
         )
 
+        __fields[field.name].onValueChanged((value) => {
+            $bus.$emit(`${field.name}:value-changed`, value)
+        })
     })
 
-    return generateMethods(__fields)
+    return generateMethods(__fields, $bus)
 }

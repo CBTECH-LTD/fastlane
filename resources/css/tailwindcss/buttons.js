@@ -87,6 +87,10 @@ module.exports = plugin(function ({ addComponents, theme, config }) {
         '&:disabled, &[disabled], &.btn-disabled': {
             boxShadow: 'none'
         },
+        '&.btn-oval': {
+            borderWidth: theme('borderWidth.full'),
+            borderRadius: theme('borderRadius.full'),
+        }
     })
 
     // Add size variants...

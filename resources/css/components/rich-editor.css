@@ -1,0 +1,135 @@
+.rich-editor__menubar {
+    @apply flex items-center py-2;
+}
+
+.rich-editor__menububble {
+    @apply absolute flex items-center bg-gray-900 rounded z-10 p-1 mb-1;
+    transform: translateX(-50%);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+.rich-editor__menububble.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.rich-editor__menububble__form {
+    @apply flex items-center;
+}
+
+.rich-editor__menububble__button {
+    @apply p-1 flex items-center justify-center rounded bg-transparent font-normal text-sm text-gray-300 mx-1;
+}
+
+.rich-editor__menububble__button:hover {
+    @apply bg-gray-800 text-gray-200;
+}
+
+.rich-editor__menububble__button.is-active {
+    @apply text-gray-100 bg-gray-800;
+}
+
+.rich-editor__menububble__input {
+    @apply text-white bg-transparent border-0;
+}
+
+.rich-editor__menubar__button {
+    @apply w-8 h-6 flex items-center justify-center rounded bg-transparent font-bold text-sm text-gray-700 mx-1;
+}
+
+.rich-editor__menubar__button:hover {
+    @apply bg-gray-200 text-gray-800;
+}
+
+.rich-editor__menubar__button.is-active {
+    @apply bg-gray-300 text-gray-900;
+}
+
+.rich-editor__menubar__divider {
+    @apply mx-1 h-4 border-l border-gray-500;
+}
+
+.rich-editor__editor__content {
+    min-height: 200px;
+}
+
+.rich-editor__editor__content {
+    @apply relative;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.rich-editor__editor__content .ProseMirror {
+    outline: none;
+    min-height: 200px;
+}
+
+.rich-editor__editor__content h3 {
+    @apply text-lg text-gray-700 font-semibold;
+}
+
+.rich-editor__editor__content h2 {
+    @apply text-xl text-gray-800 font-bold;
+}
+
+.rich-editor__editor__content h1 {
+    @apply text-2xl text-gray-900 font-bold;
+}
+
+.rich-editor__editor__content ul {
+    @apply p-8;
+    list-style: disc;
+}
+
+.rich-editor__editor__content ol {
+    @apply p-8;
+    list-style: decimal;
+}
+
+.rich-editor__editor__content blockquote {
+    @apply p-4 bg-gray-200 italic text-base text-gray-900 rounded-lg;
+}
+
+.rich-editor__editor__content code {
+    @apply p-1 bg-gray-200 text-gray-800 text-base font-mono rounded;
+}
+
+.rich-editor__editor__content pre {
+    @apply p-4 bg-gray-900 text-gray-100 text-base font-mono rounded-lg;
+}
+
+.rich-editor__editor__content pre code {
+    @apply bg-transparent text-gray-100 text-base font-mono;
+}
+
+.rich-editor__editor__content a {
+    @apply underline text-blue-500;
+}
+
+.rich-editor__editor__content table {
+    @apply table-auto border border-gray-500 w-full;
+}
+
+.rich-editor__editor__content td {
+    @apply p-2 border border-gray-500 text-base text-gray-700;
+}
+
+.rich-editor__editor__content tr {
+    @apply border border-gray-500 text-base text-gray-700;
+}
+
+.rich-editor__editor__content .iframe__embed {
+    @apply w-full bg-gray-200 rounded;
+    height: 15rem;
+    border: 0;
+}
+
+.rich-editor__editor__content .iframe__input {
+    @apply bg-white border-2 border-gray-400 rounded;
+    display: block;
+    width: 100%;
+    font: inherit;
+    padding: 0.3rem 0.5rem;
+}

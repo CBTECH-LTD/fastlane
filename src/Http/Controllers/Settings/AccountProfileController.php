@@ -28,7 +28,7 @@ class AccountProfileController extends AbstractAccountsController
         $this->entryType()->updateAuthenticatedUser($request);
 
         app('fastlane')->flashSuccess(
-            'Your account profile was updated successfully.',
+            'fastlane::core.account_settings.profile_success_msg',
             'thumbs-up'
         );
 

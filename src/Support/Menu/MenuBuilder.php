@@ -28,9 +28,9 @@ class MenuBuilder implements Menu
 
         return $menu
             ->push(
-                MenuLink::make(route('cp.account'), 'Account Settings')
+                MenuLink::make(route('cp.account'), __('fastlane::core.account_settings.title'))
                     ->icon('user-cog')
-                    ->group('System')
+                    ->group(__('fastlane::core.menu.system_group'))
             )
             ->mapToGroups(function (MenuItem $item) {
                 return ($item->getGroup() === '')

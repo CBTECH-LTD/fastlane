@@ -7,15 +7,15 @@ use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
 use CbtechLtd\Fastlane\FastlaneFacade;
 use CbtechLtd\Fastlane\QueryFilter\QueryFilter;
+use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResource;
 use CbtechLtd\Fastlane\Support\ApiResources\EntryResourceCollection;
 use CbtechLtd\Fastlane\Support\Concerns\HandlesHooks;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType as EntryTypeContract;
-use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
 use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WithRules;
+use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\WriteValue;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceType;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -27,10 +27,11 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use ReflectionClass;
+use Spatie\ResponseCache\Facades\ResponseCache;
 
 abstract class EntryType implements EntryTypeContract
 {
-    use HandlesHooks;
+    use HandlesHooks, QueriesModel;
 
     /** @description OnSavingHook */
     const HOOK_BEFORE_HYDRATING = 'beforeHydrating';
@@ -58,6 +59,11 @@ abstract class EntryType implements EntryTypeContract
     ];
 
     protected Gate $gate;
+
+    public static function retrieve(): self
+    {
+        return app('fastlane')->getEntryTypeByClass(static::class);
+    }
 
     public function __construct(Gate $gate)
     {
@@ -157,49 +163,59 @@ abstract class EntryType implements EntryTypeContract
         return true;
     }
 
-    public function getItems(?QueryFilterContract $queryFilter = null): LengthAwarePaginator
+    public function getItemsForRelationField(?QueryFilterContract $queryFilter = null): Collection
     {
         $this->gate->authorize('list', $this->model());
 
         $query = ($queryFilter ?? new QueryFilter)
             ->addOrder('created_at')
             ->addOrder('id')
-            ->pipeThrough(
-                $this->newModelInstance()->newModelQuery()
-            );
+            ->pipeThrough($this->queryBuilder());
+
+        $this->queryItemsForRelationField($query);
+
+        return $query->get();
+    }
+
+    public function getItems(?QueryFilterContract $queryFilter = null): LengthAwarePaginator
+    {
+        $this->gate->authorize('list', $this->model());
+
+        $this->prepareQueryFilter($queryFilter ?? new QueryFilter);
+
+        $query = $queryFilter
+            ->addOrder('created_at')
+            ->addOrder('id')
+            ->pipeThrough($this->queryBuilder());
 
         $this->queryItems($query);
 
-        $pagination = $query->paginate($this->getItemsPerPage());
-        $pagination->getCollection()->transform(fn(Model $model) => $this->newInstance($model));
-
-        return $pagination;
+        return $query->paginate($this->getItemsPerPage());
     }
 
     public function findItem(string $hashid): EntryInstanceContract
     {
-        $model = $this->newModelInstance();
-        $query = $model->newModelQuery();
+        $query = $this->queryBuilder();
         $this->querySingleItem($query, $hashid);
-        $entry = $query->where($model->getRouteKeyName(), $hashid)->firstOrFail();
 
-        $this->gate->authorize('show', $entry);
+        abort_if(! $entry = $query->routeKey($hashid)->first(), 404);
 
-        return $this->newInstance($entry);
+        $this->gate->authorize('show', $entry->model());
+
+        return $entry;
     }
 
     public function store(Request $request): EntryInstanceContract
     {
-        $this->gate->authorize('create', $this->model());
-        $entryInstance = $this->newInstance(null);
-
-        // Check whether the authenticated user can update
-        // the given entry instance.
+        // Check whether the authenticated user can create an
+        // instance of the given entry type.
         if ($this->policy()) {
             $this->gate->authorize('create', $this->model());
         }
 
-        // Validate the request data against the update fields
+        $entryInstance = $this->newInstance(null);
+
+        // Validate the request data against the create fields
         // and save the validated data in a new variable.
         $fields = $entryInstance->schema()->getCreateFields();
 
@@ -224,25 +240,23 @@ abstract class EntryType implements EntryTypeContract
         $this->executeHooks(static::HOOK_AFTER_CREATING, $afterHook);
         $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
 
+        ResponseCache::clear();
+
         return $afterHook->entryInstance();
     }
 
     public function update(Request $request, string $hashid): EntryInstanceContract
     {
-        $model = $this->newModelInstance();
-        $query = $model->newModelQuery();
+        $query = $this->queryBuilder();
         $this->querySingleItem($query, $hashid);
-        $entry = $query->where($model->getRouteKeyName(), $hashid)->firstOrFail();
+
+        abort_if(! $entryInstance = $query->routeKey($hashid)->first(), 404);
 
         // Check whether the authenticated user can update
         // the given entry instance.
         if ($this->policy()) {
-            $this->gate->authorize('update', $entry);
+            $this->gate->authorize('update', $entryInstance->model());
         }
-
-        // Create an Entry Instance based in the model we have
-        // just found in the database.
-        $entryInstance = $this->newInstance($entry);
 
         // Validate the request data against the update fields
         // and save the validated data in a new variable.
@@ -269,23 +283,26 @@ abstract class EntryType implements EntryTypeContract
         $this->executeHooks(static::HOOK_AFTER_UPDATING, $afterHook);
         $this->executeHooks(static::HOOK_AFTER_SAVING, $afterHook);
 
+        ResponseCache::clear();
+
         return $afterHook->entryInstance();
     }
 
     public function delete(string $hashid): EntryInstanceContract
     {
-        $model = $this->newModelInstance();
-        $query = $model->newModelQuery();
+        $query = $this->queryBuilder();
         $this->querySingleItem($query, $hashid);
-        $entry = $query->where($model->getRouteKeyName(), $hashid)->firstOrFail();
+        abort_if(! $entryInstance = $query->routeKey($hashid)->first(), 404);
 
         if ($this->policy()) {
-            $this->gate->authorize('delete', $entry);
+            $this->gate->authorize('delete', $entryInstance->model());
         }
 
-        $entry->delete();
+        $entryInstance->model()->delete();
 
-        return $this->newInstance($entry);
+        ResponseCache::clear();
+
+        return $entryInstance;
     }
 
     public function newModelInstance(): Model
@@ -327,12 +344,22 @@ abstract class EntryType implements EntryTypeContract
         });
     }
 
-    protected function queryItems(Builder $query): void
+    protected function queryItemsForRelationField(QueryBuilder $query): void
     {
         //
     }
 
-    protected function querySingleItem(Builder $query, string $hashid): void
+    protected function prepareQueryFilter(QueryFilterContract $queryFilter): void
+    {
+
+    }
+
+    protected function queryItems(QueryBuilder $query): void
+    {
+        //
+    }
+
+    protected function querySingleItem(QueryBuilder $query, string $hashid): void
     {
         //
     }

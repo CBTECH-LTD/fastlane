@@ -16,8 +16,17 @@ class CreateFastlaneFilesTable extends Migration
         Schema::create('fastlane_files', function (Blueprint $table) {
             $table->cmsCommon();
             $table->string('name');
-            $table->string('file');
+            $table->string('file')->index();
+            $table->string('extension', 10)->nullable();
+            $table->string('size', 20)->nullable();
+            $table->string('mimetype', 50)->nullable();
             $table->boolean('is_active')->default(true);
+            $table->unsignedBigInteger('parent_id')->nullable();
+
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('fastlane_files')
+                ->cascadeOnDelete();
         });
     }
 

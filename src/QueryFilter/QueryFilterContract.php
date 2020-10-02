@@ -2,7 +2,8 @@
 
 namespace CbtechLtd\Fastlane\QueryFilter;
 
-use Illuminate\Database\Eloquent\Builder;
+use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
+use CbtechLtd\Fastlane\QueryFilter\Pipes\QueryPipeContract;
 
 interface QueryFilterContract
 {
@@ -10,5 +11,7 @@ interface QueryFilterContract
 
     public function addOrder(string $order): self;
 
-    public function pipeThrough(Builder $builder): Builder;
+    public function addFilter(QueryPipeContract $queryPipe): self;
+
+    public function pipeThrough(QueryBuilder $builder): QueryBuilder;
 }

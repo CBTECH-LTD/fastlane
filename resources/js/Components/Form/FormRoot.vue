@@ -9,6 +9,7 @@
                                :aria-required="field.required"
                                :placeholder="field.placeholder"
                                :aria-placeholder="field.placeholder"
+                               :form="form"
                     ></component>
                 </template>
             </f-form-field-panel>

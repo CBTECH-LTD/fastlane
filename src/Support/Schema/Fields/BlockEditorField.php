@@ -2,45 +2,47 @@
 
 namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
-use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Concerns\HandlesAttachments;
-use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\HasAttachments;
-use Illuminate\Support\Facades\URL;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
+use Illuminate\Support\Collection;
 
-class BlockEditorField extends AbstractBaseField implements HasAttachments
+class BlockEditorField extends RichEditorField
 {
-    use HandlesAttachments;
+    protected $default = [];
+    protected Collection $blocks;
+
+    public function __construct(string $name, string $label)
+    {
+        parent::__construct($name, $label);
+
+        $this->blocks = app('fastlane')->contentBlocks();
+    }
 
     public function getType(): string
     {
         return 'blockEditor';
     }
 
-    protected function getTypeRules(): array
+    public function disableBlocks(array $blockClasses): self
     {
-        return [
-            $this->getName()                    => 'array',
-            $this->getName() . '.blocks'        => 'sometimes|array',
-            $this->getName() . '.blocks.*'      => "sometimes|array",
-            $this->getName() . '.blocks.*.type' => "required|string",
-            $this->getName() . '.blocks.*.data' => "required|array",
-            $this->getName() . '__draft_id'     => "required_with:{$this->getName()}|uuid",
-        ];
+        foreach ($blockClasses as $class) {
+            $this->blocks->remove($class);
+        }
+
+        return $this;
     }
 
-    protected function resolveConfig(EntryInstanceContract $entryInstance, string $destination): void
+    public function withBlocks(array $blockClasses): self
     {
-        $this->resolvedConfig = $this->resolvedConfig->merge([
-            'csrfToken' => csrf_token(),
-            'links'     => [
-                'attachments' => URL::relative("cp.{$entryInstance->type()->identifier()}.attachments", $this->getName()),
-            ],
-        ]);
+        $this->blocks = app('fastlane')->contentBlocks()->filter(
+            fn(string $block) => in_array($block, $blockClasses)
+        );
+
+        return $this;
     }
 
-    public function getAcceptableMimetypes(): array
+    protected function getMigrationMethod(): array
     {
-        return [];
+        return ['json'];
     }
 
     public function toModelAttribute(): array
@@ -48,5 +50,17 @@ class BlockEditorField extends AbstractBaseField implements HasAttachments
         return [
             $this->getName() => 'array',
         ];
+    }
+
+    protected function buildFieldValueInstance(string $fieldName, $value): FieldValue
+    {
+        return new BlockFieldValue($fieldName, $value);
+    }
+
+    protected function resolveConfig(EntryInstance $entryInstance, string $destination): void
+    {
+        $this->resolvedConfig->put('blocks', $this->blocks->mapWithKeys(
+            fn($blockClass) => [$blockClass::key() => $blockClass::make()->forDestination($destination)]
+        )->toArray());
     }
 }

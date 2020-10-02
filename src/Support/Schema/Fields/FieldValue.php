@@ -4,10 +4,10 @@ namespace CbtechLtd\Fastlane\Support\Schema\Fields;
 
 use Illuminate\Contracts\Support\Arrayable;
 
-class FieldValue implements Arrayable
+class FieldValue implements Arrayable, \Stringable
 {
-    private string $name;
-    private $value;
+    protected string $name;
+    protected $value;
 
     public function __construct(string $name, $value)
     {
@@ -36,5 +36,10 @@ class FieldValue implements Arrayable
         return [
             $this->name => $this->value,
         ];
+    }
+
+    public function __toString()
+    {
+        return $this->value() ?? '';
     }
 }

@@ -7,7 +7,9 @@ use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Support\Schema\Fields\BlockEditorField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
+use CbtechLtd\Fastlane\Support\Schema\Fields\SlugField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
+use CbtechLtd\Fastlane\Support\Schema\Fields\TextField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
 
 class ContentEntryType extends EntryType implements RenderableOnMenu
@@ -49,19 +51,28 @@ class ContentEntryType extends EntryType implements RenderableOnMenu
                 ->showOnIndex()
                 ->sortable(),
 
-            StringField::make('slug', __('fastlane::core.fields.slug'))
+            SlugField::make('slug', __('fastlane::core.fields.slug'))
+                ->makeFromField('name')
                 ->required()
                 ->showOnIndex()
                 ->sortable(),
 
             BlockEditorField::make('blocks', __('fastlane::core.fields.blocks')),
 
-            FieldPanel::make('Settings')->withIcon('tools')
+            FieldPanel::make(__('fastlane::core.settings'))->withIcon('tools')
                 ->withFields([
+                    StringField::make('meta_title', __('fastlane::core.fields.meta_title')),
+                    TextField::make('meta_description', __('fastlane::core.fields.meta_description')),
+
                     ToggleField::make('is_active', __('fastlane::core.fields.active'))
                         ->required()
                         ->showOnIndex(),
                 ]),
         ];
+    }
+
+    public function queryBuilder(): QueryBuilder
+    {
+        return new QueryBuilder($this);
     }
 }

@@ -7,6 +7,7 @@ use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\RandomPasswordPipe;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Pipes\UpdateRolePipe;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\EntryTypes\Hooks\OnSavingHook;
+use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
@@ -65,16 +66,16 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
     public function fields(): array
     {
         return [
-            StringField::make('name', 'Name')
+            StringField::make('name', __('fastlane::core.fields.name'))
                 ->required()
                 ->showOnIndex(),
 
-            StringField::make('email', 'Email')
+            StringField::make('email', __('fastlane::core.fields.email'))
                 ->required()
-                ->unique(new Unique(User::class, 'email'))
+                ->unique()
                 ->showOnIndex(),
 
-            SelectField::make('role', 'Role')
+            SelectField::make('role', __('fastlane::core.fields.role'))
                 ->withOptions(
                     Role::all()->map(
                         fn(Role $role) => SelectOption::make($role->name, $role->name)
@@ -91,7 +92,7 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
                     }
                 }),
 
-            ToggleField::make('is_active', 'Active')
+            ToggleField::make('is_active', __('fastlane::core.fields.active'))
                 ->required()
                 ->setDefault(true),
         ];
@@ -141,18 +142,18 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
         return $savingHook->entryInstance();
     }
 
-    protected function queryItems(Builder $query): void
+    protected function queryItems(QueryBuilder $query): void
     {
-        $query->except(Auth::user());
+        $query->except([Auth::user()->getKey()]);
     }
 
-    protected function querySingleItem(Builder $query, string $hashid): void
+    protected function querySingleItem(QueryBuilder $query, string $hashid): void
     {
-        $query->except(Auth::user());
+        $query->except([Auth::user()->getKey()]);
     }
 
     protected function menuGroup(): string
     {
-        return 'System';
+        return __('fastlane::core.menu.system_group');
     }
 }

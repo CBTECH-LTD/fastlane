@@ -64,7 +64,7 @@ class User extends BaseModel implements
 
     public function getRoleAttribute(): string
     {
-        return $this->roles->first()->name;
+        return optional($this->roles->first())->name ?? '';
     }
 
     public function setPasswordAttribute(string $value, bool $hash = true): self

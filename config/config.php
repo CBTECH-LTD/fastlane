@@ -13,10 +13,23 @@ return [
     'asset_login_bg' => 'vendor/fastlane/img/login-bg-black.jpg',
 
     /**
+     * Determine whether cache of models are enabled.
+     */
+    'cache'          => false,
+
+    /**
      * Configure the Entry Types which must be enabled
      * in Fastlane.
      */
     'entry_types'    => [
+        //
+    ],
+
+    /**
+     * Configure the Content Blocks which must be enabled
+     * in the Block Editor.
+     */
+    'content_blocks' => [
         //
     ],
 
@@ -44,7 +57,7 @@ return [
      */
     'menu'              => \CbtechLtd\Fastlane\Support\Menu\MenuBuilder::class,
 
-    /*
+    /**
      * Minimum length of models Hash IDs.
      */
     'hashid_min_length' => 5,
@@ -54,17 +67,25 @@ return [
      */
     'super_admin'       => true,
 
-    /*
-     * Determine the storage disk to be used fot file attachments.
-     */
-    'attachment_disk'   => 'public',
-
     /**
-     * URL to process images using Thumbor.
+     * Determine handlers and storage disk to be used for file attachments.
      */
+    'attachments'       => [
+        'disk'     => 'public',
+        'max_size' => 10000000, // in kb
+    ],
 
-    'image_uploader' => [
-        'class' => CbtechLtd\Fastlane\FileUpload\StorageDiskImageUploader::class,
-        'disk'  => 's3',
+    'currency' => [
+        /**
+         * Default currency settings to be used when a CurrencyField does not
+         * provide its own settings.
+         *
+         * Consult https://github.com/RobinHerbots/Inputmask to view a complete
+         * list of possible mask values.
+         */
+        'symbol' => '£',
+        'code'   => 'GBP',
+        'mask'   => '\R\$ currency',
+        'locale' => null,
     ],
 ];

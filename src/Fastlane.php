@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane;
 
+use CbtechLtd\Fastlane\ContentBlocks\ContentBlock;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\EntryTypes\Content\ContentEntryType;
 use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
@@ -15,26 +16,29 @@ use CbtechLtd\Fastlane\Support\Menu\MenuManager;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class Fastlane
 {
     protected Collection $entryTypes;
+    protected Collection $contentBlocks;
     protected Collection $routes;
     protected array $flashMessages = [];
     protected MenuManagerContract $menuManager;
     protected FastlaneRequest $request;
+    protected array $translations = [];
 
     public function __construct()
     {
-        $this->initialize();
-    }
-
-    public function initialize(): void
-    {
-        $this->registerEntryTypes();
         $this->registerMenuManager();
+        $this->registerTranslations();
+
+        app()->afterResolving('fastlane', function () {
+            $this->registerEntryTypes();
+            $this->registerContentBlocks();
+        });
     }
 
     public function setRequest(FastlaneRequest $request): self
@@ -117,7 +121,7 @@ class Fastlane
                 : Controllers\EntriesController::class;
 
             $router
-                ->middleware('fastlane.resolve:control_panel')
+                ->middleware('fastlane.resolve:' . $entryType->identifier())
                 ->group(fn() => $router->fastlaneControlPanel(
                     $entryType->identifier(),
                     $controller
@@ -162,11 +166,21 @@ class Fastlane
         );
     }
 
+    public function contentBlocks(): Collection
+    {
+        return $this->contentBlocks;
+    }
+
     public function getAccessTokenAbilities(): array
     {
         return [
             'entries:read',
         ];
+    }
+
+    public function getTranslations(): array
+    {
+        return $this->translations;
     }
 
     public function getMenuManager(): MenuManagerContract
@@ -190,6 +204,8 @@ class Fastlane
 
         // Iterate over every entry type, instantiate a base instance of  it using
         // the Laravel Container and register their policies as well.
+        $this->entryTypeModels = new Collection;
+
         $this->entryTypes = Collection::make($classes)->map(function ($typeClass) {
             /** @var EntryType $instance */
             $instance = app()->make($typeClass);
@@ -202,8 +218,25 @@ class Fastlane
         });
     }
 
+    protected function registerContentBlocks(): void
+    {
+        $this->contentBlocks = Collection::make(config('fastlane.content_blocks'))
+            ->mapWithKeys(function (string $class) {
+                return [
+                    $class::key() => $class,
+                ];
+            });
+    }
+
     protected function registerMenuManager(): void
     {
         $this->menuManager = new MenuManager;
+    }
+
+    protected function registerTranslations(): void
+    {
+        $this->translations = [
+            'core' => Lang::get('fastlane::core'),
+        ];
     }
 }

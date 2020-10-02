@@ -9,6 +9,7 @@ use CbtechLtd\Fastlane\Console\Commands\MakeEntryTypeCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Commands\CreateSystemAdminCommand;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
+use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
 use CbtechLtd\Fastlane\FileAttachment\Attachment;
 use CbtechLtd\Fastlane\Http\Controllers\EntryAttachmentsController;
 use CbtechLtd\Fastlane\Http\Controllers\EntryImagesController;
@@ -20,13 +21,18 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Translation\Translator;
 use Inertia\Inertia;
+use Spatie\ResponseCache\Middlewares\CacheResponse;
+use Spatie\ResponseCache\Middlewares\DoNotCacheResponse;
 
 class FastlaneServiceProvider extends ServiceProvider
 {
@@ -70,7 +76,7 @@ class FastlaneServiceProvider extends ServiceProvider
             // Publishing the translation files.
             $this->publishes([
                 __DIR__ . '/../resources/lang' => resource_path('lang/vendor/fastlane'),
-            ], 'lang');
+            ], 'fastlane-lang');
 
             // Registering package commands.
             $this->commands([
@@ -166,8 +172,21 @@ class FastlaneServiceProvider extends ServiceProvider
 
         // Set data that must be available to all components.
         Inertia::share('app.name', Config::get('app.name'));
+
         Inertia::share('app.baseUrl', Config::get('app.url'));
+
         Inertia::share('app.requestUrl', request()->path());
+
+        Inertia::share('app.cpUrls', function () {
+            return [
+                'fileManager' => route('cp.file-manager.index'),
+            ];
+        });
+
+        Inertia::share('app.csrfToken', function () {
+            return csrf_token();
+        });
+
         Inertia::share('app.assets', [
             'logoImage'       => config('fastlane.asset_logo_img'),
             'loginBackground' => config('fastlane.asset_login_bg'),
@@ -222,6 +241,14 @@ class FastlaneServiceProvider extends ServiceProvider
         /** @var Router $router */
         $router = $this->app['router'];
 
+        if (! in_array('fastlane.cacheResponse', $router->getMiddleware())) {
+            $router->aliasMiddleware('fastlane.cacheResponse', CacheResponse::class);
+        }
+
+        if (! in_array('fastlane.doNotCacheResponse', $router->getMiddleware())) {
+            $router->aliasMiddleware('fastlane.doNotCacheResponse', DoNotCacheResponse::class);
+        }
+
         if (! in_array('fastlane.auth', $router->getMiddleware())) {
             $router->aliasMiddleware('fastlane.auth', Authenticate::class);
         }
@@ -260,17 +287,6 @@ class FastlaneServiceProvider extends ServiceProvider
                 if (! in_array('delete', $disabledRoutes)) {
                     $this->delete('/{id}', [$controller, 'delete'])->name("{$prefix}.delete");
                 }
-
-                // Attachment management routes
-                if (! in_array('attachments', $disabledRoutes)) {
-                    $this->post('/attachments/{fieldName}', [EntryAttachmentsController::class, 'store'])->name("{$prefix}.attachments");
-                    $this->delete('/attachments/{fieldName}', [EntryAttachmentsController::class, 'delete']);
-                }
-
-                // Image upload routes
-                if (! in_array('image', $disabledRoutes)) {
-                    $this->post('/images/{fieldName}', [EntryImagesController::class, 'store'])->name("{$prefix}.images");
-                }
             });
         });
 
@@ -306,8 +322,10 @@ class FastlaneServiceProvider extends ServiceProvider
 
     protected function setupControlPanelRoutes(): void
     {
-        $middleware = array_merge(
-            config('fastlane.control_panel.middleware'), ['inertia:fastlane']);
+        $middleware = array_merge(config('fastlane.control_panel.middleware'), [
+            'inertia:fastlane',
+            'fastlane.doNotCacheResponse',
+        ]);
 
         Route::middleware($middleware)
             ->prefix(config('fastlane.control_panel.url_prefix'))

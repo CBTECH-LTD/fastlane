@@ -10,10 +10,8 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\Contracts\ExportsToApiRelationship 
 use Closure;
 use Illuminate\Support\Collection;
 
-abstract class RelationField extends AbstractBaseField implements ExportsToApiRelationshipContract
+abstract class RelationField extends AbstractBaseField
 {
-    use ExportsToApiRelationship;
-
     protected $default = null;
     protected bool $multiple = false;
     protected bool $withTimestamps = true;
@@ -21,14 +19,19 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
     protected bool $renderAsCheckbox = false;
     protected EntryTypeContract $relatedEntryType;
 
-    abstract public function isMultiple(): bool;
-
     /**
      * A string representing a function name to be used as relationship.
      *
      * @return string
      */
     abstract public function getRelationshipName(): string;
+
+    /**
+     * A string representing the label of the field.
+     *
+     * @return string
+     */
+    abstract public function getRelationshipLabel(): string;
 
     /**
      * A closure function to be used as the relationship method (like a
@@ -45,8 +48,13 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
         /** @var EntryTypeContract $class */
         $this->relatedEntryType = app()->make($relatedEntryType);
 
-        $this->label = $this->relatedEntryType->pluralName();
-        $this->name = "relations__{$this->relatedEntryType->identifier()}";
+        $this->label = $this->getRelationshipLabel();
+        $this->name = "relations__{$this->getRelationshipName()}";
+    }
+
+    public function isMultiple(): bool
+    {
+        return $this->multiple;
     }
 
     public function withTimestamps(bool $state = true): self
@@ -139,7 +147,7 @@ abstract class RelationField extends AbstractBaseField implements ExportsToApiRe
 
     protected function resolveOptions(): void
     {
-        $this->resolvedConfig->put('options', $this->relatedEntryType->getItems()->map(
+        $this->resolvedConfig->put('options', $this->relatedEntryType->getItemsForRelationField()->map(
             fn(EntryInstanceContract $entryInstance) => SelectOption::make(
                 $entryInstance->id(), $entryInstance->title()
             )

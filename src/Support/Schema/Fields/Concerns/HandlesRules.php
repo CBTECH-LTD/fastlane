@@ -26,8 +26,8 @@ trait HandlesRules
     /** @var bool */
     protected bool $required = false;
 
-    /** @var Unique|null */
-    protected ?Unique $unique = null;
+    /** @var Unique|boolean|null */
+    protected $unique = null;
 
     /**
      * Determine whether the field is required.
@@ -38,18 +38,6 @@ trait HandlesRules
     public function required(bool $required = true): self
     {
         $this->required = $required;
-        return $this;
-    }
-
-    /**
-     * Set the uniqueness of the field.
-     *
-     * @param Unique $unique
-     * @return $this
-     */
-    public function unique(Unique $unique): self
-    {
-        $this->unique = $unique;
         return $this;
     }
 
@@ -74,6 +62,24 @@ trait HandlesRules
     public function withCreateRules($rules): self
     {
         $this->createRules = $rules;
+        return $this;
+    }
+
+    /**
+     * Set the uniqueness of the field. The parameter must be
+     * null or a custom Unique instance. If null, Fastlane
+     * will just use the entry type's model and the field name
+     * as the comparison column.
+     *
+     * @param Unique|null $rule
+     * @return $this
+     */
+    public function unique(?Unique $rule = null): self
+    {
+        $this->unique = $rule instanceof Unique
+            ? $rule
+            : true;
+
         return $this;
     }
 
@@ -132,8 +138,10 @@ trait HandlesRules
             ? ['required']
             : ['nullable'];
 
-        if ($this->unique instanceof Unique) {
-            $rules[] = (string)$this->unique;
+        if ($this->unique) {
+            $rules[] = (string)($this->unique instanceof Unique)
+                ? $this->unique
+                : new Unique($this->entryInstance->model()->getTable(), $this->getName());
         }
 
         return implode('|', $rules);
@@ -165,7 +173,7 @@ trait HandlesRules
     protected function buildUpdateRules(): array
     {
         $rules = array_merge(
-            [$this->getBaseRules()],
+            ['sometimes', $this->getBaseRules()],
             [Arr::get($this->getTypeRules(), $this->getName(), '')],
             [$this->updateRules]
         );
@@ -184,10 +192,17 @@ trait HandlesRules
 
     protected function getRule(string $name): string
     {
-        if ($rule = Arr::get($this->rules, $name, null)) {
-            return $name . ':' . $rule;
+        if (Arr::has($this->rules, $name)) {
+            $params = $this->getRuleParams($name, null);
+
+            return $name . ($params ? ":{$params}" : '');
         }
 
         return '';
+    }
+
+    protected function getRuleParams(string $name, $default = null): ?string
+    {
+        return Arr::get($this->rules, $name, $default);
     }
 }

@@ -7,7 +7,6 @@ use CbtechLtd\Fastlane\Http\Requests\FastlaneRequest;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\EntryType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class ResolveFastlaneRequest
 {
@@ -18,9 +17,9 @@ class ResolveFastlaneRequest
         $this->fastlane = app('fastlane');
     }
 
-    public function handle($request, \Closure $next, $routeGroup)
+    public function handle($request, \Closure $next, string $entryTypeIdentifier)
     {
-        $entryType = $this->getEntryType($request, $routeGroup);
+        $entryType = $this->getEntryType($entryTypeIdentifier);
         $entryInstance = $this->getEntryInstance($request, $entryType);
 
         $newRequest = tap(FastlaneRequest::createFrom($request), function (FastlaneRequest $req) use ($entryType, $entryInstance) {
@@ -33,14 +32,9 @@ class ResolveFastlaneRequest
         return $next($newRequest);
     }
 
-    protected function getEntryType(Request $request, $routeGroup): EntryType
+    protected function getEntryType($identifier): EntryType
     {
-        $groupUrl = config("fastlane.${routeGroup}.url_prefix") . '/';
-        $urlPrefix = Str::replaceLast('/', '/entry-types/', $groupUrl);
-
-        $slug = explode('/', Str::replaceFirst($urlPrefix, '', '/' . $request->path()))[0];
-
-        return $this->fastlane->getEntryTypeByIdentifier($slug);
+        return $this->fastlane->getEntryTypeByIdentifier($identifier);
     }
 
     protected function getEntryInstance(Request $request, EntryType $entryType): ?EntryInstance
