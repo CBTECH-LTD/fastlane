@@ -86,7 +86,7 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
         $value = Arr::wrap($entryInstance->model()->{$this->getName()});
 
         /** @var Collection<SelectOption> $options */
-        $options = $this->resolvedConfig->get('options');
+        $options = $this->resolvedConfig->get('options', Collection::make());
 
         return $this->buildFieldValueInstance($this->getName(), $options->filter(
             fn(SelectOption $opt) => $opt->isSelected() || in_array($opt->getValue(), $value)
@@ -155,7 +155,9 @@ class SelectField extends AbstractBaseField implements ExportsToApiAttributeCont
             'type'     => $this->renderAsCheckbox ? 'checkbox' : 'select',
         ]);
 
-        $this->resolveOptions($entryInstance);
+        if ($destination === 'form') {
+            $this->resolveOptions($entryInstance);
+        }
     }
 
     protected function resolveOptions(EntryInstance $entryInstance): void

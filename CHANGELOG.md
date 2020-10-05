@@ -2,6 +2,11 @@
 
 All notable changes to `fastlane` will be documented in this file
 
+## [0.9.3] - 2020-10-05
+
+### Changed
+- When select field resolves its options.
+
 ## [0.9.2] - 2020-10-05
 
 ### Fixed
