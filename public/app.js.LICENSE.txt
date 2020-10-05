@@ -1,0 +1,105 @@
+/* NProgress, (c) 2013, 2014 Rico Sta. Cruz - http://ricostacruz.com/nprogress
+ * @license MIT */
+
+/* flatpickr v4.6.3, @license MIT */
+
+/*!
+    * tiptap v1.29.5
+    * (c) 2020 überdosis GbR (limited liability)
+    * @license MIT
+    */
+
+/*!
+    * tiptap-commands v1.14.5
+    * (c) 2020 überdosis GbR (limited liability)
+    * @license MIT
+    */
+
+/*!
+    * tiptap-extensions v1.32.6
+    * (c) 2020 überdosis GbR (limited liability)
+    * @license MIT
+    */
+
+/*!
+    * tiptap-utils v1.10.0
+    * (c) 2020 Scrumpy UG (limited liability)
+    * @license MIT
+    */
+
+/*!
+  Copyright (c) 2017 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+
+/*!
+ * Cropper.js v1.5.7
+ * https://fengyuanchen.github.io/cropperjs
+ *
+ * Copyright 2015-present Chen Fengyuan
+ * Released under the MIT license
+ *
+ * Date: 2020-05-23T05:23:00.081Z
+ */
+
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <http://feross.org>
+ * @license  MIT
+ */
+
+/*! 
+  * portal-vue © Thorsten Lünborg, 2019 
+  * 
+  * Version: 2.1.7
+  * 
+  * LICENCE: MIT 
+  * 
+  * https://github.com/linusborg/portal-vue
+  * 
+ */
+
+/*! *****************************************************************************
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain a copy of the
+    License at http://www.apache.org/licenses/LICENSE-2.0
+
+    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+    MERCHANTABLITY OR NON-INFRINGEMENT.
+
+    See the Apache Version 2.0 License for specific language governing permissions
+    and limitations under the License.
+    ***************************************************************************** */
+
+/**
+   * Takes a string with placeholder variables like `%{smart_count} file selected`
+   * and replaces it with values from options `{smart_count: 5}`
+   *
+   * @license https://github.com/airbnb/polyglot.js/blob/master/LICENSE
+   * taken from https://github.com/airbnb/polyglot.js/blob/master/lib/polyglot.js#L299
+   *
+   * @param {string} phrase that needs interpolation, with placeholders
+   * @param {object} options with values that will be used to replace placeholders
+   * @returns {string} interpolated
+   */
+
+/**
+ * @license
+ * Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+ * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+ * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+ * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ * Code distributed by Google as part of the polymer project is also
+ * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ */
+
+//! moment.js
+
+//! moment.js language configuration
+
+//! moment.js locale configuration
