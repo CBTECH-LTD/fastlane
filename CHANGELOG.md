@@ -2,6 +2,13 @@
 
 All notable changes to `fastlane` will be documented in this file
 
+## [0.9.2] - 2020-10-05
+
+### Fixed
+- Publish assets.
+
+---
+
 ## [0.9.1] - 2020-10-05
 
 ### Fixed
