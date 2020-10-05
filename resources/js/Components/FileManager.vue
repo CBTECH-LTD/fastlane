@@ -8,7 +8,7 @@
                     </div>
                     <div class="flex items-center">
                         <input type="text" class="w-full form-input" placeholder="Search..." :value="searchTerm" @input="onSearch($event.target.value)">
-<!--                        <v-select class="form-input w-64 ml-4" clearable :options="fileTypesOptions" :value="searchType" @input="onSearchType"></v-select>-->
+                        <!--                        <v-select class="form-input w-64 ml-4" clearable :options="fileTypesOptions" :value="searchType" @input="onSearchType"></v-select>-->
                     </div>
                     <div>
                         <f-button @click="selectFiles" color="green" size="lg" left-icon="cloud-upload-alt" :disabled="!selectedFiles.length">Select</f-button>
@@ -24,7 +24,7 @@
                     <template v-else-if="files.length">
                         <transition-group name="files-list" tag="div" class="w-full max-h-full p-4 flex flex-wrap overflow-x-hidden overflow-y-auto">
                             <template v-for="file in files">
-                                <div v-if="file.visible" :key="file.file" class="relative w-1/3 p-1">
+                                <div v-if="file.visible" :key="file.id" class="relative w-1/3 p-1">
                                     <div class="absolute top-0 left-0 z-10">
                                         <input v-if="canSelectFile(file)" type="checkbox" class="form-checkbox p-3" :checked="file.selected" @input="toggleFile(file)">
                                     </div>
@@ -70,7 +70,7 @@ import 'vue-select/dist/vue-select.css'
 
 export default {
     name: 'FileManager',
-    components: {VSelect},
+    components: { VSelect },
 
     props: {
         endpoint: {

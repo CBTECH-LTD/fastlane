@@ -2,6 +2,14 @@
 
 All notable changes to `fastlane` will be documented in this file
 
+## [0.9.1] - 2020-10-05
+
+### Fixed
+- Add missing meta title.
+- File manager :key.
+
+---
+
 ## [0.9.0] - 2020-10-02
 
 ## Added
