@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\EntryTypes\Content;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
+use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Support\Schema\Fields\BlockEditorField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
@@ -11,6 +12,7 @@ use CbtechLtd\Fastlane\Support\Schema\Fields\SlugField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\TextField;
 use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
+use Illuminate\Http\Request;
 
 class ContentEntryType extends EntryType implements RenderableOnMenu
 {
