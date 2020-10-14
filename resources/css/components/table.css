@@ -1,0 +1,25 @@
+.table__cell {
+    @apply table-fixed p-4 text-base text-gray-700 overflow-hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.table__row {
+    @apply border-b border-gray-200 text-base text-gray-700;
+}
+
+.table__column-group {
+    @apply border-gray-200;
+}
+
+thead .table__column-group {
+    @apply border-b;
+}
+
+tfoot .table__column-group {
+    @apply border-t;
+}
+
+.table__column {
+    @apply p-4 text-left text-xs text-gray-500 uppercase tracking-wider font-semibold;
+}

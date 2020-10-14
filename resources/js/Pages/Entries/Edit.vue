@@ -3,7 +3,7 @@
         <template v-slot:title>{{ item.meta.item_label }}</template>
         <template v-slot:subtitle>{{ item.meta.entry_type.singular_name }}</template>
         <template v-slot:actions>
-            <f-button :href="item.links.parent" variant="outline" left-icon="arrow-left">
+            <f-button :href="item.links.top" variant="outline" left-icon="arrow-left">
                 {{ $l('core.back_to_list') }}
             </f-button>
             <f-button submit form="editForm"
@@ -52,6 +52,12 @@ import { FormSchemaFactory } from '../../Support/FormSchema'
 export default {
     name: 'Entries.Edit',
 
+    metaInfo () {
+        return {
+            title: 'Edit ' + this.item.meta.entry_type.singular_name
+        }
+    },
+
     props: {
         item: {
             required: true,
@@ -59,12 +65,10 @@ export default {
         },
     },
 
-    // remember: ['form'],
-
     data () {
         return {
             isUpdating: false,
-            form: new FormSchemaFactory(this.item.attributes)
+            form: new FormSchemaFactory(this.item.meta.entry_type.fields, this.item.attributes)
         }
     },
 

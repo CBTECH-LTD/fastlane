@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Contracts;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryTypeRouteCollection;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
+use CbtechLtd\Fastlane\Http\Transformers\EntryResource;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
@@ -107,6 +108,13 @@ interface EntryType
     public function entryKey();
 
     /**
+     * Get the route key of the underlying model.
+     *
+     * @return mixed
+     */
+    public function entryRouteKey();
+
+    /**
      * Generate a string to be used as the description
      * of the underlying model.
      *
@@ -170,4 +178,28 @@ interface EntryType
      * @throws \Exception
      */
     public function delete(): self;
+
+    /**
+     * Get an array representation of the entry type including
+     * only fields available on listing page.
+     *
+     * @return EntryResource
+     */
+    public function toListingResource(): EntryResource;
+
+    /**
+     * Get an array representation of the entry type including
+     * only fields available on create page.
+     *
+     * @return EntryResource
+     */
+    public function toCreateResource(): EntryResource;
+
+    /**
+     * Get an array representation of the entry type including
+     * only fields available on update page.
+     *
+     * @return EntryResource
+     */
+    public function toUpdateResource(): EntryResource;
 }

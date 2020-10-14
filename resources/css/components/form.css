@@ -1,0 +1,20 @@
+.form-input.v-select .vs__dropdown-toggle {
+    padding: 0;
+    border: none;
+    border-radius: 0;
+}
+
+.form-input.v-select .vs__selected,
+.form-input.v-select .vsl__combobox {
+    padding: 0;
+    margin: 0;
+    color: #000;
+}
+
+.form-checkbox {
+    @apply w-4 h-4 mr-4;
+}
+
+.form-radio {
+    @apply mr-4;
+}

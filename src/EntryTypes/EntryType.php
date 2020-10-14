@@ -6,18 +6,15 @@ use CbtechLtd\Fastlane\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Contracts\Panelizable;
 use CbtechLtd\Fastlane\Contracts\QueryBuilder;
 use CbtechLtd\Fastlane\Contracts\QueryBuilder as QueryBuilderContract;
-use CbtechLtd\Fastlane\Contracts\Transformable;
 use CbtechLtd\Fastlane\Exceptions\ClassDoesNotExistException;
-use CbtechLtd\Fastlane\Exceptions\InvalidArgumentException;
 use CbtechLtd\Fastlane\Exceptions\InvalidModelException;
 use CbtechLtd\Fastlane\Exceptions\UnknownEventException;
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
-use CbtechLtd\Fastlane\Fields\Value;
 use CbtechLtd\Fastlane\Http\Controllers\EntriesController;
+use CbtechLtd\Fastlane\Http\Transformers\EntryResource;
 use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -64,22 +61,6 @@ abstract class EntryType implements EntryTypeContract
     }
 
     /**
-     * The model used by the entry type.
-     *
-     * @return string
-     */
-    public static function model(): string
-    {
-        $name = Str::replaceLast('EntryType', '', (new ReflectionClass(static::class))->getName());
-
-        if (! class_exists($name)) {
-            ClassDoesNotExistException::model($name);
-        }
-
-        return $name;
-    }
-
-    /**
      * The singular name of the entry type.
      *
      * @return string
@@ -120,13 +101,15 @@ abstract class EntryType implements EntryTypeContract
      */
     public static function policy(): ?string
     {
-        $name = Str::replaceLast('EntryType', '', (new ReflectionClass(static::class))->getName()) . 'Policy';
+        $name = Str::replaceLast('EntryType', '', (new ReflectionClass(static::class))->getShortName()) . 'Policy';
 
-        if (! class_exists($name)) {
+        $fullClass = 'App\\Policies\\' . $name;
+
+        if (! class_exists($fullClass)) {
             return null;
         }
 
-        return $name;
+        return $fullClass;
     }
 
     /**
@@ -163,8 +146,6 @@ abstract class EntryType implements EntryTypeContract
     {
         // By resolving the Query Builder instance using the Laravel IoC,
         // we enable developers to override the Query Builder implementation.
-        $inst = static::newInstance();
-
         return app()->make(QueryBuilderContract::class, [
             'entryType' => static::newInstance(),
         ]);
@@ -263,6 +244,16 @@ abstract class EntryType implements EntryTypeContract
     }
 
     /**
+     * Get the route key of the underlying model.
+     *
+     * @return mixed
+     */
+    public function entryRouteKey()
+    {
+        return $this->entry->getRouteKey();
+    }
+
+    /**
      * Generate a string to be used as the description
      * of the underlying model.
      *
@@ -317,17 +308,20 @@ abstract class EntryType implements EntryTypeContract
         // and save the validated data in a new variable.
         $fields = $this->getFields()->onCreate();
 
-        $data = $this->validateAndTransformData($data, $fields->getCreateRules($data));
+        $data = $this->validateAndTransformData($data, $fields);
 
         // Create the new model...
         $model = tap(app()->make(static::model()), function (Model $model) use ($data) {
             $model->fill($data);
 
             static::fireEvent(static::EVENT_CREATING, [$model, $data]);
-            $model->save($data);
-            static::fireEvent(static::EVENT_CREATED, [$model]);
-        });
+            static::fireEvent(static::EVENT_SAVING, [$model, $data]);
 
+            $model->save($data);
+
+            static::fireEvent(static::EVENT_CREATED, [$model]);
+            static::fireEvent(static::EVENT_SAVED, [$model]);
+        });
 
         return static::newInstance($model);
     }
@@ -350,7 +344,13 @@ abstract class EntryType implements EntryTypeContract
         $data = $this->validateAndTransformData($data, $fields);
 
         // Fill and save the model!
+        static::fireEvent(static::EVENT_UPDATING, [$this->modelInstance(), $data]);
+        static::fireEvent(static::EVENT_SAVING, [$this->modelInstance(), $data]);
+
         $this->modelInstance()->fill($data)->save();
+
+        static::fireEvent(static::EVENT_UPDATED, [$this->modelInstance(), $data]);
+        static::fireEvent(static::EVENT_SAVED, [$this->modelInstance(), $data]);
 
         return $this;
     }
@@ -369,26 +369,57 @@ abstract class EntryType implements EntryTypeContract
             Gate::authorize('delete', $this->modelInstance());
         }
 
+        static::fireEvent(static::EVENT_DELETING, [$this->modelInstance()]);
         $this->modelInstance()->delete();
+        static::fireEvent(static::EVENT_DELETED, [$this->modelInstance()]);
 
         return $this;
+    }
+
+    /**
+     * Get an array representation of the entry type including
+     * only fields available on listing page.
+     *
+     * @param bool $includeSchema
+     * @return EntryResource
+     */
+    public function toListingResource(bool $includeSchema = false): EntryResource
+    {
+        return EntryResource::toListing($this);
+    }
+
+    /**
+     * Get an array representation of the entry type including
+     * only fields available on create page.
+     *
+     * @param bool $includeSchema
+     * @return EntryResource
+     */
+    public function toCreateResource(bool $includeSchema = false): EntryResource
+    {
+        return EntryResource::toCreate($this);
+    }
+
+    /**
+     * Get an array representation of the entry type including
+     * only fields available on update page.
+     *
+     * @param bool $includeSchema
+     * @return EntryResource
+     */
+    public function toUpdateResource(bool $includeSchema = false): EntryResource
+    {
+        return EntryResource::toUpdate($this);
     }
 
     protected function validateAndTransformData(array $data, FieldCollection $fields): array
     {
         $data = Validator::make($data, $fields->getUpdateRules($data))->validated();
 
-        return $fields->getCollection()->map(function (Field $field) use ($data) {
-            if ($value = Arr::get($data, $field->getAttribute())) {
-                if ($field instanceof Transformable) {
-                    return $field->transformer()->fromRequest($this, $value);
-                }
-
-                return new Value($this, $value);
-            }
-
-            return null;
-        })->filter()->all();
+        return $fields->getCollection()
+            ->filter(fn(Field $field) => Arr::has($data, $field->getAttribute()))
+            ->map(fn(Field $field) => $field->processValue(Arr::get($data, $field->getAttribute())))
+            ->all();
     }
 
     protected static function installRolesAndPermissions(): void

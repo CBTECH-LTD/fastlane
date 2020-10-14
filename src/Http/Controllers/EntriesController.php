@@ -2,23 +2,19 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers;
 
-use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Contracts\QueryBuilder;
 use CbtechLtd\Fastlane\Contracts\WithCustomViews;
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Http\Requests\CreateRequest;
 use CbtechLtd\Fastlane\Http\Requests\DeleteRequest;
-use CbtechLtd\Fastlane\Http\Requests\UpdateRequest;
 use CbtechLtd\Fastlane\Http\Requests\IndexRequest;
+use CbtechLtd\Fastlane\Http\Requests\UpdateRequest;
+use CbtechLtd\Fastlane\Http\Transformers\EntryTypeResourceCollection;
 use CbtechLtd\Fastlane\Support\Contracts\WithCollectionLinks;
 use CbtechLtd\Fastlane\Support\Contracts\WithCollectionMeta;
-use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
-use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResourceCollection;
-use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redirect;
@@ -51,16 +47,15 @@ class EntriesController extends Controller
         // Transform the paginator collection, which is composed of
         // entry instances, into a collection of entry resources ready
         // to be transformed to our front-end application.
-        $paginator->getCollection()->transform(
-            fn(EntryType $entry) => (new EntryResource($entry))->toListing()
-        );
+        $collection = EntryTypeResourceCollection::toListing(
+            $request->entryType(),
+            $paginator->items()
+        )->withPaginator($paginator)->withMeta([
+            'order' => $request->input('order'),
+        ]);
 
-        $collection = EntryResourceCollection::makeFromPaginator($paginator)
-            ->forEntryType($request->entryType())
-            ->withMeta([
-                ResourceMeta::make('order', $request->input('order')),
-            ]);
-
+        // Check whether the entry type implements custom collection links
+        // and collection meta then add them to the entry collection.
         if ($request->entryType() instanceof WithCollectionLinks) {
             $collection->withLinks($request->entryType()->collectionLinks());
         }
@@ -69,8 +64,9 @@ class EntriesController extends Controller
             $collection->withMeta($request->entryType()->collectionMeta());
         }
 
-        // Return the transformed collection and some important information like
-        // entry type schema, names and links.
+        // Return the collection to the expected view. The entry type
+        // may define its custom view component, otherwise we just
+        // return the default index view.
         $view = function () use ($request) {
             return $request->entryType() instanceof WithCustomViews
                 ? $request->entryType()->getListingView()
@@ -78,7 +74,7 @@ class EntriesController extends Controller
         };
 
         return $this->render($view() ?? 'Entries/Index', [
-            'items' => $collection->transform(),
+            'items' => $collection->toArray(),
         ]);
     }
 
@@ -95,17 +91,7 @@ class EntriesController extends Controller
         };
 
         return $this->render($view() ?? 'Entries/Create', [
-            'item'      => (new EntryResource($request->entryType()))->toCreate()->transform(),
-            'entryType' => [
-                'schema'        => $request->entryType()->getFields()->onCreate(),
-                'panels'        => $request->entryType()->getFields()->panels(),
-                'singular_name' => $request->entryType()::name(),
-                'plural_name'   => $request->entryType()::pluralName(),
-            ],
-            'links'     => [
-                'form'   => $request->entryType()::routes()->get('store')->url(null, false),
-                'parent' => $request->entryType()::routes()->get('index')->url(null, false),
-            ],
+            'item' => $request->entryType()->toCreateResource()->withSchema()->toArray(),
         ]);
     }
 
@@ -125,7 +111,7 @@ class EntriesController extends Controller
         return redirect(
             $request->entryType()::routes()
                 ->get('edit')
-                ->url([$entry->modelInstance()])
+                ->url([$entry->entryRouteKey()])
         );
     }
 
@@ -142,7 +128,7 @@ class EntriesController extends Controller
         };
 
         return $this->render($view() ?? 'Entries/Edit', [
-            'item' => (new EntryResource($request->entryType()))->toUpdate()->transform(),
+            'item' => $request->entryType()->toUpdateResource()->toArray(),
         ]);
     }
 

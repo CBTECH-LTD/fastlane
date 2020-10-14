@@ -27,7 +27,7 @@
                     <slot :name="`item-content-${field.attribute}`" :field="field" :item="item" :value="item.attributes[field.attribute]">
                         <component :is="field.component"
                                    :field="field"
-                                   :value="item.attributes[field.attribute].value"
+                                   :value="item.attributes[field.attribute]"
                                    :loading="isPerformingActionFor[item.id]"
                                    @input="value => onInput(item, field, value)"
                         ></component>
@@ -55,6 +55,12 @@ import ListSchema from '../../Support/ListSchema'
 
 export default {
     name: 'Entries.Index',
+
+    metaInfo () {
+        return {
+            title: this.items.meta.entry_type.plural_name,
+        }
+    },
 
     props: {
         items: {

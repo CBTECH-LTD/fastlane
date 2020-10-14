@@ -3,18 +3,15 @@
 namespace CbtechLtd\Fastlane\Fields;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
-use CbtechLtd\Fastlane\Contracts\Transformable;
-use CbtechLtd\Fastlane\Contracts\Transformer;
 use CbtechLtd\Fastlane\Fields\Rules\Unique;
-use CbtechLtd\Fastlane\Fields\Transformers\StringTransformer;
 use CbtechLtd\Fastlane\Fields\Types\Panel;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-abstract class Field implements Arrayable, Transformable
+abstract class Field implements Arrayable
 {
     protected string $component;
     protected Collection $config;
@@ -261,11 +258,12 @@ abstract class Field implements Arrayable, Transformable
     /**
      * Get the field value.
      *
+     * @param Model $model
      * @return mixed
      */
-    public function getValue()
+    public function get(Model $model)
     {
-        return $this->value;
+        return $model->{$this->getAttribute()};
     }
 
     /**
@@ -353,12 +351,14 @@ abstract class Field implements Arrayable, Transformable
         return $this->hideOnCreate()->hideOnUpdate();
     }
 
-    /**
-     * @return Transformer
-     */
-    public function transformer(): Transformer
+    public function castValue($value)
     {
-        return new StringTransformer;
+        return $value;
+    }
+
+    public function processValue($value)
+    {
+        return $value;
     }
 
     /**

@@ -3,6 +3,7 @@ import ErrorBagsFactory from './Support/ErrorBags'
 import Vue from 'vue'
 import PortalVue from 'portal-vue'
 import VueI18n from 'vue-i18n'
+import VueMeta from 'vue-meta'
 import components from './components.js'
 import Asset from './Plugins/Asset'
 import Lang from './Plugins/Lang'
@@ -14,6 +15,7 @@ Vue.use(Asset)
 Vue.use(Lang)
 Vue.use(VueI18n)
 Vue.use(PortalVue)
+Vue.use(VueMeta)
 
 /*
  * Register all components and pages globally.
@@ -28,10 +30,16 @@ Vue.use(InertiaApp)
 
 const app = document.getElementById('app')
 
-new Vue({
-    render: h => {
-        const initialPage = JSON.parse(app.dataset.page)
+const initialPage = JSON.parse(app.dataset.page)
 
+new Vue({
+    metaInfo: {
+        // if no subcomponents specify a metaInfo.title, this title will be used
+        title: 'Control Panel',
+        // all titles will be injected into this template
+        titleTemplate: '%s | ' + initialPage.props.app.name,
+    },
+    render: h => {
         return h(InertiaApp, {
             props: {
                 initialPage,

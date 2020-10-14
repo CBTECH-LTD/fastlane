@@ -5,8 +5,6 @@ namespace CbtechLtd\Fastlane\Fields\Types;
 use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Contracts\Transformable;
 use CbtechLtd\Fastlane\Fields\Field;
-use CbtechLtd\Fastlane\Fields\Value;
-use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 
@@ -77,37 +75,13 @@ class FieldCollection extends Collection
     public function getData(): array
     {
         $attributes = Collection::make(
-            $this->entryType->modelInstance()->only($this->getAttributes()->map->getAttribute()->all())
-        )->map(function (Value $value) {
-            return $value->toArray();
-        });
+            $this->entryType->modelInstance()->only($this->getAttributes()->all())
+        );
 
         $relationships = $this->getRelationships()->map(function (Relationship $field) {
-            $value = $this->entryType->modelInstance()->getRelationValue(
-                $field->getRelationshipMethod()
-            );
+            // TODO: ONLY LOAD RELATIONSHIP IF IT'S IN A $with VARIABLE IN THE ENTRY TYPE INSTANCE
+            //       SIMILAR TO THE WAY MODELS EAGER LOAD RELATIONSHIPS.
 
-            return $field->transformer()->get($this->entryType, $value);
-        });
-
-        return $attributes->merge($relationships)->toArray();
-    }
-
-    /**
-     * Get reduced data from fields. It will return a single associative
-     * array of keys and value.
-     *
-     * @return array
-     */
-    public function getShallowData(): array
-    {
-        $attributes = Collection::make(
-            $this->entryType->modelInstance()->only($this->getAttributes()->map->getAttribute()->all())
-        )->map(function (Value $value) {
-            return $value->value();
-        });
-
-        $relationships = $this->getRelationships()->map(function (Relationship $field) {
             $value = $this->entryType->modelInstance()->getRelationValue(
                 $field->getRelationshipMethod()
             );
@@ -165,6 +139,16 @@ class FieldCollection extends Collection
         $items = Collection::make($this->items)
             ->filter(function (Field $field) {
                 return $field->isVisibleOnCreate();
+            })
+            ->mapWithKeys(function (Field $field) {
+                if ($field instanceof Panel) {
+                    return FieldCollection::make($field->getFields())
+                        ->setEntryType($this->entryType)
+                        ->onCreate()
+                        ->all();
+                }
+
+                return [$field->getAttribute() => $field];
             })->all();
 
         return $this->newInstance($items);
@@ -185,8 +169,7 @@ class FieldCollection extends Collection
                 }
 
                 return [$field->getAttribute() => $field];
-            })
-            ->all();
+            })->all();
 
         return $this->newInstance($items);
     }
@@ -210,7 +193,7 @@ class FieldCollection extends Collection
     {
         return $this->flattenFields()->filter(
             fn(Field $field) => ! $field instanceof Relationship
-        );
+        )->keys();
     }
 
     /**

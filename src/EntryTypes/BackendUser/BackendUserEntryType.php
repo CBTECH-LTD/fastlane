@@ -8,6 +8,7 @@ use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use CbtechLtd\Fastlane\EntryTypes\RendersOnMenu;
 use CbtechLtd\Fastlane\Fields\Types\ActiveToggle;
+use CbtechLtd\Fastlane\Fields\Types\Panel;
 use CbtechLtd\Fastlane\Fields\Types\ShortText;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +37,16 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
         });
     }
 
+    public static function model(): string
+    {
+        return User::class;
+    }
+
+    public static function policy(): ?string
+    {
+        return BackendUserPolicy::class;
+    }
+
     public static function icon(): string
     {
         return 'user';
@@ -51,17 +62,14 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
         return __('fastlane::core.user.plural_name');
     }
 
-    public static function model(): string
-    {
-        return User::class;
-    }
-
     public static function fields(): array
     {
         return [
             ShortText::make('Name')->required()->listable()->sortable(),
             ShortText::make('Email')->required()->unique()->listable()->sortable(),
-            ActiveToggle::make()->listable(),
+            Panel::make('Settings')->withFields([
+                ActiveToggle::make()->listable(),
+            ]),
         ];
     }
 

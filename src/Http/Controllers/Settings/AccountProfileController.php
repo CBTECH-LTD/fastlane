@@ -4,7 +4,7 @@ namespace CbtechLtd\Fastlane\Http\Controllers\Account;
 
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Http\Requests\AccountUpdateRequest;
-use CbtechLtd\Fastlane\Support\ControlPanelResources\EntryResource;
+use CbtechLtd\Fastlane\Http\Transformers\EntryResource;
 use Illuminate\Support\Facades\Redirect;
 
 class AccountProfileController extends AbstractAccountsController

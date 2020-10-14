@@ -92,11 +92,4 @@ trait FromEntryType
         $this->mergeCasts($casts->all());
         $this->mergeFillable($casts->keys()->all());
     }
-
-    public function toShallowArray(): array
-    {
-        return $this->getEntryType()
-            ->getFields()
-            ->getShallowData();
-    }
 }

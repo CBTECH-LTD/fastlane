@@ -2,10 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Fields\Types;
 
-use CbtechLtd\Fastlane\Contracts\Transformer;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
-use CbtechLtd\Fastlane\Fields\Transformers\SelectTransformer;
 use Illuminate\Support\Collection;
 
 class Select extends Field
@@ -20,17 +18,30 @@ class Select extends Field
 
         $this->mergeConfig([
             'multiple' => false,
+            'taggable' => false,
             'type'     => 'select',
             'options'  => SelectOptionCollection::make(),
         ]);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function transformer(): Transformer
+    public function castValue($value)
     {
-        return new SelectTransformer($this);
+        if (is_null($value)) {
+            return [];
+        }
+
+        $value = $this->isMultiple() ? $value : [$value];
+
+        return $this->getOptions()
+            ->load()
+            ->select($value)
+            ->selected()
+            ->values();
+    }
+
+    public function processValue($value)
+    {
+        return $value->toJson();
     }
 
     /**
@@ -63,6 +74,26 @@ class Select extends Field
     public function isMultiple(): bool
     {
         return $this->getConfig('multiple');
+    }
+
+    /**
+     * Enable tags in the select input.
+     *
+     * @return $this
+     */
+    public function taggable(): self
+    {
+        return $this->setConfig('taggable', true);
+    }
+
+    /**
+     * Determine whether the select input is taggable.
+     *
+     * @return bool
+     */
+    public function isTaggable(): bool
+    {
+        return $this->getConfig('taggable');
     }
 
     /**

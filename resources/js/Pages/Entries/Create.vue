@@ -2,7 +2,7 @@
     <f-the-app-layout>
         <template v-slot:title>{{ $l('core.new') }} {{ item.meta.entry_type.singular_name }}</template>
         <template v-slot:actions>
-            <f-button :href="links.parent" variant="outline" left-icon="arrow-left">
+            <f-button :href="item.links.top" variant="outline" left-icon="arrow-left">
                 {{ $l('core.back_to_list') }}
             </f-button>
             <f-button submit form="createForm"
@@ -36,18 +36,12 @@ export default {
             required: true,
             type: Object,
         },
-        links: {
-            required: true,
-            type: Object,
-        },
     },
-
-    remember: ['form'],
 
     data () {
         return {
             isCreating: false,
-            form: new FormSchemaFactory(this.item.attributes, this.item.meta.entry_type.schema),
+            form: new FormSchemaFactory(this.item.meta.entry_type.fields, this.item.attributes),
         }
     },
 
@@ -69,7 +63,7 @@ export default {
                 this.isCreating = true
 
                 try {
-                    await this.$inertia.post(this.links.form, this.form.toFormObject(false).all())
+                    await this.$inertia.post(this.item.links.self, this.form.toFormObject(false).all())
                 } catch {}
 
                 this.isCreating = false

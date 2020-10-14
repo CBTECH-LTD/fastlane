@@ -73,32 +73,35 @@ function generateMethods (form, $bus) {
 /**
  * Generate a new Form Schema instance.
  *
+ * @param schema
  * @param data
  */
-export function FormSchemaFactory (data) {
+export function FormSchemaFactory (schema, data) {
     const $bus = new Vue
     const __fields = {}
 
-    each(data, item => {
-        const component = components[camelCase(item.field.component)].form
+    console.log(schema)
 
-        const value = data.hasOwnProperty(item.field.attribute)
-            ? data[item.field.attribute]
-            : item.field.config.default
+    each(schema, item => {
+        const component = components[camelCase(item.component)].form
 
-        __fields[item.field.attribute] = Vue.observable(
+        const value = data.hasOwnProperty(item.attribute)
+            ? data[item.attribute]
+            : item.config.default
+
+        __fields[item.attribute] = Vue.observable(
             !!component.buildForSchema
                 ? component.buildForSchema({
-                    field: item.field,
-                    value: item.value,
+                    field: item,
+                    value,
                     component,
                     data
                 })
-                : FormFieldFactory(item.field, component, item.value, {})
+                : FormFieldFactory(item, component, value, {})
         )
 
-        __fields[item.field.attribute].onValueChanged((value) => {
-            $bus.$emit(`${item.field.attribute}:value-changed`, value)
+        __fields[item.attribute].onValueChanged((value) => {
+            $bus.$emit(`${item.attribute}:value-changed`, value)
         })
     })
 

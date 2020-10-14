@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\Support\ControlPanelResources;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
+use CbtechLtd\Fastlane\Http\Transformers\EntryResource;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceLink;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceMeta;
 use CbtechLtd\JsonApiTransformer\ApiResources\ResourceTypeCollection;

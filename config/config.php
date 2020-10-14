@@ -9,19 +9,24 @@ return [
      * ATTENTION: The value must be a relative path to the
      * public directory.
      */
-    'asset_logo_img' => 'vendor/fastlane/img/app-logo.png',
-    'asset_login_bg' => 'vendor/fastlane/img/login-bg-black.jpg',
+    'asset_logo_img'        => 'vendor/fastlane/img/app-logo.png',
+    'asset_login_bg'        => 'vendor/fastlane/img/login-bg-black.jpg',
 
     /**
      * Determine whether cache of models are enabled.
      */
-    'cache'          => false,
+    'cache'                 => false,
 
     /**
-     * Configure the Entry Types which must be enabled
-     * in Fastlane.
+     * Determine where Fastlane looks to automatically register entry types.
+     * Set it null to disable auto discovery and registration.
      */
-    'entry_types'    => [
+    'entry_types_namespace' => 'App\\EntryTypes',
+
+    /**
+     * Configure the Entry Types which must be enabled in Fastlane.
+     */
+    'entry_types'           => [
         //
     ],
 
@@ -29,14 +34,14 @@ return [
      * Configure the Content Blocks which must be enabled
      * in the Block Editor.
      */
-    'content_blocks' => [
+    'content_blocks'        => [
         //
     ],
 
     /**
      * Control panel settings.
      */
-    'control_panel'  => [
+    'control_panel'         => [
         'middleware'          => ['web'],
         'url_prefix'          => env('FASTLANE_CP_URL_PREFIX', '/cp'),
         'pagination_per_page' => 20,

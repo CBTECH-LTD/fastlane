@@ -1,0 +1,7 @@
+.menu-group__label::before {
+    @apply border-t border-dashed border-gray-400;
+    content: ' ';
+    display: block;
+    position: absolute;
+    width: 100%;
+}
