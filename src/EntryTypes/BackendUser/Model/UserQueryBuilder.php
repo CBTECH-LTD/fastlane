@@ -14,9 +14,9 @@ class UserQueryBuilder extends BaseQueryBuilder
 
     public function __construct(QueryBuilder $query)
     {
-        parent::__construct(
-            $query->orderBy('name', 'asc')
-        );
+        parent::__construct($query);
+
+        $this->orderBy('name', 'asc');
     }
 
     public function byRole(string $role): self

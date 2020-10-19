@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Contracts;
 
-use CbtechLtd\Fastlane\Fields\Value;
+use CbtechLtd\Fastlane\Fields\ValueResolver;
 
 interface Transformer
 {
@@ -31,5 +31,5 @@ interface Transformer
      * @param           $value
      * @return mixed
      */
-    public function fromRequest(EntryType $entryType, $value): Value;
+    public function fromRequest(EntryType $entryType, $value): ValueResolver;
 }

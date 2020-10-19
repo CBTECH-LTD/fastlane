@@ -7,14 +7,19 @@ use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use CbtechLtd\Fastlane\EntryTypes\RendersOnMenu;
+use CbtechLtd\Fastlane\Fields\Support\SelectOption;
+use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
 use CbtechLtd\Fastlane\Fields\Types\ActiveToggle;
 use CbtechLtd\Fastlane\Fields\Types\Panel;
+use CbtechLtd\Fastlane\Fields\Types\Select;
 use CbtechLtd\Fastlane\Fields\Types\ShortText;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\NewAccessToken;
+use Spatie\Permission\Models\Role;
 
 class BackendUserEntryType extends EntryType implements RenderableOnMenu
 {
@@ -34,6 +39,12 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
 
         static::listen(static::EVENT_QUERY_LISTING, function (QueryBuilder $builder) {
             $builder->except([Auth::user()->getKey()]);
+        });
+
+        static::listen(static::EVENT_SAVED, function (User $model, array $data) {
+            if (Arr::has($data, 'role')) {
+                $model->syncRoles(Arr::wrap($data['role']));
+            }
         });
     }
 
@@ -68,6 +79,11 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
             ShortText::make('Name')->required()->listable()->sortable(),
             ShortText::make('Email')->required()->unique()->listable()->sortable(),
             Panel::make('Settings')->withFields([
+                Select::make('Role')
+                    ->computed()
+                    ->withOptions(SelectOptionCollection::lazy(function () {
+                        return Role::all()->map(fn(Role $role) => SelectOption::make($role->name, $role->name))->all();
+                    })),
                 ActiveToggle::make()->listable(),
             ]),
         ];

@@ -2,8 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Fields\Types;
 
+use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
 use CbtechLtd\Fastlane\Fields\Field;
-use Illuminate\Support\Facades\URL;
 
 class RichEditor extends Field implements Contracts\HasAttachments
 {
@@ -16,10 +16,21 @@ class RichEditor extends Field implements Contracts\HasAttachments
         parent::__construct($label, $attribute);
 
         $this->mergeConfig([
-            'csrfToken' => csrf_token(),
-            'links'     => [
-//                'fileManager' => URL::relative('fastlane.cp.file-manager.index'),
+            'csrfToken'   => csrf_token(),
+            'acceptFiles' => true,
+            'links'       => [
+                'fileManager' => FileManagerEntryType::routes()->get('index')->url(),
             ],
         ]);
+    }
+
+    /**
+     * Disable files in the content editor.
+     *
+     * @return $this
+     */
+    public function disableFiles(): self
+    {
+        return $this->setConfig('acceptFiles', false);
     }
 }

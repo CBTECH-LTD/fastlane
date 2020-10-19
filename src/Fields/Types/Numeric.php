@@ -3,9 +3,7 @@
 namespace CbtechLtd\Fastlane\Fields\Types;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
-use CbtechLtd\Fastlane\Contracts\Transformer;
 use CbtechLtd\Fastlane\Fields\Field;
-use CbtechLtd\Fastlane\Fields\Transformers\NumberTransformer;
 
 class Numeric extends Field
 {
@@ -19,15 +17,7 @@ class Numeric extends Field
             'decimals' => 0,
         ]);
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function transformer(): Transformer
-    {
-        return new NumberTransformer($this);
-    }
-
+    
     /**
      * Set how many decimals the value may have.
      *

@@ -1,7 +1,7 @@
 <template>
-    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required" :stacked="field.label_stacked">
-        <template v-if="field.label && field.label_visible" v-slot:label>
-            {{ field.label }}
+    <f-form-field :errors="$page.errors.get(field.attribute)" :required="field.config.required" :stacked="field.config.stacked">
+        <template v-if="field.config.label" v-slot:label>
+            {{ field.config.label }}
         </template>
 
         <div class="w-full">
@@ -19,10 +19,10 @@
                 <template v-for="field in block.schema.getAll()">
                     <component :is="field.component"
                                :field="field"
-                               :required="field.required"
-                               :aria-required="field.required"
-                               :placeholder="field.placeholder"
-                               :aria-placeholder="field.placeholder"
+                               :required="field.config.required"
+                               :aria-required="field.config.required"
+                               :placeholder="field.config.placeholder"
+                               :aria-placeholder="field.config.placeholder"
                                :form="block.schema"
                                @input="updateContent"/>
                 </template>
@@ -54,11 +54,7 @@ export default {
          * so we can access it easily.
          */
         availableBlocks () {
-            const availableBlocks = this.field.config.blocks
-
-            console.log(availableBlocks)
-
-            return availableBlocks
+            return this.field.config.blocks
         }
     },
 
@@ -74,7 +70,9 @@ export default {
                 uuid,
                 key: block.key,
                 name: block.name,
-                schema: new FormSchemaFactory({}, block.fields),
+                schema: new FormSchemaFactory(block.fields, {
+                    id: uuidv4()
+                }),
             })
 
             this.$nextTick(() => {
@@ -110,7 +108,7 @@ export default {
                 const uuid = this.addBlock(this.availableBlocks[block.key])
 
                 each(block.fields, (field) => {
-                    this.blocks[uuid].schema.getField(field.name).value = field.value
+                    this.blocks[uuid].schema.getField(field.attribute).value = field.value
                 })
             })
         }

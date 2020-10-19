@@ -24,7 +24,7 @@ interface ContentBlockRepository
      * @param string $key
      * @return ContentBlock
      */
-    public function findByKey(string $key): ContentBlock;
+    public function findByKey(string $key): string;
 
     /**
      * Find an entry type by its class.
@@ -32,5 +32,5 @@ interface ContentBlockRepository
      * @param string $class
      * @return ContentBlock
      */
-    public function findByClass(string $class): ContentBlock;
+    public function findByClass(string $class): string;
 }

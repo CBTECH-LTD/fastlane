@@ -4,7 +4,7 @@ namespace CbtechLtd\Fastlane\Fields\Transformers;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Contracts\Transformer;
-use CbtechLtd\Fastlane\Fields\Value;
+use CbtechLtd\Fastlane\Fields\ValueResolver;
 
 class BooleanTransformer implements Transformer
 {
@@ -24,8 +24,8 @@ class BooleanTransformer implements Transformer
         return (bool)$value;
     }
 
-    public function fromRequest(EntryType $entryType, $value): Value
+    public function fromRequest(EntryType $entryType, $value): ValueResolver
     {
-        return new Value($entryType, (bool)$value);
+        return new ValueResolver($entryType, (bool)$value);
     }
 }

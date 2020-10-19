@@ -1,5 +1,5 @@
 <template>
-    <div class="inline-block mb-2">
+    <div class="block mb-2">
         <inertia-link
             :href="item.href"
             @click="() => $emit('click', item)"
@@ -27,10 +27,10 @@ export default {
     computed: {
         classes () {
             if (this.$page.app.requestUrl.startsWith(trimStart(this.item.href, this.$page.app.baseUrl))) {
-                return 'text-gray-200 bg-gray-800'
+                return 'text-brand-200 bg-brand-700'
             }
 
-            return 'bg-transparent hover:bg-gray-300 text-gray-600 hover:text-gray-700'
+            return 'bg-transparent text-gray-600 hover:text-brand-600 hover:bg-brand-300'
         },
     }
 }

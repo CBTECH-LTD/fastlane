@@ -27,17 +27,17 @@ export default {
     },
 
     data () {
-        const schema = filter(this.items.meta.entry_type.schema, f => f.name === 'file')
+        const schema = filter(this.items.meta.entry_type.schema, f => f.attribute === 'file')
 
         return {
-            uploadForm: new FormSchemaFactory({}, schema),
+            uploadForm: new FormSchemaFactory(schema, {}),
             isUploading: false,
         }
     },
 
     methods: {
         openUploadModal () {
-            this.$refs.fileInput.openModal()
+            this.$refs.fileInput.openFileManager()
         },
 
         async uploadFiles () {

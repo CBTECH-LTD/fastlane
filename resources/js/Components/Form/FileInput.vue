@@ -1,12 +1,12 @@
 <template>
-    <f-form-field :errors="$page.errors.get(field.name)" :required="field.required && (inline || showUploadButton)" :stacked="stacked">
-        <template v-if="field.label && (inline || showUploadButton)" v-slot:label>{{ field.label }}</template>
-        <template v-if="field.description && (inline || showUploadButton)" v-slot:description>{{ field.description }}</template>
+    <f-form-field :errors="$page.errors.get(field.attribute)" :required="field.config.required && (inline || showUploadButton)" :stacked="stacked">
+        <template v-if="field.config.label && (inline || showUploadButton)" v-slot:label>{{ field.config.label }}</template>
+        <template v-if="field.config.description && (inline || showUploadButton)" v-slot:description>{{ field.config.description }}</template>
 
         <div class="w-full">
             <template v-if="listFiles && field.value && field.value.length">
                 <transition-group name="files-list" tag="div" class="w-full flex flex-wrap">
-                    <div v-for="file in field.value" :key="file.file" class="relative w-1/2 p-2">
+                    <div v-for="file in field.value" :key="file.id" class="relative w-1/2 p-2">
                         <div class="absolute top-0 right-0 -mr-2 -mt-2 z-10">
                             <f-button @click="removeFile(file)" color="danger" size="sm" class="btn-oval p-0 flex items-center justify-center">
                                 <div class="flex items-center justify-center w-full h-full">

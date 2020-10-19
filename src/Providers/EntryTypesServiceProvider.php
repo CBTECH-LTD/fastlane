@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\Providers;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
+use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
 use CbtechLtd\Fastlane\Facades\EntryType;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -15,7 +16,7 @@ class EntryTypesServiceProvider extends ServiceProvider
      */
     protected array $builtInTypes = [
         // ContentEntryType::class,
-        // FileManagerEntryType::class,
+        FileManagerEntryType::class,
         BackendUserEntryType::class,
     ];
 

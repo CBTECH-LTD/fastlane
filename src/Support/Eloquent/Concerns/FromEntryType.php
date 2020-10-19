@@ -89,7 +89,7 @@ trait FromEntryType
                 ];
             });
 
-        $this->mergeCasts($casts->all());
-        $this->mergeFillable($casts->keys()->all());
+//        $this->mergeCasts($casts->all());
+//        $this->mergeFillable($casts->keys()->all());
     }
 }

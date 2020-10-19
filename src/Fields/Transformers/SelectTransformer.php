@@ -5,7 +5,7 @@ namespace CbtechLtd\Fastlane\Fields\Transformers;
 use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Contracts\Transformer;
 use CbtechLtd\Fastlane\Fields\Types\Select;
-use CbtechLtd\Fastlane\Fields\Value;
+use CbtechLtd\Fastlane\Fields\ValueResolver;
 
 class SelectTransformer implements Transformer
 {
@@ -43,7 +43,7 @@ class SelectTransformer implements Transformer
         return $value->first();
     }
 
-    public function fromRequest(EntryType $entryType, $value): Value
+    public function fromRequest(EntryType $entryType, $value): ValueResolver
     {
 //        $value = $this->field->isMultiple()
 //            ? $value
@@ -57,6 +57,6 @@ class SelectTransformer implements Transformer
 //
 //        dd($selected);
 
-        return new Value($entryType, $value);
+        return new ValueResolver($entryType, $value);
     }
 }

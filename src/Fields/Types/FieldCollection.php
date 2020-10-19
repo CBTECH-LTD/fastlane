@@ -3,8 +3,8 @@
 namespace CbtechLtd\Fastlane\Fields\Types;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
-use CbtechLtd\Fastlane\Contracts\Transformable;
 use CbtechLtd\Fastlane\Fields\Field;
+use CbtechLtd\Fastlane\Fields\UndefinedValue;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 
@@ -37,6 +37,7 @@ class FieldCollection extends Collection
     public function setEntryType(EntryType $entryType): self
     {
         $this->entryType = $entryType;
+
         return $this;
     }
 
@@ -74,9 +75,9 @@ class FieldCollection extends Collection
      */
     public function getData(): array
     {
-        $attributes = Collection::make(
-            $this->entryType->modelInstance()->only($this->getAttributes()->all())
-        );
+        $attributes = $this->getAttributes()->mapWithKeys(fn(Field $field) => [
+            $field->getAttribute() => $field->read($this->entryType->modelInstance()->{$field->getAttribute()}, $this->entryType),
+        ])->filter(fn($value) => ! $value instanceof UndefinedValue);
 
         $relationships = $this->getRelationships()->map(function (Relationship $field) {
             // TODO: ONLY LOAD RELATIONSHIP IF IT'S IN A $with VARIABLE IN THE ENTRY TYPE INSTANCE
@@ -86,7 +87,7 @@ class FieldCollection extends Collection
                 $field->getRelationshipMethod()
             );
 
-            return $field->transformer()->get($this->entryType, $value);
+            return $field->read($value, $this->entryType);
         });
 
         return $attributes->merge($relationships)->toArray();
@@ -128,7 +129,7 @@ class FieldCollection extends Collection
     public function onListing(): FieldCollection
     {
         $items = Collection::make($this->items)->filter(function (Field $field) {
-            return $field->isListable();
+            return $field->setArrayFormat('listing')->isListable();
         })->all();
 
         return $this->newInstance($items);
@@ -141,6 +142,8 @@ class FieldCollection extends Collection
                 return $field->isVisibleOnCreate();
             })
             ->mapWithKeys(function (Field $field) {
+                $field->setArrayFormat('create');
+
                 if ($field instanceof Panel) {
                     return FieldCollection::make($field->getFields())
                         ->setEntryType($this->entryType)
@@ -161,6 +164,8 @@ class FieldCollection extends Collection
                 return $field->isVisibleOnUpdate();
             })
             ->mapWithKeys(function (Field $field) {
+                $field->setArrayFormat('update');
+
                 if ($field instanceof Panel) {
                     return FieldCollection::make($field->getFields())
                         ->setEntryType($this->entryType)
@@ -189,11 +194,11 @@ class FieldCollection extends Collection
      *
      * @return Collection
      */
-    protected function getAttributes(): Collection
+    public function getAttributes(): Collection
     {
         return $this->flattenFields()->filter(
             fn(Field $field) => ! $field instanceof Relationship
-        )->keys();
+        );
     }
 
     /**
@@ -201,7 +206,7 @@ class FieldCollection extends Collection
      *
      * @return Collection
      */
-    protected function getRelationships(): Collection
+    public function getRelationships(): Collection
     {
         return $this->flattenFields()->filter(
             fn(Field $field) => $field instanceof Relationship

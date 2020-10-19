@@ -37,6 +37,18 @@ class EntryTypeRouteCollection
         return Arr::get($this->routes, $name);
     }
 
+    public function prepend(EntryTypeRoute $route): self
+    {
+        $this->routes = array_merge([$route->name() => $route], $this->routes);
+        return $this;
+    }
+
+    public function push(EntryTypeRoute $route): self
+    {
+        $this->routes[$route->name()] = $route;
+        return $this;
+    }
+
     public function all(): array
     {
         return $this->routes;

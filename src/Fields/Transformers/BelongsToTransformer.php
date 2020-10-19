@@ -7,7 +7,7 @@ use CbtechLtd\Fastlane\Contracts\Transformer;
 use CbtechLtd\Fastlane\Fields\Support\SelectOption;
 use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
 use CbtechLtd\Fastlane\Fields\Types\BelongsTo;
-use CbtechLtd\Fastlane\Fields\Value;
+use CbtechLtd\Fastlane\Fields\ValueResolver;
 use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
 use Illuminate\Support\Collection;
 
@@ -22,7 +22,7 @@ class BelongsToTransformer implements Transformer
 
     public function get(EntryType $entryType, $value)
     {
-        return new Value($entryType, $this->getSelectedOptions($value), $this->field);
+        return new ValueResolver($entryType, $this->getSelectedOptions($value), $this->field);
     }
 
     public function set(EntryType $entryType, $value)
@@ -34,11 +34,11 @@ class BelongsToTransformer implements Transformer
         }
     }
 
-    public function fromRequest(EntryType $entryType, $value): Value
+    public function fromRequest(EntryType $entryType, $value): ValueResolver
     {
         $entry = $this->field->getRelatedEntryType()::query()->key($value)->first();
 
-        return new Value($entryType, $entry->modelInstance(), $this->field);
+        return new ValueResolver($entryType, $entry->modelInstance(), $this->field);
     }
 
     /**

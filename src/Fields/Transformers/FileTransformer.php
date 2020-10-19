@@ -6,7 +6,7 @@ use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Contracts\Transformer;
 use CbtechLtd\Fastlane\EntryTypes\FileManager\File as FileModel;
 use CbtechLtd\Fastlane\Fields\Types\File;
-use CbtechLtd\Fastlane\Fields\Value;
+use CbtechLtd\Fastlane\Fields\ValueResolver;
 use Illuminate\Support\Collection;
 
 class FileTransformer implements Transformer
@@ -33,12 +33,12 @@ class FileTransformer implements Transformer
         return $value->value()->pluck('id')->toJson();
     }
 
-    public function fromRequest(EntryType $entryType, $value): Value
+    public function fromRequest(EntryType $entryType, $value): ValueResolver
     {
         $items = FileModel::query()
             ->whereKey(is_array($value) ? $value : json_decode($value))
             ->get();
 
-        return new Value($entryType, Collection::make($items->toArray()));
+        return new ValueResolver($entryType, Collection::make($items->toArray()));
     }
 }

@@ -1,9 +1,9 @@
 <template>
     <div class="flex flex-col">
-        <div class="fixed top-0 w-full h-20 bg-white z-40 flex justify-between">
+        <div class="fixed top-0 w-full h-20 bg-white border-b border-gray-200 z-40 flex justify-between">
             <!-- App logo -->
-            <div>
-                <img :src="$asset($page.app.assets.logoImage)" alt="" class="h-20">
+            <div class="h-20 p-2">
+                <img :src="$asset($page.app.assets.logoImage)" alt="" class="h-full">
             </div>
 
             <!-- User / Sign out -->
@@ -17,8 +17,8 @@
                 </f-button>
             </div>
         </div>
-        <div class="mt-20 w-full flex-grow flex">
-            <div class="flex flex-col bg-white h-screen sticky overflow-hidden" style="width: 320px; top: 80px;">
+        <div class="mt-20 w-full flex">
+            <div class="flex flex-col h-screen sticky overflow-hidden" style="width: 320px; top: 80px;">
                 <!-- Navigation items -->
                 <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scroll">
                     <f-navigation-list class="my-6 px-2" :items="this.$page.menu"/>
@@ -26,7 +26,7 @@
             </div>
 
             <!-- Main area -->
-            <div class="flex-1 flex flex-row px-4">
+            <div class="w-full flex flex-row overflow-x-hidden px-4">
                 <div v-if="$slots.hasOwnProperty('page-sidebar')">
                     <slot name="page-sidebar"/>
                 </div>
@@ -127,28 +127,28 @@ export default {
 }
 
 .title-bar__title {
-    @apply text-3xl text-gray-700 font-extrabold;
+    @apply text-3xl text-gray-800 font-extrabold;
 }
 
 .title-bar__subtitle {
-    @apply text-lg text-gray-500 font-semibold;
+    @apply text-lg text-gray-600 font-semibold;
 }
 
 .title-bar-wrapper.is-floating {
-    @apply pb-1;
+    @apply pb-4 bg-white border-b border-brand-200  shadow-lg;
 }
 
 .title-bar-wrapper.is-floating .title-bar {
-    @apply py-4 mb-12 bg-gray-100 border border-gray-300 ;
-    transform: translateY(48px);
+    @apply py-6 mb-12;
+    transform: translateY(52px);
 }
 
 .title-bar-wrapper.is-floating .title-bar__title {
-    @apply text-xl;
+    /* @apply text-xl; */
 }
 
 .title-bar-wrapper.is-floating .title-bar__subtitle {
-    @apply text-sm;
+    /* @apply text-sm; */
 }
 
 .flash-message {

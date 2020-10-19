@@ -5,11 +5,13 @@ namespace CbtechLtd\Fastlane\Fields;
 use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Rules\Unique;
 use CbtechLtd\Fastlane\Fields\Types\Panel;
+use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Webmozart\Assert\Assert;
 
 abstract class Field implements Arrayable
 {
@@ -17,6 +19,16 @@ abstract class Field implements Arrayable
     protected Collection $config;
     protected Collection $visibility;
     protected Collection $rules;
+    protected string $arrayFormat = 'listing';
+
+    /** @var mixed */
+    protected $value;
+
+    /** @var null|Closure */
+    protected ?Closure $writeResolverCallback = null;
+
+    /** @var null|Closure */
+    protected ?Closure $readResolverCallback = null;
 
     /** @var int */
     protected int $listingColWidth = 0;
@@ -36,6 +48,7 @@ abstract class Field implements Arrayable
             'sortable'  => false,
             'default'   => null,
             'panel'     => null,
+            'computed'  => false,
             'listing'   => new Collection([
                 'colWidth' => $this->listingColWidth,
             ]),
@@ -111,6 +124,27 @@ abstract class Field implements Arrayable
         $value = $this->getConfig('unique');
 
         return $value instanceof Unique || $value === true;
+    }
+
+    /**
+     * Set the field as computed. Computed fields are not used
+     * to retrieve or write data from/to models.
+     *
+     * @return $this
+     */
+    public function computed(): self
+    {
+        return $this->setConfig('computed', true);
+    }
+
+    /**
+     * Determine whether a field is computed.
+     *
+     * @return bool
+     */
+    public function isComputed(): bool
+    {
+        return $this->getConfig('computed');
     }
 
     /**
@@ -240,6 +274,12 @@ abstract class Field implements Arrayable
         return $this->getConfig('default');
     }
 
+    /**
+     * Set the panel which field will be rendered in.
+     *
+     * @param Panel $panel
+     * @return $this
+     */
     public function inPanel(Panel $panel): self
     {
         return $this->setConfig('panel', $panel->getAttribute());
@@ -253,29 +293,6 @@ abstract class Field implements Arrayable
     public function getPanel(): ?string
     {
         return $this->getConfig('panel');
-    }
-
-    /**
-     * Get the field value.
-     *
-     * @param Model $model
-     * @return mixed
-     */
-    public function get(Model $model)
-    {
-        return $model->{$this->getAttribute()};
-    }
-
-    /**
-     * Set the field value.
-     *
-     * @param mixed $value
-     * @return $this
-     */
-    public function setValue($value): self
-    {
-        $this->value = $value;
-        return $this;
     }
 
     /**
@@ -351,14 +368,54 @@ abstract class Field implements Arrayable
         return $this->hideOnCreate()->hideOnUpdate();
     }
 
-    public function castValue($value)
+    public function setArrayFormat(string $format): self
     {
-        return $value;
+        Assert::inArray($format, ['listing', 'create', 'update']);
+
+        $this->arrayFormat = $format;
+        return $this;
     }
 
-    public function processValue($value)
+    public function read($value, ?EntryType $entryType = null)
     {
-        return $value;
+        if (is_callable($this->readResolverCallback)) {
+            return $this->readResolverCallback->call($this, $value, $entryType);
+        }
+
+        return $this->processReadValue($value);
+    }
+
+    public function write($value, ?EntryType $entryType = null)
+    {
+        if (is_callable($this->writeResolverCallback)) {
+            return $this->writeResolverCallback->call($this, $value, $entryType);
+        }
+
+        return $this->processWriteValue($value);
+    }
+
+    /**
+     * Set a custom callable to read the value from the model.
+     *
+     * @param callable $callable
+     * @return $this
+     */
+    public function readUsing(callable $callable): self
+    {
+        $this->readResolverCallback = $callable;
+        return $this;
+    }
+
+    /**
+     * Set a custom callable to write the value to the model.
+     *
+     * @param callable $callable
+     * @return $this
+     */
+    public function writeUsing(callable $callable): self
+    {
+        $this->writeResolverCallback = $callable;
+        return $this;
     }
 
     /**
@@ -366,11 +423,45 @@ abstract class Field implements Arrayable
      */
     public function toArray()
     {
+        $config = (function () {
+            $config = $this->config->except('attribute');
+
+            if ($this->arrayFormat === 'listing') {
+                return $this->prepareConfigToListing($config);
+            }
+
+            if ($this->arrayFormat === 'create') {
+                return $this->prepareConfigToCreate($config);
+            }
+
+            if ($this->arrayFormat === 'update') {
+                return $this->prepareConfigToUpdate($config);
+            }
+
+            throw new \Exception('Invalid arrayFormat value.');
+        })();
+
         return [
             'attribute' => $this->getConfig('attribute'),
             'component' => $this->component,
-            'config'    => $this->config->except('attribute')->toArray(),
+            'value'     => $this->value,
+            'config'    => $config,
         ];
+    }
+
+    protected function prepareConfigToListing(Collection $config): array
+    {
+        return $config->toArray();
+    }
+
+    protected function prepareConfigToCreate(Collection $config): array
+    {
+        return $config->toArray();
+    }
+
+    protected function prepareConfigToUpdate(Collection $config): array
+    {
+        return $config->toArray();
     }
 
     /**
@@ -484,5 +575,15 @@ abstract class Field implements Arrayable
     {
         $this->config = $this->config->merge($config);
         return $this;
+    }
+
+    protected function processReadValue($value)
+    {
+        return $value;
+    }
+
+    protected function processWriteValue($value)
+    {
+        return $value;
     }
 }

@@ -11,31 +11,19 @@ class EntryTypeResourceCollection implements Arrayable
 {
     protected EntryType $entryType;
     protected array $items;
-    protected string $to;
     protected ?LengthAwarePaginator $paginator;
     protected array $meta = [];
     protected array $links = [];
 
-    public static function toListing(EntryType $entryType, array $items): EntryTypeResourceCollection
+    public static function make(EntryType $entryType, array $items): self
     {
-        return new static($entryType, $items, 'listing');
+        return new static($entryType, $items);
     }
 
-    public static function toCreate(EntryType $entryType, array $items): EntryTypeResourceCollection
-    {
-        return new static($entryType, $items, 'create');
-    }
-
-    public static function toUpdate(EntryType $entryType, array $items): EntryTypeResourceCollection
-    {
-        return new static($entryType, $items, 'update');
-    }
-
-    public function __construct(EntryType $entryType, array $items, string $to)
+    public function __construct(EntryType $entryType, array $items)
     {
         $this->entryType = $entryType;
         $this->items = $items;
-        $this->to = $to;
     }
 
     public function withMeta(array $data): self
@@ -87,19 +75,7 @@ class EntryTypeResourceCollection implements Arrayable
     protected function buildData(): array
     {
         return Collection::make($this->items)->map(function (EntryType $entryType) {
-            if ($this->to === 'listing') {
-                return $entryType->toListingResource();
-            }
-
-            if ($this->to === 'create') {
-                return $entryType->toCreateResource();
-            }
-
-            if ($this->to === 'update') {
-                return $entryType->toUpdateResource();
-            }
-
-            return null;
+            return $entryType->toResource()->toListing();
         })->filter()->toArray();
     }
 

@@ -80,8 +80,6 @@ export function FormSchemaFactory (schema, data) {
     const $bus = new Vue
     const __fields = {}
 
-    console.log(schema)
-
     each(schema, item => {
         const component = components[camelCase(item.component)].form
 

@@ -7,6 +7,7 @@ use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Http\Transformers\EntryResource;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 interface EntryType
 {
@@ -77,10 +78,11 @@ interface EntryType
      * Get an instance of the entry type query builder
      * to fetch items to the listing page.
      *
+     * @param bool          $paginate
      * @param callable|null $callback
-     * @return LengthAwarePaginator
+     * @return LengthAwarePaginator|Collection
      */
-    public static function queryListing(?callable $callback = null): LengthAwarePaginator;
+    public static function queryListing(bool $paginate = true, ?callable $callback = null);
 
     /**
      * Get an instance of the entry type query builder
@@ -180,26 +182,9 @@ interface EntryType
     public function delete(): self;
 
     /**
-     * Get an array representation of the entry type including
-     * only fields available on listing page.
+     * Get an Entry Resource instance representing the entry type.
      *
      * @return EntryResource
      */
-    public function toListingResource(): EntryResource;
-
-    /**
-     * Get an array representation of the entry type including
-     * only fields available on create page.
-     *
-     * @return EntryResource
-     */
-    public function toCreateResource(): EntryResource;
-
-    /**
-     * Get an array representation of the entry type including
-     * only fields available on update page.
-     *
-     * @return EntryResource
-     */
-    public function toUpdateResource(): EntryResource;
+    public function toResource(): EntryResource;
 }

@@ -34,6 +34,15 @@ class SelectOptionCollection implements Arrayable
         return Collection::make($this->items)->values();
     }
 
+    public function withTags(array $tags): self
+    {
+        foreach ($tags as $tag) {
+            $this->items[] = SelectOption::make($tag, $tag);
+        }
+
+        return $this;
+    }
+
     public function all(): array
     {
         return $this->items;

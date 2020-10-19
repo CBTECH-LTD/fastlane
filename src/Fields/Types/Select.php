@@ -3,14 +3,14 @@
 namespace CbtechLtd\Fastlane\Fields\Types;
 
 use CbtechLtd\Fastlane\Fields\Field;
+use CbtechLtd\Fastlane\Fields\Support\SelectOption;
 use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class Select extends Field
 {
     protected string $component = 'select';
-
-    protected Collection $resolvedOptions;
 
     public function __construct(string $label, ?string $attribute = null)
     {
@@ -22,26 +22,6 @@ class Select extends Field
             'type'     => 'select',
             'options'  => SelectOptionCollection::make(),
         ]);
-    }
-
-    public function castValue($value)
-    {
-        if (is_null($value)) {
-            return [];
-        }
-
-        $value = $this->isMultiple() ? $value : [$value];
-
-        return $this->getOptions()
-            ->load()
-            ->select($value)
-            ->selected()
-            ->values();
-    }
-
-    public function processValue($value)
-    {
-        return $value->toJson();
     }
 
     /**
@@ -110,5 +90,25 @@ class Select extends Field
     public function getOptions(): SelectOptionCollection
     {
         return $this->getConfig('options');
+    }
+
+    protected function processReadValue($value)
+    {
+        if ($this->isMultiple()) {
+            $value = \json_decode($value);
+        }
+
+        return SelectOptionCollection::make(
+            Collection::make($value)->map(fn($value) => SelectOption::make($value, $value))->all()
+        );
+    }
+
+    protected function processWriteValue($value)
+    {
+        if ($this->isMultiple()) {
+            $value = \json_encode(Arr::wrap($value));
+        }
+
+        return $value;
     }
 }

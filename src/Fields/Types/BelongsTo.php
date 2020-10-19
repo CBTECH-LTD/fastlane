@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\Fields\Types;
 
 use CbtechLtd\Fastlane\Contracts\Transformer;
+use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\Fields\Transformers\BelongsToTransformer;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
@@ -44,5 +45,12 @@ class BelongsTo extends Relationship
                 $this->getRelationshipMethod()
             );
         };
+    }
+
+    protected function processWriteValue($value)
+    {
+        $method = $this->getRelationshipMethod();
+
+        dd($method);
     }
 }

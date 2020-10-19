@@ -41,7 +41,7 @@ export default {
     data () {
         return {
             isCreating: false,
-            form: new FormSchemaFactory(this.item.meta.entry_type.fields, this.item.attributes),
+            form: new FormSchemaFactory(this.item.meta.entry_type.fields, {}),
         }
     },
 

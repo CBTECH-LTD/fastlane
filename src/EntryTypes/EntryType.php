@@ -12,9 +12,12 @@ use CbtechLtd\Fastlane\Exceptions\UnknownEventException;
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
+use CbtechLtd\Fastlane\Fields\UndefinedValue;
+use CbtechLtd\Fastlane\Fields\ValueResolver;
 use CbtechLtd\Fastlane\Http\Controllers\EntriesController;
 use CbtechLtd\Fastlane\Http\Transformers\EntryResource;
 use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
+use CbtechLtd\Fastlane\Support\Eloquent\Concerns\Hashable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -44,6 +47,7 @@ abstract class EntryType implements EntryTypeContract
     public function __construct(Model $model)
     {
         $this->entry = $model;
+
         $this->fields = (new FieldCollection(static::fields()))->setEntryType($this);
     }
 
@@ -155,17 +159,33 @@ abstract class EntryType implements EntryTypeContract
      * Get an instance of the entry type query builder
      * to fetch items to the listing page.
      *
+     * @param bool          $paginate
      * @param callable|null $callback
-     * @return LengthAwarePaginator
-     * @throws \Exception
+     * @return LengthAwarePaginator|Collection
+     * @throws UnknownEventException
      */
-    public static function queryListing(?callable $callback = null): LengthAwarePaginator
+    public static function queryListing(bool $paginate = true, ?callable $callback = null)
     {
         if (static::policy()) {
             Gate::authorize('index', static::model());
         }
 
-        $query = static::query();
+        // Start the query, selecting only fields we really need.
+        $defaultColumns = ['id'];
+
+        if (in_array(Hashable::class, class_uses_recursive(static::model()))) {
+            $defaultColumns[] = 'hashid';
+        }
+
+        $columns = static::newInstance()->getFields()->onListing()
+            ->getAttributes()->filter(fn(Field $field) => ! $field->isComputed())
+            ->keys()->all();
+
+        $query = static::query()
+            ->select(array_merge(
+                $defaultColumns,
+                $columns,
+            ));
 
         if ($callback) {
             $query = call_user_func($callback, $query);
@@ -173,7 +193,7 @@ abstract class EntryType implements EntryTypeContract
 
         static::fireEvent(static::EVENT_QUERY_LISTING, [$query]);
 
-        return $query->paginate();
+        return $paginate ? $query->paginate() : $query->get();
     }
 
     /**
@@ -304,26 +324,25 @@ abstract class EntryType implements EntryTypeContract
             Gate::authorize('create', static::model());
         }
 
-        // Validate the request data against the update fields
-        // and save the validated data in a new variable.
+        // Validate the request data against the required fields
+        // and fill it to the model.
         $fields = $this->getFields()->onCreate();
 
-        $data = $this->validateAndTransformData($data, $fields);
+        $this->fillModel(
+            $fields,
+            $data = Validator::make($data, $fields->getCreateRules($data))->validated()
+        );
 
-        // Create the new model...
-        $model = tap(app()->make(static::model()), function (Model $model) use ($data) {
-            $model->fill($data);
+        // Dispatch events and save the model.
+        static::fireEvent(static::EVENT_CREATING, [$this->modelInstance(), $data]);
+        static::fireEvent(static::EVENT_SAVING, [$this->modelInstance(), $data]);
 
-            static::fireEvent(static::EVENT_CREATING, [$model, $data]);
-            static::fireEvent(static::EVENT_SAVING, [$model, $data]);
+        $this->modelInstance()->save();
 
-            $model->save($data);
+        static::fireEvent(static::EVENT_CREATED, [$this->modelInstance(), $data]);
+        static::fireEvent(static::EVENT_SAVED, [$this->modelInstance(), $data]);
 
-            static::fireEvent(static::EVENT_CREATED, [$model]);
-            static::fireEvent(static::EVENT_SAVED, [$model]);
-        });
-
-        return static::newInstance($model);
+        return $this;
     }
 
     /**
@@ -341,13 +360,16 @@ abstract class EntryType implements EntryTypeContract
         // and save the validated data in a new variable.
         $fields = $this->getFields()->onUpdate();
 
-        $data = $this->validateAndTransformData($data, $fields);
+        $this->fillModel(
+            $fields,
+            $data = Validator::make($data, $fields->getUpdateRules($data))->validated()
+        );
 
-        // Fill and save the model!
+        // Dispatch events and save the model
         static::fireEvent(static::EVENT_UPDATING, [$this->modelInstance(), $data]);
         static::fireEvent(static::EVENT_SAVING, [$this->modelInstance(), $data]);
 
-        $this->modelInstance()->fill($data)->save();
+        $this->modelInstance()->save();
 
         static::fireEvent(static::EVENT_UPDATED, [$this->modelInstance(), $data]);
         static::fireEvent(static::EVENT_SAVED, [$this->modelInstance(), $data]);
@@ -374,6 +396,16 @@ abstract class EntryType implements EntryTypeContract
         static::fireEvent(static::EVENT_DELETED, [$this->modelInstance()]);
 
         return $this;
+    }
+
+    /**
+     * Get an EntryResource instance representing this entry type instance.
+     *
+     * @return EntryResource
+     */
+    public function toResource(): EntryResource
+    {
+        return new EntryResource($this);
     }
 
     /**
@@ -412,14 +444,21 @@ abstract class EntryType implements EntryTypeContract
         return EntryResource::toUpdate($this);
     }
 
-    protected function validateAndTransformData(array $data, FieldCollection $fields): array
+    protected function fillModel(FieldCollection $fields, array $data): self
     {
-        $data = Validator::make($data, $fields->getUpdateRules($data))->validated();
+        $fields->each(function (Field $field) use ($data) {
+            if ($field->isComputed()) {
+                return;
+            }
 
-        return $fields->getCollection()
-            ->filter(fn(Field $field) => Arr::has($data, $field->getAttribute()))
-            ->map(fn(Field $field) => $field->processValue(Arr::get($data, $field->getAttribute())))
-            ->all();
+            if (Arr::has($data, $field->getAttribute())) {
+                $this->modelInstance()->{$field->getAttribute()} = $field->write(
+                    Arr::get($data, $field->getAttribute()), $this
+                );
+            }
+        });
+
+        return $this;
     }
 
     protected static function installRolesAndPermissions(): void

@@ -22,7 +22,7 @@ class File extends BaseModel
         return 'id';
     }
 
-    public function url(): string
+    public function getUrlAttribute(): string
     {
         return Storage::disk(config('fastlane.attachments.disk'))->url($this->file);
     }

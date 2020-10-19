@@ -24,7 +24,7 @@ class ContentBlockRepository implements ContentBlockRepositoryContract
      */
     public function register(string $class): void
     {
-        Assert::isAOf($class, ContentBlockRepositoryContract::class);
+        Assert::isAOf($class, \CbtechLtd\Fastlane\Contracts\ContentBlock::class);
 
         $this->items->push($class);
     }
@@ -46,7 +46,7 @@ class ContentBlockRepository implements ContentBlockRepositoryContract
      * @return ContentBlockContract
      * @throws ContentBlockNotRegisteredException
      */
-    public function findByKey(string $key): ContentBlockContract
+    public function findByKey(string $key): string
     {
         if (! $item = $this->items->first(fn(string $class) => $class::key() === $key)) {
             throw ContentBlockNotRegisteredException::keyNotRegistered($key);
@@ -62,7 +62,7 @@ class ContentBlockRepository implements ContentBlockRepositoryContract
      * @return ContentBlockContract
      * @throws ContentBlockNotRegisteredException
      */
-    public function findByClass(string $class): ContentBlockContract
+    public function findByClass(string $class): string
     {
         if (! $item = $this->items->first(fn(string $c) => $c === $class)) {
             throw ContentBlockNotRegisteredException::classNotRegistered($class);

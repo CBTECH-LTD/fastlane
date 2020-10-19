@@ -12,15 +12,18 @@ abstract class Relationship extends Field
 {
     protected string $component = 'select';
     protected EntryType $relatedEntryType;
+    protected array $columns = [];
 
     /**
      * Relationship constructor.
      *
      * @param EntryType|string $relatedEntryType
+     * @param mixed            ...$columns
      */
-    public function __construct(string $relatedEntryType)
+    public function __construct(string $relatedEntryType, ...$columns)
     {
         $this->relatedEntryType = $relatedEntryType::newInstance();
+        $this->columns = $columns;
 
         parent::__construct($this->getRelationshipLabel(), $this->getRelationshipMethod());
 
@@ -141,6 +144,7 @@ abstract class Relationship extends Field
     {
         return SelectOptionCollection::lazy(function () {
             return $this->relatedEntryType::query()
+                ->select(['id', ...$this->columns])
                 ->get()
                 ->map(function (EntryType $entryType) {
                     return SelectOption::make(

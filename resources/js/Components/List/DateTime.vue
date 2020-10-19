@@ -14,7 +14,7 @@ export default {
 
     computed: {
         formattedValue () {
-            return moment(this.value).format(this.config.momentDisplayFormat)
+            return moment(this.value).format(this.field.config.momentDisplayFormat)
         }
     },
 }

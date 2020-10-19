@@ -28,7 +28,7 @@ class EntriesController extends Controller
      */
     public function index(IndexRequest $request)
     {
-        $paginator = $request->entryType()::queryListing(function (QueryBuilder $builder) use ($request) {
+        $paginator = $request->entryType()::queryListing(true, function (QueryBuilder $builder) use ($request) {
             return $request->buildQueryFilter()
                 ->addOrder('created_at')
                 ->addOrder('id')
@@ -47,7 +47,7 @@ class EntriesController extends Controller
         // Transform the paginator collection, which is composed of
         // entry instances, into a collection of entry resources ready
         // to be transformed to our front-end application.
-        $collection = EntryTypeResourceCollection::toListing(
+        $collection = EntryTypeResourceCollection::make(
             $request->entryType(),
             $paginator->items()
         )->withPaginator($paginator)->withMeta([
@@ -91,7 +91,7 @@ class EntriesController extends Controller
         };
 
         return $this->render($view() ?? 'Entries/Create', [
-            'item' => $request->entryType()->toCreateResource()->withSchema()->toArray(),
+            'item' => $request->entryType()->toResource()->toCreate()->withSchema()->toArray(),
         ]);
     }
 
@@ -128,7 +128,7 @@ class EntriesController extends Controller
         };
 
         return $this->render($view() ?? 'Entries/Edit', [
-            'item' => $request->entryType()->toUpdateResource()->toArray(),
+            'item' => $request->entryType()->toResource()->toUpdate()->toArray(),
         ]);
     }
 

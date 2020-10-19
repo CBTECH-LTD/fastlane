@@ -2,8 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Console\Commands;
 
+use CbtechLtd\Fastlane\Contracts\EntryTypeRepository;
 use CbtechLtd\Fastlane\Facades\Fastlane;
-use CbtechLtd\Fastlane\Contracts\EntryType;
 use Illuminate\Console\Command;
 
 class InstallEntryTypesCommand extends Command
@@ -39,10 +39,10 @@ class InstallEntryTypesCommand extends Command
      */
     public function handle()
     {
-        Fastlane::entryTypes()->each(function (EntryType $contentType) {
-            $this->comment('Installing ' . get_class($contentType));
+        foreach (app(EntryTypeRepository::class)->all() as $contentType) {
+            $this->comment('Installing ' . $contentType);
 
-            $contentType->install();
-        });
+            $contentType::install();
+        }
     }
 }

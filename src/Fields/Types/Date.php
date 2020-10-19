@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Fields\Types;
 
+use Carbon\Carbon;
 use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Field;
 
@@ -35,11 +36,23 @@ class Date extends Field
         return $this->setConfig('seconds', true);
     }
 
+    public function withDefault($default): Field
+    {
+        if ($default instanceof Carbon) {
+            $default = $default->format($this->getSaveFormat());
+        }
+
+        return parent::withDefault($default);
+    }
+
     public function toArray()
     {
         $data = parent::toArray();
 
         data_set($data, 'config.momentDisplayFormat', $this->convertToMomentJs($this->getDisplayFormat()));
+        data_set($data, 'config.momentSaveFormat', $this->convertToMomentJs($this->getSaveFormat()));
+        data_set($data, 'config.displayFormat', $this->getDisplayFormat());
+        data_set($data, 'config.saveFormat', $this->getSaveFormat());
 
         return $data;
     }
@@ -64,7 +77,7 @@ class Date extends Field
     protected function getSaveFormat(): string
     {
         return $this->getConfig('time')
-            ? 'Y-m-d H:i:s'
+            ? ($this->getConfig('seconds') ? 'Y-m-d H:i:s' : 'Y-m-d H:i')
             : 'Y-m-d';
     }
 

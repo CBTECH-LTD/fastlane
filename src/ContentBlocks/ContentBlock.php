@@ -2,20 +2,18 @@
 
 namespace CbtechLtd\Fastlane\ContentBlocks;
 
+use CbtechLtd\Fastlane\Contracts\ContentBlock as ContentBlockContract;
 use CbtechLtd\Fastlane\Fields\Field;
+use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Fields\Types\Slug;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 
-abstract class ContentBlock implements Arrayable
+abstract class ContentBlock implements ContentBlockContract, Arrayable
 {
-    protected Collection $fieldsData;
-
-    abstract public static function key(): string;
-
-    abstract public static function name(): string;
-
-    abstract public function fields(): array;
+    protected Collection $fields;
+    protected bool $shallow = false;
+    protected array $values = [];
 
     public static function make(): self
     {
@@ -27,9 +25,15 @@ abstract class ContentBlock implements Arrayable
         $this->resolveFields();
     }
 
+    public function shallow(bool $value = true): self
+    {
+        $this->shallow = $value;
+        return $this;
+    }
+
     public function field(string $field): Field
     {
-        return $this->fieldsData->get($field);
+        return $this->fields->get($field);
     }
 
     public function withValues(array $data): self
@@ -38,9 +42,7 @@ abstract class ContentBlock implements Arrayable
             throw new \Exception('Incompatible Content Block key');
         }
 
-        $this->fieldsData->each(function (Field $field) use ($data) {
-            $field->set(data_get($data, "data.{$field->getAttribute()}"));
-        });
+        $this->values = $data['data'];
 
         return $this;
     }
@@ -50,20 +52,24 @@ abstract class ContentBlock implements Arrayable
         return [
             'key'    => static::key(),
             'name'   => static::name(),
-            'fields' => $this->fieldsData->toArray(),
+            'fields' => $this->shallow ? [] : $this->fields->map(function (Field $field) {
+                return array_merge($field->toArray(), [
+                    'value' => $field->read($this->values[$field->getAttribute()] ?? null),
+                ]);
+            }),
         ];
     }
 
     protected function resolveFields(): void
     {
+        $this->fields = (new FieldCollection($this->fields()));
+
         $defaultFields = Collection::make([
             Slug::make('ID')->required()->unique(),
         ]);
 
-        $this->fieldsData = $defaultFields->merge($this->fields())
+        $this->fields = $defaultFields->merge($this->fields())
             ->mapWithKeys(function (Field $field) {
-                $field->resolve();
-
                 return [
                     $field->getAttribute() => $field,
                 ];

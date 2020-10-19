@@ -21,7 +21,10 @@
                 :clearable="false"
                 :options="field.config.options"
                 :multiple="field.config.multiple"
-                :value="field.value"
+                :taggable="field.config.taggable"
+                :value="this.field.value"
+                :reduce="reduce"
+                :createOption="createOption"
                 @input="onInput">
             </v-select>
         </div>
@@ -37,6 +40,8 @@ import filter from 'lodash/filter'
 import find from 'lodash/find'
 import map from 'lodash/map'
 import isObject from 'lodash/isObject'
+import isArray from 'lodash/isArray'
+import { castArray } from 'lodash/lang'
 
 export default {
     name: 'SelectInput',
@@ -44,62 +49,34 @@ export default {
     components: { VSelect },
 
     methods: {
+        reduce (v) {
+            return v.value
+        },
+
+        createOption (opt) {
+            console.log('new', opt)
+
+            return { label: opt, value: opt }
+        },
+
         commit (formObject) {
-            formObject.put(this.field.attribute, this.prepareValueForCommit())
-        },
-
-        prepareValueForCommit () {
-            if (!this.field.value) {
-                return null
-            }
-
-            if (this.field.config.multiple) {
-                return map(this.field.value, v => {
-                    return v.value
-                })
-            }
-
-            return this.field.value.value
-        },
-
-        isSelected (option) {
-            if (this.field.config.multiple) {
-                return !!find(this.field.value, v => {
-                    return v.value === option.value
-                })
-            }
-
-            return this.field.value && this.field.value.value === option.value
+            formObject.put(this.field.attribute, this.field.value)
         },
     },
 
     buildForSchema ({ field, component, value }) {
-        const selectedIds = (() => {
-            if (!value) {
-                return []
-            }
-
-            if (field.config.multiple === true) {
-                return map(value, v => {
-                    if (isObject(v)) {
-                        return v.value
-                    }
-
-                    return v
-                })
-            }
-
-            return value.length ? [value[0].value] : []
-        })()
-
-        const filteredValue = filter(field.config.options, o => {
-            return selectedIds.includes(o.value)
-        })
+        if (value && field.config.taggable) {
+            value.forEach(v => {
+                if (field.config.options.indexOf(v.value) === -1) {
+                    field.config.options.push(v)
+                }
+            })
+        }
 
         return FormFieldFactory(
             field,
             component,
-            filteredValue || field.config.default,
+            isArray(value) ? value.map(v => v.value) : field.config.default,
             {}
         )
     }

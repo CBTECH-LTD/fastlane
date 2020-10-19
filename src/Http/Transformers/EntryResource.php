@@ -3,38 +3,22 @@
 namespace CbtechLtd\Fastlane\Http\Transformers;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
-use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class EntryResource implements Arrayable
 {
     protected EntryType $entry;
-    protected string $to;
     protected bool $includeSchema = false;
     protected array $additionalMeta = [];
     protected array $additionalLinks = [];
+    protected string $to = 'listing';
 
-    public static function toListing(EntryType $entryType): self
-    {
-        return new static($entryType, 'listing');
-    }
-
-    public static function toCreate(EntryType $entryType): self
-    {
-        return new static($entryType, 'create');
-    }
-
-    public static function toUpdate(EntryType $entryType): self
-    {
-        return new static($entryType, 'update');
-    }
-
-    public function __construct(EntryType $entry, string $to)
+    public function __construct(EntryType $entry)
     {
         $this->entry = $entry;
-        $this->to = $to;
     }
 
     public function withSchema(): self
@@ -46,6 +30,24 @@ class EntryResource implements Arrayable
     public function model(): Model
     {
         return $this->entry->modelInstance();
+    }
+
+    public function toListing(): self
+    {
+        $this->to = 'listing';
+        return $this;
+    }
+
+    public function toCreate(): self
+    {
+        $this->to = 'create';
+        return $this;
+    }
+
+    public function toUpdate(): self
+    {
+        $this->to = 'update';
+        return $this;
     }
 
     public function id(): string
@@ -60,19 +62,9 @@ class EntryResource implements Arrayable
 
     private function getFields()
     {
-        if ($this->to === 'listing') {
-            return $this->entry->getFields()->onListing();
-        }
+        $method = Str::camel('on ' . $this->to);
 
-        if ($this->to === 'create') {
-            return $this->entry->getFields()->onCreate();
-        }
-
-        if ($this->to === 'update') {
-            return $this->entry->getFields()->onUpdate();
-        }
-
-        return FieldCollection::make();
+        return $this->entry->getFields()->{$method}();
     }
 
     private function getPanels()
