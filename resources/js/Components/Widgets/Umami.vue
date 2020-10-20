@@ -1,6 +1,6 @@
 <template>
     <div>
-        <iframe :src="url" frameborder="0" class="w-full"></iframe>
+        <iframe :src="url" frameborder="0" class="w-full" :style="style"></iframe>
     </div>
 </template>
 
@@ -11,11 +11,18 @@ export default {
         url: {
             type: String,
             required: true,
+        },
+        height: {
+            type: String,
+            required: true,
+        },
+    },
+    computed: {
+        style() {
+            return {
+                height: this.height,
+            }
         }
     }
 }
 </script>
-
-<style scoped>
-
-</style>
