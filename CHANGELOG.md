@@ -2,6 +2,13 @@
 
 All notable changes to `fastlane` will be documented in this file
 
+## [0.11.1] - 2020-10-20
+
+### Fixed
+- Attributes inherited by parent in Umami Widget.
+
+---
+
 ## [0.11.0] - 2020-10-20
 
 ### Added
