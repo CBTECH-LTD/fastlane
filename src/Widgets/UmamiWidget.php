@@ -9,6 +9,7 @@ class UmamiWidget implements Arrayable
     protected string $id = 'umami';
     protected string $label = 'Analytics';
     protected string $component = 'umami-widget';
+    protected string $height = '2400px';
     protected ?string $url;
 
     public static function make(string $url): UmamiWidget
@@ -52,7 +53,8 @@ class UmamiWidget implements Arrayable
             'label'     => $this->getLabel(),
             'component' => $this->getComponent(),
             'data'      => [
-                'url' => $this->url,
+                'url'    => $this->url,
+                'height' => $this->height,
             ],
         ];
     }

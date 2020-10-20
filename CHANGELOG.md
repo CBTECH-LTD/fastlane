@@ -2,6 +2,13 @@
 
 All notable changes to `fastlane` will be documented in this file
 
+## [0.11.0] - 2020-10-20
+
+### Added
+- Height to umami widget.
+
+---
+
 ## [0.10.0] - 2020-10-07
 
 ### Fixed
