@@ -7,6 +7,7 @@
 <script>
 export default {
     name: 'UmamiWidget',
+    inheritAttrs: false,
     props: {
         url: {
             type: String,
