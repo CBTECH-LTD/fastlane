@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Fields\Types;
 
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Support\SelectOption;
 use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
@@ -92,10 +93,10 @@ class Select extends Field
         return $this->getConfig('options');
     }
 
-    protected function processReadValue($value)
+    protected function processReadValue($value, ?EntryType $entryType = null)
     {
         if ($this->isMultiple()) {
-            $value = \json_decode($value);
+            $value = Arr::wrap(is_array($value) ? $value : \json_decode($value));
         }
 
         return SelectOptionCollection::make(
@@ -103,7 +104,7 @@ class Select extends Field
         );
     }
 
-    protected function processWriteValue($value)
+    protected function processWriteValue($value, ?EntryType $entryType = null)
     {
         if ($this->isMultiple()) {
             $value = \json_encode(Arr::wrap($value));

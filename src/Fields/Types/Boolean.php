@@ -23,12 +23,12 @@ class Boolean extends Field
         return [$this->getAttribute() => 'boolean'];
     }
 
-    protected function processReadValue($value)
+    protected function processReadValue($value, ?EntryType $entryType = null)
     {
         return (bool)$value;
     }
 
-    protected function processWriteValue($value)
+    protected function processWriteValue($value, ?EntryType $entryType = null)
     {
         return (bool)$value;
     }

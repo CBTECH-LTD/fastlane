@@ -452,9 +452,11 @@ abstract class EntryType implements EntryTypeContract
             }
 
             if (Arr::has($data, $field->getAttribute())) {
-                $this->modelInstance()->{$field->getAttribute()} = $field->write(
-                    Arr::get($data, $field->getAttribute()), $this
-                );
+                $value = $field->write(Arr::get($data, $field->getAttribute()), $this);
+
+                if (! $value instanceof UndefinedValue) {
+                    $this->modelInstance()->{$field->getAttribute()} = $value;
+                }
             }
         });
 
@@ -502,7 +504,7 @@ abstract class EntryType implements EntryTypeContract
      * @param callable $callback
      * @throws UnknownEventException
      */
-    protected static function listen(string $event, callable $callback): void
+    public static function listen(string $event, callable $callback): void
     {
         $keys = static::getEventKeys();
 

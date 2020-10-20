@@ -2,9 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Fields\Types;
 
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Contracts\Transformer;
-use CbtechLtd\Fastlane\EntryTypes\EntryType;
+use CbtechLtd\Fastlane\Fields\Support\SelectOption;
+use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
 use CbtechLtd\Fastlane\Fields\Transformers\BelongsToTransformer;
+use CbtechLtd\Fastlane\Fields\UndefinedValue;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -21,7 +24,16 @@ class BelongsTo extends Relationship
      */
     public function getRelationshipMethod(): string
     {
-        return Str::singular($this->getRelatedEntryType()::key());
+        if ($attr = $this->getAttribute()) {
+            return Str::camel($attr);
+        }
+
+        return Str::camel(Str::singular($this->getRelatedEntryType()::key()), '_');
+    }
+
+    public function getRelationshipColumn(): string
+    {
+        return $this->getRelationshipMethod() . '_id';
     }
 
     /**
@@ -38,19 +50,35 @@ class BelongsTo extends Relationship
     public function getRelationshipResolver(): Closure
     {
         return function (Model $model) {
+            if (method_exists($model, $this->getRelationshipMethod())) {
+                return $model->{$this->getRelationshipMethod()}();
+            }
+
             return $model->belongsTo(
                 $this->getRelatedEntryType()::model(),
-                $this->getRelationshipMethod() . '_id',
+                $this->getRelationshipColumn(),
                 $model->getKeyName(),
                 $this->getRelationshipMethod()
             );
         };
     }
 
-    protected function processWriteValue($value)
+    protected function processWriteValue($value, ?EntryType $entryType = null)
     {
         $method = $this->getRelationshipMethod();
 
-        dd($method);
+        $entryType->modelInstance()->{$method}()->associate($value);
+
+        return new UndefinedValue;
+    }
+
+    protected function processReadValue($value, ?EntryType $entryType = null)
+    {
+        return SelectOptionCollection::make([
+            SelectOption::make(
+                (string)$value->getKey(),
+                $value->name,
+            ),
+        ]);
     }
 }

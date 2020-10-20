@@ -7,7 +7,6 @@ use CbtechLtd\Fastlane\Fields\Rules\Unique;
 use CbtechLtd\Fastlane\Fields\Types\Panel;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -72,7 +71,7 @@ abstract class Field implements Arrayable
      */
     public function getAttribute(): string
     {
-        return $this->config->get('attribute');
+        return $this->config->get('attribute', '');
     }
 
     /**
@@ -382,7 +381,7 @@ abstract class Field implements Arrayable
             return $this->readResolverCallback->call($this, $value, $entryType);
         }
 
-        return $this->processReadValue($value);
+        return $this->processReadValue($value, $entryType);
     }
 
     public function write($value, ?EntryType $entryType = null)
@@ -391,7 +390,7 @@ abstract class Field implements Arrayable
             return $this->writeResolverCallback->call($this, $value, $entryType);
         }
 
-        return $this->processWriteValue($value);
+        return $this->processWriteValue($value, $entryType);
     }
 
     /**
@@ -577,12 +576,12 @@ abstract class Field implements Arrayable
         return $this;
     }
 
-    protected function processReadValue($value)
+    protected function processReadValue($value, ?EntryType $entryType = null)
     {
         return $value;
     }
 
-    protected function processWriteValue($value)
+    protected function processWriteValue($value, ?EntryType $entryType = null)
     {
         return $value;
     }

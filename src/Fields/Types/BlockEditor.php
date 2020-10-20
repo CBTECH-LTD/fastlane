@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Fields\Types;
 
 use CbtechLtd\Fastlane\ContentBlocks\ContentBlockCollection;
 use CbtechLtd\Fastlane\Contracts\ContentBlockRepository;
+use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Field;
 use Illuminate\Support\Collection;
 
@@ -43,9 +44,9 @@ class BlockEditor extends Field
         return parent::toArray();
     }
 
-    protected function processReadValue($value)
+    protected function processReadValue($value, ?EntryType $entryType = null)
     {
-        $val = json_decode($value ?? '[]', true);
+        $val = is_array($value) ? $value : json_decode($value ?? '[]', true);
 
         return Collection::make($val)->map(function (array $block) {
             if (! $instance = app(ContentBlockRepository::class)->findByKey($block['block'])) {
@@ -56,7 +57,7 @@ class BlockEditor extends Field
         })->filter();
     }
 
-    protected function processWriteValue($value)
+    protected function processWriteValue($value, ?EntryType $entryType = null)
     {
         return json_encode($value);
     }

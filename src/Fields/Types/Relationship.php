@@ -18,14 +18,13 @@ abstract class Relationship extends Field
      * Relationship constructor.
      *
      * @param EntryType|string $relatedEntryType
-     * @param mixed            ...$columns
+     * @param string|null      $attribute
      */
-    public function __construct(string $relatedEntryType, ...$columns)
+    public function __construct(string $relatedEntryType, ?string $attribute = null)
     {
         $this->relatedEntryType = $relatedEntryType::newInstance();
-        $this->columns = $columns;
 
-        parent::__construct($this->getRelationshipLabel(), $this->getRelationshipMethod());
+        parent::__construct($this->getRelationshipLabel(), $attribute);
 
         $this->mergeConfig([
             'multiple'   => false,
@@ -33,6 +32,12 @@ abstract class Relationship extends Field
             'options'    => $this->loadOptionsFromRelatedEntryType(),
             'type'       => 'select',
         ]);
+    }
+
+    public function withColumns(...$columns): self
+    {
+        $this->columns = $columns;
+        return $this;
     }
 
     /**

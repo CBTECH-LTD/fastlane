@@ -69,7 +69,7 @@ class File extends Field implements Contracts\HasAttachments
         return $this->getConfig('multiple');
     }
 
-    protected function processReadValue($value)
+    protected function processReadValue($value, ?EntryType $entryType = null)
     {
 
         return FileManagerEntryType::queryListing(false, function (QueryBuilder $builder) use ($value) {
