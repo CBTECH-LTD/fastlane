@@ -55,11 +55,13 @@ class CreateSystemAdminCommand extends Command
             return false;
         }
 
-        $user = User::create([
-            'name'     => $name,
-            'email'    => $email,
-            'password' => $password,
-        ]);
+        $user = new User;
+
+        $user->name = $name;
+        $user->email = $email;
+        $user->setPasswordAttribute($password);
+
+        $user->save();
 
         $user->assignRole(BackendUserEntryType::ROLE_SYSTEM_ADMIN);
 
