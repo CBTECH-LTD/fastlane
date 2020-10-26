@@ -180,6 +180,7 @@ class FastlaneServiceProvider extends ServiceProvider
         Inertia::share('app.cpUrls', function () {
             return [
                 'fileManager' => route('cp.file-manager.index'),
+                'logout' => route('cp.logout'),
             ];
         });
 
