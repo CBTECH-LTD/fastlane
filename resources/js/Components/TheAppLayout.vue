@@ -86,7 +86,7 @@ export default {
     methods: {
         async signOut () {
             this.isSigningOut = true
-            await this.$inertia.post('/cp/logout')
+            await this.$inertia.post(this.$page.app.cpUrls.logout)
             this.isSigningOut = false
         },
 
