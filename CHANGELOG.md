@@ -2,6 +2,13 @@
 
 All notable changes to `fastlane` will be documented in this file
 
+## [0.11.2] - 2020-10-26
+
+### Fixed
+- Logout URL.
+
+---
+
 ## [0.11.1] - 2020-10-20
 
 ### Fixed
