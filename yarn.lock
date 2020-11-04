@@ -925,6 +925,11 @@
     mini-svg-data-uri "^1.0.3"
     traverse "^0.6.6"
 
+"@tinymce/tinymce-vue@^3.2.6":
+  version "3.2.6"
+  resolved "https://registry.yarnpkg.com/@tinymce/tinymce-vue/-/tinymce-vue-3.2.6.tgz#66bf3c1d338348e9ec9da16f98b980eecb698603"
+  integrity sha512-MOzYtjvzzjY2ziiK3a9Mbv/Yl4KptAqQD1l51OVjme4CF1RapEevSgnKHTzsu61F8iHfRjFogdCWy2QG6HATNg==
+
 "@transloadit/prettier-bytes@0.0.7":
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/@transloadit/prettier-bytes/-/prettier-bytes-0.0.7.tgz#cdb5399f445fdd606ed833872fa0cabdbc51686b"
