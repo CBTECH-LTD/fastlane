@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\EntryTypes\Content;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
+use CbtechLtd\Fastlane\QueryFilter\QueryFilterContract;
 use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
 use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
@@ -76,5 +77,12 @@ class ContentEntryType extends EntryType implements RenderableOnMenu
     public function queryBuilder(): QueryBuilder
     {
         return new QueryBuilder($this);
+    }
+
+    protected function prepareQueryFilter(QueryFilterContract $queryFilter): void
+    {
+        if (is_null(request()->input('order'))) {
+            $queryFilter->addOrder('name');
+        }
     }
 }
