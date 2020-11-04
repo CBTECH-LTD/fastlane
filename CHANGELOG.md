@@ -2,6 +2,13 @@
 
 All notable changes to `fastlane` will be documented in this file
 
+## [0.11.3] - 2020-11-04
+
+### Changed
+- Default content order to name field.
+
+---
+
 ## [0.11.2] - 2020-10-26
 
 ### Fixed
