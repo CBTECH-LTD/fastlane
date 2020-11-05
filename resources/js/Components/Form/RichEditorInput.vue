@@ -67,7 +67,11 @@ export default {
             editorConfig: {
                 height: 500,
                 menubar: false,
+                document_base_url: this.$page.app.baseUrl + '/',
+                relative_urls: false,
+                remove_script_host: true,
                 image_title: true,
+                image_advtab: true,
                 file_picker_callback: (cb, value, meta) => this.openFileManager(cb, value, meta),
                 plugins: [
                     'advlist autolink lists charmap anchor link image table',
