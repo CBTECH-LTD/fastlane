@@ -2,6 +2,13 @@
 
 All notable changes to `fastlane` will be documented in this file
 
+## [0.12.0] - 2020-11-05
+
+### Changed
+- Rich Editor from tiptap to TinyMCE 5.
+
+---
+
 ## [0.11.3] - 2020-11-04
 
 ### Changed
