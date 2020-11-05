@@ -2,187 +2,56 @@
     <f-form-field :errors="$page.errors.get(field.name)" :required="field.required">
         <template v-if="field.label" v-slot:label>{{ field.label }}</template>
         <div class="w-full">
-            <!-- MENU BAR -->
-            <editor-menu-bar :editor="editor" v-slot="{ commands, isActive }">
-                <div class="rich-editor__menubar">
-                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.paragraph() }" @click="commands.paragraph">
-                        <f-icon class="text-lg" name="paragraph"/>
-                    </button>
-
-                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.heading({ level: 1 }) }" @click="commands.heading({ level: 1 })">
-                        H1
-                    </button>
-
-                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.heading({ level: 2 }) }" @click="commands.heading({ level: 2 })">
-                        H2
-                    </button>
-
-                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.heading({ level: 3 }) }" @click="commands.heading({ level: 3 })">
-                        H3
-                    </button>
-
-                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.bullet_list() }" @click="commands.bullet_list">
-                        <f-icon class="text-lg" name="list-ul"/>
-                    </button>
-
-                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.ordered_list() }" @click="commands.ordered_list">
-                        <f-icon class="text-lg" name="list-ol"/>
-                    </button>
-
-                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.blockquote() }" @click="commands.blockquote">
-                        <f-icon class="text-lg" name="quote-left"/>
-                    </button>
-
-                    <button type="button" class="rich-editor__menubar__button" @click="openFileManager">
-                        <f-icon class="text-lg" name="image"/>
-                    </button>
-                    <portal to="modals">
-                        <f-file-manager  v-if="showFileManager" :endpoint="field.config.links.fileManager" :file-types="['image/*']" :csrf-token="$page.app.csrfToken" @files-selected="files => onFilesSelected(files, commands.image)" @close="closeFileManager" />
-                    </portal>
-
-                    <button type="button" class="rich-editor__menubar__button" @click="commands.iframe">
-                        <f-icon class="text-lg" name="film"/>
-                    </button>
-
-                    <!-- TABLES -->
-                    <span class="inline-block flex items-center rounded" :class="{'border border-gray-300': isActive.table()}">
-                        <button type="button" class="rich-editor__menubar__button" @click="commands.createTable({rowsCount: 3, colsCount: 3, withHeaderRow: false })">
-                            <f-icon class="text-lg" name="table"/>
-                        </button>
-                        <span v-if="isActive.table()" class="inline-block flex items-center">
-                            <button type="button" class="rich-editor__menubar__button" @click="commands.deleteTable">
-                                <f-icon class="text-lg" name="trash"/>
-                            </button>
-                            <span class="divider"></span>
-                            <button class="rich-editor__menubar__button" @click="commands.addColumnBefore">
-                                <f-icon class="text-lg" name="caret-square-left"/>
-                            </button>
-                            <button type="button" class="rich-editor__menubar__button" @click="commands.addColumnAfter">
-                                <f-icon class="text-lg" name="caret-square-right"/>
-                            </button>
-                            <button type="button" class="rich-editor__menubar__button" @click="commands.deleteColumn">
-                                <f-icon class="text-lg" name="window-close"/>
-                            </button>
-                            <span class="rich-editor__menubar__divider"></span>
-                            <button type="button" class="rich-editor__menubar__button" @click="commands.addRowBefore">
-                                <f-icon class="text-lg" name="caret-square-up"/>
-                            </button>
-                            <button type="button" class="rich-editor__menubar__button" @click="commands.addRowAfter">
-                                <f-icon class="text-lg" name="caret-square-down"/>
-                            </button>
-                            <button type="button" class="rich-editor__menubar__button" @click="commands.deleteRow">
-                                <f-icon class="text-lg" name="window-close"/>
-                            </button>
-                            <span class="rich-editor__menubar__divider"></span>
-                            <button class="rich-editor__menubar__button" @click="commands.toggleCellMerge">
-                                <f-icon class="text-lg" name="expand"/>
-                            </button>
-                        </span>
-					</span>
-
-                    <span class="rich-editor__menubar__divider"></span>
-
-                    <button type="button" class="rich-editor__menubar__button" :class="{ 'is-active': isActive.code_block() }" @click="commands.code_block">
-                        <f-icon class="text-lg" name="terminal"/>
-                    </button>
-
-                    <button type="button" class="rich-editor__menubar__button" @click="commands.horizontal_rule">
-                        <f-icon class="text-lg" name="ruler-horizontal"/>
-                    </button>
-
-                    <button type="button" class="rich-editor__menubar__button" @click="commands.undo">
-                        <f-icon class="text-lg" name="undo"/>
-                    </button>
-
-                    <button type="button" class="rich-editor__menubar__button" @click="commands.redo">
-                        <f-icon class="text-lg" name="redo"/>
-                    </button>
-                </div>
-            </editor-menu-bar>
-
-            <!-- MENU BUBBLE -->
-            <editor-menu-bubble class="rich-editor__menububble" :editor="editor" @hide="hideLinkMenu" v-slot="{ commands, isActive, getMarkAttrs, menu }">
-                <div class="rich-editor__menububble" :class="{ 'is-active': menu.isActive }" :style="`left: ${menu.left}px; bottom: ${menu.bottom}px;`">
-                    <!-- GENERAL -->
-                    <button type="button" class="rich-editor__menububble__button" :class="{ 'is-active': isActive.bold() }" @click="commands.bold">
-                        <f-icon class="text-lg" name="bold"/>
-                    </button>
-
-                    <button type="button" class="rich-editor__menububble__button" :class="{ 'is-active': isActive.italic() }" @click="commands.italic">
-                        <f-icon class="text-lg" name="italic"/>
-                    </button>
-
-                    <button type="button" class="rich-editor__menububble__button" :class="{ 'is-active': isActive.strike() }" @click="commands.strike">
-                        <f-icon class="text-lg" name="strikethrough"/>
-                    </button>
-
-                    <button type="button" class="rich-editor__menububble__button" :class="{ 'is-active': isActive.underline() }" @click="commands.underline">
-                        <f-icon class="text-lg" name="underline"/>
-                    </button>
-
-                    <button type="button" class="rich-editor__menububble__button" :class="{ 'is-active': isActive.code() }" @click="commands.code">
-                        <f-icon class="text-lg" name="code"/>
-                    </button>
-
-                    <!-- LINKS -->
-                    <form class="rich-editor__menububble__form" v-if="linkMenuIsActive" @submit.prevent="setLinkUrl(commands.link, linkUrl)">
-                        <input class="rich-editor__menububble__input" type="text" v-model="linkUrl" placeholder="https://" ref="linkInput" @keydown.esc="hideLinkMenu"/>
-                        <button class="rich-editor__menububble__button" @click="setLinkUrl(commands.link, null)" type="button">
-                            <f-icon class="text-lg" name="trash"/>
-                        </button>
-                    </form>
-                    <template v-else>
-                        <button class="rich-editor__menububble__button" @click="showLinkMenu(getMarkAttrs('link'))" :class="{ 'is-active': isActive.link() }">
-                            <f-icon class="text-lg" name="link"/>
-                        </button>
-                    </template>
-                </div>
-            </editor-menu-bubble>
-
-            <editor-content class="rich-editor__editor__content form-input" :editor="editor"/>
+            <Editor
+                :initialValue="field.value"
+                :init="editorConfig"
+                @onChange="(ev, editor) => onInput(editor.getContent())"
+            ></Editor>
         </div>
+
+        <portal to="modals">
+            <f-file-manager v-if="fileManagerSettings !== null" max-number-of-files="1" :endpoint="field.config.links.fileManager" :file-types="['image/*']" :csrf-token="$page.app.csrfToken" @files-selected="files => onFilesSelected(files)" @close="closeFileManager" />
+        </portal>
     </f-form-field>
 </template>
 
 <script>
 import axios from 'axios'
-import { Editor, EditorContent, EditorMenuBar, EditorMenuBubble } from 'tiptap'
-import {
-    Blockquote,
-    CodeBlock,
-    HardBreak,
-    Heading,
-    HorizontalRule,
-    OrderedList,
-    BulletList,
-    ListItem,
-    TodoItem,
-    TodoList,
-    Image,
-    Bold,
-    Code,
-    Italic,
-    Link,
-    Strike,
-    Underline,
-    History,
-    Table,
-    TableHeader,
-    TableCell,
-    TableRow,
-} from 'tiptap-extensions'
-import Iframe from './tiptap/iframe'
-import { v4 as uuidv4 } from 'uuid'
+import Editor from '@tinymce/tinymce-vue'
 import FormInput from '../Mixins/FormInput'
+
+// Tiny MCE
+import 'tinymce/tinymce'
+import 'tinymce/icons/default'
+import 'tinymce/themes/silver/theme'
+
+// Tiny Plugins
+import 'tinymce/plugins/advlist'
+import 'tinymce/plugins/anchor'
+import 'tinymce/plugins/autolink'
+import 'tinymce/plugins/autoresize'
+import 'tinymce/plugins/charmap'
+import 'tinymce/plugins/code'
+import 'tinymce/plugins/fullscreen'
+import 'tinymce/plugins/help'
+import 'tinymce/plugins/hr'
+import 'tinymce/plugins/image'
+import 'tinymce/plugins/imagetools'
+import 'tinymce/plugins/link'
+import 'tinymce/plugins/lists'
+import 'tinymce/plugins/media'
+import 'tinymce/plugins/paste'
+import 'tinymce/plugins/searchreplace'
+import 'tinymce/plugins/table'
+import 'tinymce/plugins/visualblocks'
+import 'tinymce/plugins/wordcount'
 
 export default {
     name: 'RichEditorInput',
     mixins: [FormInput],
     inheritAttrs: false,
     components: {
-        EditorMenuBar,
-        EditorMenuBubble,
-        EditorContent,
+        Editor,
     },
 
     props: {
@@ -192,12 +61,29 @@ export default {
         },
     },
 
-    data: () => ({
-        editor: null,
-        linkUrl: null,
-        linkMenuIsActive: false,
-        showFileManager: false,
-    }),
+    data () {
+        return {
+            editor: null,
+            editorConfig: {
+                height: 500,
+                menubar: false,
+                image_title: true,
+                file_picker_callback: (cb, value, meta) => this.openFileManager(cb, value, meta),
+                plugins: [
+                    'advlist autolink lists charmap anchor link image table',
+                    'searchreplace visualblocks code fullscreen',
+                    'media hr paste help wordcount'
+                ],
+                toolbar: 'undo redo | formatselect | bold italic link | hr | image imagetools media | \
+                            table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | \
+                            alignleft aligncenter alignright | \
+                            bullist numlist charmap anchor outdent indent | fullscreen help'
+            },
+            linkUrl: null,
+            linkMenuIsActive: false,
+            fileManagerSettings: null,
+        }
+    },
 
     methods: {
         /**
@@ -233,89 +119,29 @@ export default {
             console.log(attachment)
         },
 
-        showLinkMenu (attrs) {
-            this.linkUrl = attrs.href
-            this.linkMenuIsActive = true
-            this.$nextTick(() => {
-                this.$refs.linkInput.focus()
-            })
-        },
-
-        hideLinkMenu () {
-            this.linkUrl = null
-            this.linkMenuIsActive = false
-        },
-
-        setLinkUrl (command, url) {
-            command({ href: url })
-            this.hideLinkMenu()
-        },
-
-        openFileManager () {
-            this.showFileManager = true
+        openFileManager (callback, value, meta) {
+            this.fileManagerSettings = { callback, value, meta }
         },
 
         closeFileManager () {
-            this.showFileManager = false
+            this.fileManagerSettings = null
         },
 
-        onFilesSelected (files, command) {
+        onFilesSelected (files) {
+            console.log('onFilesSelected', files)
+
+            this.fileManagerSettings.callback(files[0].url, { title: files[0].name })
+
             this.closeFileManager()
-
-            files.forEach(f => {
-                command({
-                    src: f.url,
-                })
-            })
-        },
-
-        cleanUp () {
-            this.editor.destroy()
-
-            if (this.field.config.acceptFiles) {
-                // TODO: Delete draft attachments
-            }
         },
     },
 
     mounted () {
-        this.editor = new Editor({
-            content: this.field.value,
-            extensions: [
-                new Blockquote(),
-                new BulletList(),
-                new CodeBlock(),
-                new HardBreak(),
-                new Heading({ levels: [1, 2, 3] }),
-                new ListItem(),
-                new OrderedList(),
-                new TodoItem(),
-                new TodoList(),
-                new Image(),
-                new Link(),
-                new Bold(),
-                new Code(),
-                new Italic(),
-                new Strike(),
-                new Underline(),
-                new History(),
-                new HorizontalRule(),
-                new Table({
-                    resizable: true,
-                }),
-                new TableHeader(),
-                new TableCell(),
-                new TableRow(),
-                new Iframe(),
-            ],
-            onUpdate: ({ getHTML }) => {
-                this.onInput(getHTML())
-            }
-        })
+        //
     },
 
     beforeDestroy () {
-        this.cleanUp()
+        //
     }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
     <div tabindex="0" @keydown.esc="close">
-        <div class="fixed top-0 left-0 w-full h-screen bg-black bg-opacity-50 flex items-center justify-center p-8 z-50">
+        <div class="fixed top-0 left-0 w-full h-screen bg-black bg-opacity-50 flex items-center justify-center p-8" style="z-index: 2000;">
             <div class="relative w-full h-full bg-white shadow-lg rounded-lg">
                 <div class="absolute top-0 left-0 w-full h-16 flex items-center justify-between border-b border-gray-200 px-4">
                     <div>

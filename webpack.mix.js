@@ -16,6 +16,7 @@ const mix = require('laravel-mix')
 mix
     .setPublicPath('public')
     .copy('resources/fonts', 'public/fonts')
+    .copy('node_modules/tinymce/skins', 'public/skins')
     .copy('resources/icons', 'public/icons')
     .copy('resources/img', 'public/img')
     .js('resources/js/app.js', 'public')
@@ -38,4 +39,6 @@ mix
         },
     })
     .version()
+
+    // Copy files in the dev environment
     .copy('public', '../../public/vendor/fastlane')

@@ -4,30 +4,6 @@
 /* flatpickr v4.6.3, @license MIT */
 
 /*!
-    * tiptap v1.29.5
-    * (c) 2020 überdosis GbR (limited liability)
-    * @license MIT
-    */
-
-/*!
-    * tiptap-commands v1.14.5
-    * (c) 2020 überdosis GbR (limited liability)
-    * @license MIT
-    */
-
-/*!
-    * tiptap-extensions v1.32.6
-    * (c) 2020 überdosis GbR (limited liability)
-    * @license MIT
-    */
-
-/*!
-    * tiptap-utils v1.10.0
-    * (c) 2020 Scrumpy UG (limited liability)
-    * @license MIT
-    */
-
-/*!
   Copyright (c) 2017 Jed Watson.
   Licensed under the MIT License (MIT), see
   http://jedwatson.github.io/classnames
