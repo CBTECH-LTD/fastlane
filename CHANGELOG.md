@@ -2,6 +2,13 @@
 
 All notable changes to `fastlane` will be documented in this file
 
+## [0.12.1] - 2020-11-05
+
+### Fixed
+- PSR-4 wrong namespaces.
+
+---
+
 ## [0.12.0] - 2020-11-05
 
 ### Changed
