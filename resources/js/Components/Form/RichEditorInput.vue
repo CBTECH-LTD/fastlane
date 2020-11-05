@@ -5,6 +5,7 @@
             <Editor
                 :initialValue="field.value"
                 :init="editorConfig"
+                @onChange="(ev, editor) => onInput(editor.getContent())"
             ></Editor>
         </div>
 
@@ -18,6 +19,32 @@
 import axios from 'axios'
 import Editor from '@tinymce/tinymce-vue'
 import FormInput from '../Mixins/FormInput'
+
+// Tiny MCE
+import 'tinymce/tinymce'
+import 'tinymce/icons/default'
+import 'tinymce/themes/silver/theme'
+
+// Tiny Plugins
+import 'tinymce/plugins/advlist'
+import 'tinymce/plugins/anchor'
+import 'tinymce/plugins/autolink'
+import 'tinymce/plugins/autoresize'
+import 'tinymce/plugins/charmap'
+import 'tinymce/plugins/code'
+import 'tinymce/plugins/fullscreen'
+import 'tinymce/plugins/help'
+import 'tinymce/plugins/hr'
+import 'tinymce/plugins/image'
+import 'tinymce/plugins/imagetools'
+import 'tinymce/plugins/link'
+import 'tinymce/plugins/lists'
+import 'tinymce/plugins/media'
+import 'tinymce/plugins/paste'
+import 'tinymce/plugins/searchreplace'
+import 'tinymce/plugins/table'
+import 'tinymce/plugins/visualblocks'
+import 'tinymce/plugins/wordcount'
 
 export default {
     name: 'RichEditorInput',
@@ -43,12 +70,11 @@ export default {
                 image_title: true,
                 file_picker_callback: (cb, value, meta) => this.openFileManager(cb, value, meta),
                 plugins: [
-                    'advlist autolink lists charmap anchor link image charmap table',
+                    'advlist autolink lists charmap anchor link image table',
                     'searchreplace visualblocks code fullscreen',
-                    'print preview anchor insertdatetime media hr',
-                    'paste code help wordcount table'
+                    'media hr paste help wordcount'
                 ],
-                toolbar: 'undo redo | formatselect | bold italic | hr | image imagetools media | \
+                toolbar: 'undo redo | formatselect | bold italic link | hr | image imagetools media | \
                             table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | \
                             alignleft aligncenter alignright | \
                             bullist numlist charmap anchor outdent indent | fullscreen help'
