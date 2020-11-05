@@ -2097,7 +2097,7 @@ button.uppy-Dashboard-Item-progressIndicator:focus .uppy-Dashboard-Item-progress
 }
 
 .uppy-Dashboard--modal {
-    z-index: 1001;
+    z-index: 3000;
 }
 
 .uppy-Dashboard--modal[aria-hidden=true] {
