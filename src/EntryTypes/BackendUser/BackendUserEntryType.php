@@ -5,7 +5,6 @@ namespace CbtechLtd\Fastlane\EntryTypes\BackendUser;
 use CbtechLtd\Fastlane\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
-use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use CbtechLtd\Fastlane\EntryTypes\RendersOnMenu;
 use CbtechLtd\Fastlane\Fields\Support\SelectOption;
 use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
@@ -13,11 +12,8 @@ use CbtechLtd\Fastlane\Fields\Types\ActiveToggle;
 use CbtechLtd\Fastlane\Fields\Types\Panel;
 use CbtechLtd\Fastlane\Fields\Types\Select;
 use CbtechLtd\Fastlane\Fields\Types\ShortText;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
+use CbtechLtd\Fastlane\Http\Controllers\BackendUserController;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
 use Laravel\Sanctum\NewAccessToken;
 use Spatie\Permission\Models\Role;
 
@@ -29,71 +25,48 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
     const PERM_MANAGE_ACCESS_TOKENS = 'manage personal access tokens';
     const ROLE_SYSTEM_ADMIN = 'system admin';
 
-    public static function boot(): void
-    {
-        parent::boot();
+    /** @var string */
+    protected static string $key = 'users';
 
-        static::listen(static::EVENT_CREATING, function (Model $model, array $data) {
-            $model->setPasswordAttribute(Str::random(12));
-        });
+    /** @var string|null */
+    protected static ?string $icon = 'user';
 
-        static::listen(static::EVENT_QUERY_LISTING, function (QueryBuilder $builder) {
-            $builder->except([Auth::user()->getKey()]);
-        });
+    protected static array $label = [
+        'singular' => 'User',
+        'plural'   => 'Users',
+    ];
 
-        static::listen(static::EVENT_SAVED, function (User $model, array $data) {
-            if (Arr::has($data, 'role')) {
-                $model->syncRoles(Arr::wrap($data['role']));
-            }
-        });
-    }
+    /** @var string */
+    protected static string $repository = BackendUserRepository::class;
 
-    public static function model(): string
-    {
-        return User::class;
-    }
+    /** @var string */
+    protected static string $controller = BackendUserController::class;
 
-    public static function policy(): ?string
-    {
-        return BackendUserPolicy::class;
-    }
-
-    public static function icon(): string
-    {
-        return 'user';
-    }
-
-    public static function name(): string
-    {
-        return __('fastlane::core.user.singular_name');
-    }
-
-    public static function pluralName(): string
-    {
-        return __('fastlane::core.user.plural_name');
-    }
-
+    /**
+     * @inheritDoc
+     */
     public static function fields(): array
     {
         return [
-            ShortText::make('Name')->required()->listable()->sortable(),
-            ShortText::make('Email')->required()->unique()->listable()->sortable(),
+            Panel::make('Profile')->withFields([
+                ShortText::make('Name')->required()->listable()->sortable(),
+                ShortText::make('Email')->required()->unique()->listable()->sortable()->withHelp('An unique email'),
+                Select::make('Role')->withOptions(SelectOptionCollection::lazy(function () {
+                    return Role::all()->map(fn(Role $role) => SelectOption::make($role->name, $role->name))->all();
+                })),
+            ])->withIcon('id-card'),
+
             Panel::make('Settings')->withFields([
-                Select::make('Role')
-                    ->computed()
-                    ->withOptions(SelectOptionCollection::lazy(function () {
-                        return Role::all()->map(fn(Role $role) => SelectOption::make($role->name, $role->name))->all();
-                    })),
                 ActiveToggle::make()->listable(),
-            ]),
+            ])->withIcon('cog'),
         ];
     }
 
-    public function createToken(string $name, array $abilities): NewAccessToken
+    public static function createToken(User $user, string $name, array $abilities): NewAccessToken
     {
-        Gate::authorize('createToken', $this->modelInstance());
+        Gate::authorize('createToken', $user);
 
-        return $this->modelInstance()->createToken($name, $abilities);
+        return $user->createToken($name, $abilities);
     }
 
     protected static function menuGroup(): string

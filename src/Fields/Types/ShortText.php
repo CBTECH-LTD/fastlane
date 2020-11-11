@@ -6,5 +6,5 @@ use CbtechLtd\Fastlane\Fields\Field;
 
 class ShortText extends Field
 {
-    protected string $component = 'string';
+    protected string $formComponent = \CbtechLtd\Fastlane\View\Components\Form\ShortText::class;
 }

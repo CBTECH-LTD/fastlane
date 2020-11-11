@@ -8,7 +8,7 @@ use CbtechLtd\Fastlane\Fields\Field;
 
 class Date extends Field
 {
-    protected string $component = 'date';
+    protected string $formComponent = 'date';
 
     public function __construct(string $label, ?string $attribute = null)
     {

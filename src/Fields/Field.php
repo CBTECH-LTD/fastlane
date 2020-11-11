@@ -5,16 +5,20 @@ namespace CbtechLtd\Fastlane\Fields;
 use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Rules\Unique;
 use CbtechLtd\Fastlane\Fields\Types\Panel;
+use CbtechLtd\Fastlane\View\Components\Listing\ShortText;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Webmozart\Assert\Assert;
 
 abstract class Field implements Arrayable
 {
-    protected string $component;
+    protected string $formComponent;
+    protected string $listingComponent = ShortText::class;
     protected Collection $config;
     protected Collection $visibility;
     protected Collection $rules;
@@ -32,6 +36,12 @@ abstract class Field implements Arrayable
     /** @var int */
     protected int $listingColWidth = 0;
 
+    /** @var EntryType|string */
+    protected string $entryType;
+
+    /** @var Model */
+    protected Model $model;
+
     public static function make(...$attributes): self
     {
         return new static(...$attributes);
@@ -40,17 +50,17 @@ abstract class Field implements Arrayable
     public function __construct(string $label, ?string $attribute = null)
     {
         $this->config = new Collection([
-            'label'     => $label,
-            'attribute' => $attribute ?? Str::slug($label, '_'),
-            'required'  => false,
-            'unique'    => false,
-            'sortable'  => false,
-            'default'   => null,
-            'panel'     => null,
-            'computed'  => false,
-            'listing'   => new Collection([
-                'colWidth' => $this->listingColWidth,
-            ]),
+            'label'           => $label,
+            'attribute'       => $attribute ?? Str::slug($label, '_'),
+            'placeholder'     => $label,
+            'help'            => new HtmlString(''),
+            'required'        => false,
+            'unique'          => false,
+            'sortable'        => false,
+            'default'         => null,
+            'panel'           => null,
+            'computed'        => false,
+            'listingColWidth' => $this->listingColWidth,
         ]);
 
         $this->visibility = new Collection([
@@ -66,12 +76,54 @@ abstract class Field implements Arrayable
         ]);
     }
 
+    public function resolve(string $entryType, Model $model): self
+    {
+        $this->entryType = $entryType;
+        $this->model = $model;
+
+        return $this;
+    }
+
+    public function formComponent(): string
+    {
+        return $this->formComponent;
+    }
+
+    public function listingComponent(): string
+    {
+        return $this->listingComponent;
+    }
+
     /**
      * @return string
      */
     public function getAttribute(): string
     {
         return $this->config->get('attribute', '');
+    }
+
+    public function getLabel(): string
+    {
+        return $this->config->get('label');
+    }
+
+    public function getPlaceholder(): string
+    {
+        return $this->config->get('placeholder', $this->getLabel());
+    }
+
+    public function withHelp($text): self
+    {
+        if ($text instanceof \Illuminate\Contracts\View\View) {
+            $text = $text->render();
+        }
+
+        return $this->setConfig('help', new HtmlString($text));
+    }
+
+    public function getHelp(): HtmlString
+    {
+        return $this->getConfig('help');
     }
 
     /**
@@ -167,7 +219,7 @@ abstract class Field implements Arrayable
     {
         $callback = is_callable($rules)
             ? $rules
-            : function (array $data, EntryType $entryType) use ($rules) {
+            : function (array $data) use ($rules) {
                 return $rules;
             };
 
@@ -185,7 +237,7 @@ abstract class Field implements Arrayable
     {
         $callback = is_callable($rules)
             ? $rules
-            : function (array $data, EntryType $entryType) use ($rules) {
+            : function (array $data) use ($rules) {
                 return $rules;
             };
 
@@ -196,36 +248,35 @@ abstract class Field implements Arrayable
     /**
      * Retrieve the rules used when creating an entry.
      *
-     * @param array     $data
-     * @param EntryType $entryType
+     * @param array $data
      * @return array
      */
-    public function getCreateRules(array $data, EntryType $entryType): array
+    public function getCreateRules(array $data): array
     {
-        $customRules = $this->rules->get('create')($data, $entryType);
+        $customRules = $this->rules->get('create')($data);
 
         $rules = array_merge(
-            [$this->buildBaseRules($data, $entryType)],
-            [Arr::get($this->getFieldRules($data, $entryType), $this->getAttribute(), '')],
+            [$this->buildBaseRules($data)],
+            [Arr::get($this->getFieldRules($data), $this->getAttribute(), '')],
             [$customRules],
         );
 
-        return array_merge(Arr::except($this->getFieldRules($data, $entryType), $this->getAttribute()), [
+        return array_merge(Arr::except($this->getFieldRules($data), $this->getAttribute()), [
             $this->getAttribute() => Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|',),
         ]);
     }
 
-    public function getUpdateRules(array $data, EntryType $entryType): array
+    public function getUpdateRules(array $data): array
     {
-        $customRules = $this->rules->get('update')($data, $entryType);
+        $customRules = $this->rules->get('update')($data);
 
         $rules = array_merge(
-            ['sometimes', $this->buildBaseRules($data, $entryType)],
-            [Arr::get($this->getFieldRules($data, $entryType), $this->getAttribute(), '')],
+            ['sometimes', $this->buildBaseRules($data)],
+            [Arr::get($this->getFieldRules($data), $this->getAttribute(), '')],
             [$customRules],
         );
 
-        return array_merge(Arr::except($this->getFieldRules($data, $entryType), $this->getAttribute()), [
+        return array_merge(Arr::except($this->getFieldRules($data), $this->getAttribute()), [
             $this->getAttribute() => Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|',),
         ]);
     }
@@ -367,6 +418,13 @@ abstract class Field implements Arrayable
         return $this->hideOnCreate()->hideOnUpdate();
     }
 
+    public function getListingColWidth(): string
+    {
+        return $this->listingColWidth > 0
+            ? $this->listingColWidth . 'px'
+            : 'auto';
+    }
+
     public function setArrayFormat(string $format): self
     {
         Assert::inArray($format, ['listing', 'create', 'update']);
@@ -375,10 +433,16 @@ abstract class Field implements Arrayable
         return $this;
     }
 
-    public function read($value, ?EntryType $entryType = null)
+    public function read(Model $model, string $entryType)
     {
+        $value = $model->{$this->getAttribute()};
+
         if (is_callable($this->readResolverCallback)) {
             return $this->readResolverCallback->call($this, $value, $entryType);
+        }
+
+        if (! $model->exists) {
+            return $this->getDefault();
         }
 
         return $this->processReadValue($value, $entryType);
@@ -441,11 +505,18 @@ abstract class Field implements Arrayable
         })();
 
         return [
-            'attribute' => $this->getConfig('attribute'),
-            'component' => $this->component,
-            'value'     => $this->value,
-            'config'    => $config,
+            'attribute'  => $this->getConfig('attribute'),
+            'components' => [
+                'form'    => $this->formComponent(),
+                'listing' => $this->listingComponent(),
+            ],
+            'config'     => $config,
         ];
+    }
+
+    public function castUsing()
+    {
+        return 'string';
     }
 
     protected function prepareConfigToListing(Collection $config): array
@@ -466,27 +537,27 @@ abstract class Field implements Arrayable
     /**
      * Build the base rules.
      *
-     * @param array     $data
-     * @param EntryType $entryType
+     * @param array $data
      * @return string
      */
-    protected function buildBaseRules(array $data, EntryType $entryType): string
+    protected function buildBaseRules(array $data): string
     {
         $rules = $this->isRequired()
             ? ['required']
             : ['nullable'];
 
         if ($this->isUnique()) {
-            $rules[] = (string)($this->getConfig('unique') instanceof Unique)
-                ? $this->getConfig('unique')
-                : new Unique($entryType->modelInstance()->getTable(), $this->getAttribute());
+            // TODO: UNIQUE
+//            $rules[] = (string)($this->getConfig('unique') instanceof Unique)
+//                ? $this->getConfig('unique')
+//                : new Unique($entryType->modelInstance()->getTable(), $this->getAttribute());
         }
 
         $rules = array_merge(
             $rules,
-            $this->rules->get('config')->map(function ($rule) use ($data, $entryType) {
+            $this->rules->get('config')->map(function ($rule) use ($data) {
                 $value = is_callable($rule['params'])
-                    ? call_user_func($rule['params'], $data, $entryType)
+                    ? call_user_func($rule['params'], $data)
                     : $rule['params'];
 
                 return "{$rule['rule']}:{$value}";
@@ -499,11 +570,10 @@ abstract class Field implements Arrayable
     /**
      * Get the rules specific for the field.
      *
-     * @param array     $data
-     * @param EntryType $entryType
+     * @param array $data
      * @return array
      */
-    protected function getFieldRules(array $data, EntryType $entryType): array
+    protected function getFieldRules(array $data): array
     {
         return [];
     }
@@ -576,7 +646,7 @@ abstract class Field implements Arrayable
         return $this;
     }
 
-    protected function processReadValue($value, ?EntryType $entryType = null)
+    protected function processReadValue($value, string $entryType)
     {
         return $value;
     }

@@ -1,4 +1,4 @@
-<div class="rounded-lg bg-white border border-gray-300 shadow-lg">
+<div {{ $attributes->merge(['class' => 'rounded-lg bg-white border border-gray-300 shadow-lg']) }}>
     @isset($title)
         <div class="p-4 border-b border-gray-300 text-gray-700 font-semibold text-lg tracking-wider">
             <div class="flex items-center">

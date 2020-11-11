@@ -2,7 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Facades;
 
-use CbtechLtd\Fastlane\Contracts\EntryTypeRepository;
+use CbtechLtd\Fastlane\Contracts\EntryTypeRegistrar;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -13,13 +13,13 @@ use Illuminate\Support\Facades\Facade;
  * @method static string findByKey(string $key)
  * @method static string findByClass(string $class)
  *
- * @see     EntryTypeRepository
+ * @see     EntryTypeRegistrar
  * @package CbtechLtd\Fastlane\Facades
  */
 class EntryType extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return EntryTypeRepository::class;
+        return EntryTypeRegistrar::class;
     }
 }

@@ -9,7 +9,7 @@ class RichEditor extends Field implements Contracts\HasAttachments
 {
     use Traits\HasAttachments;
 
-    protected string $component = 'richEditor';
+    protected string $formComponent = \CbtechLtd\Fastlane\View\Components\Form\ShortText::class;
 
     public function __construct(string $label, ?string $attribute = null)
     {

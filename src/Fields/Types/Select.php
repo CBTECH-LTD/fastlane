@@ -11,7 +11,8 @@ use Illuminate\Support\Collection;
 
 class Select extends Field
 {
-    protected string $component = 'select';
+    protected string $formComponent = \CbtechLtd\Fastlane\View\Components\Form\Select::class;
+    protected string $listingComponent = \CbtechLtd\Fastlane\View\Components\Listing\Select::class;
 
     public function __construct(string $label, ?string $attribute = null)
     {
@@ -34,6 +35,17 @@ class Select extends Field
     public function asCheckboxes(): self
     {
         return $this->setConfig('type', 'checkbox');
+    }
+
+    /**
+     * Determine whether the select input should be rendered
+     * as checkboxes instead of a dropdown.
+     *
+     * @return bool
+     */
+    public function shouldRenderAsCheckboxes(): bool
+    {
+        return $this->getConfig('type') === 'checkbox';
     }
 
     /**
@@ -90,10 +102,15 @@ class Select extends Field
 
     public function getOptions(): SelectOptionCollection
     {
-        return $this->getConfig('options');
+        return $this->getConfig('options')->load();
     }
 
-    protected function processReadValue($value, ?EntryType $entryType = null)
+    public function castUsing()
+    {
+        return $this->isMultiple() ? 'array' : 'string';
+    }
+
+    protected function processReadValue($value, string $entryType)
     {
         if ($this->isMultiple()) {
             $value = Arr::wrap(is_array($value) ? $value : \json_decode($value));

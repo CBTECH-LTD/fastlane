@@ -4,92 +4,51 @@ namespace CbtechLtd\Fastlane\Support\Eloquent\Concerns;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Field;
-use CbtechLtd\Fastlane\Fields\FieldCast;
-use CbtechLtd\Fastlane\Fields\RelationshipCast;
+use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Fields\Types\Relationship;
-use Illuminate\Support\Collection;
 
 trait FromEntryType
 {
-    /** @var array<EntryType> */
-    protected static array $entryTypes = [];
-
-    /** @var EntryType */
-    protected EntryType $entryType;
-
     /**
-     * @param string | EntryType $class
+     * @return string|EntryType
      */
-    public static function withEntryType(string $class): void
+    public static function getEntryType()
     {
-        static::$entryTypes[static::class] = $class;
-    }
+        if (property_exists(static::class, 'entryType')) {
+            return static::$entryType;
+        }
 
-    /**
-     * @param EntryType $entryType
-     */
-    public function setEntryType(EntryType $entryType): void
-    {
-        $this->entryType = $entryType;
-    }
-
-    /**
-     * @return EntryType
-     */
-    public function getEntryType()
-    {
-        return $this->entryType;
+        return '';
     }
 
     public static function bootFromEntryType(): void
     {
-        if (! $entryType = static::$entryTypes[static::class] ?? null) {
-            return;
-        }
-
         // Get all fields of the entry type and add the relationships.
-        $fields = Collection::make($entryType::newInstance()->getFields()->flattenFields());
+        $fields = FieldCollection::make(static::getEntryType()::fields())->getRelationships();
 
-        $fields
-            ->filter(fn(Field $field) => $field instanceof Relationship)
-            ->each(function (Relationship $field) {
-                // We dynamically add a relation to the model if there's no
-                // method declared with the same name.
-                if (! method_exists(static::class, $field->getRelationshipMethod())) {
-                    static::resolveRelationUsing(
-                        $field->getRelationshipMethod(),
-                        $field->getRelationshipResolver()
-                    );
-                }
-            });
+        $fields->each(function (Relationship $field) {
+            // We dynamically add a relation to the model if there's no
+            // method declared with the same name.
+            if (! method_exists(static::class, $field->getRelationshipMethod())) {
+                static::resolveRelationUsing(
+                    $field->getRelationshipMethod(),
+                    $field->getRelationshipResolver()
+                );
+            }
+        });
     }
 
     public function initializeFromEntryType(): void
     {
-        if (! $entryType = static::$entryTypes[static::class] ?? null) {
-            return;
-        }
+        $fields = FieldCollection::make(static::getEntryType()::fields())->getAttributes();
 
-        $this->setEntryType($entryType::newInstance($this));
+        $casts = $fields->mapWithKeys(function (Field $field) {
+            return [
+                $field->getAttribute() => $field->castUsing(),
+            ];
+        });
 
-        // Get all fields of the entry type and add attributes
-        // and its casts to the model.
-        $fields = Collection::make($this->entryType->getFields()->flattenFields());
-
-        $casts = $fields
-            ->mapWithKeys(function (Field $field) {
-                if ($field instanceof Relationship) {
-                    return [
-                        "{$field->getAttribute()}__relation" => RelationshipCast::class,
-                    ];
-                }
-
-                return [
-                    $field->getAttribute() => FieldCast::class,
-                ];
-            });
-
-//        $this->mergeCasts($casts->all());
-//        $this->mergeFillable($casts->keys()->all());
+        $this->mergeCasts($casts->all());
+        $this->mergeFillable($casts->keys()->all());
     }
 }

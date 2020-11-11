@@ -95,7 +95,7 @@ class EntryTypeRoute
 
     public function routeName(bool $full = true): string
     {
-        $name = "{$this->entryType::key()}.{$this->name}";
+        $name = "{$this->entryType::key()}.{$this::name()}";
 
         if (! $full) {
             return $name;

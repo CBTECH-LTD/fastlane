@@ -8,17 +8,11 @@ use CbtechLtd\Fastlane\Console\Commands\InstallEntryTypesCommand;
 use CbtechLtd\Fastlane\Console\Commands\MakeEntryTypeCommand;
 use CbtechLtd\Fastlane\ContentBlocks\ContentBlockRepository;
 use CbtechLtd\Fastlane\Contracts\ContentBlockRepository as ContentBlockRepositoryContract;
-use CbtechLtd\Fastlane\Contracts\EntryTypeRepository as EntryTypeRepositoryContract;
+use CbtechLtd\Fastlane\Contracts\EntryTypeRegistrar as EntryTypeRepositoryContract;
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Commands\CreateSystemAdminCommand;
-use CbtechLtd\Fastlane\EntryTypes\EntryTypeRepository;
-use CbtechLtd\Fastlane\Http\Middleware\SetInertiaRootTemplate;
-use CbtechLtd\Fastlane\Support\Menu\MenuManager;
+use CbtechLtd\Fastlane\EntryTypes\EntryTypeRegistrar;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
-use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,7 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->bootInertia();
         $this->bootBlueprintMacro();
 
         /*
@@ -74,7 +67,7 @@ class AppServiceProvider extends ServiceProvider
     protected function registerSingletons(): void
     {
         collect([
-            EntryTypeRepositoryContract::class    => EntryTypeRepository::class,
+            EntryTypeRepositoryContract::class    => EntryTypeRegistrar::class,
             ContentBlockRepositoryContract::class => ContentBlockRepository::class,
         ])->each(function ($concrete, $abstract) {
             $this->app->singleton($abstract, $concrete);
@@ -105,77 +98,8 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    protected function bootInertia(): void
-    {
-        // Register the route middleware that sets the root path
-        // so we can use Inertia on backend and frontend.
-        $this->app['router']->aliasMiddleware('inertia', SetInertiaRootTemplate::class);
-
-        // Set data that must be available to all components.
-        Inertia::share('app.name', Config::get('app.name'));
-
-        Inertia::share('app.baseUrl', Config::get('app.url'));
-
-        Inertia::share('app.requestUrl', request()->path());
-
-//        Inertia::share('app.cpUrls', function () {
-//            return [
-//                'fileManager' => route('cp.file-manager.index'),
-//            ];
-//        });
-
-        Inertia::share('app.csrfToken', function () {
-            return csrf_token();
-        });
-
-        Inertia::share('app.assets', [
-            'logoImage'       => config('fastlane.asset_logo_img'),
-            'loginBackground' => config('fastlane.asset_login_bg'),
-        ]);
-
-        Inertia::share('auth.user', function () {
-            if (Auth::user()) {
-                return [
-                    'attributes' => Auth::user()->toArray(),
-                ];
-            }
-
-            return null;
-        });
-
-        Inertia::share('errors', function () {
-            if (Session::get('errors')) {
-                $bags = [];
-
-                foreach (Session::get('errors')->getBags() as $bag => $error) {
-                    $bags[$bag] = $error->getMessages();
-                }
-
-                return (object)$bags;
-            }
-
-            return (object)[];
-        });
-
-        Inertia::share('flashMessages', function () {
-            return Session::get('fastlane-messages');
-        });
-
-        Inertia::share('menu', function () {
-            if (Auth::check()) {
-                return (new MenuManager)->build(app()->make(config('fastlane.menu')));
-            }
-
-            return null;
-        });
-    }
-
     protected function registerViews(): void
     {
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'fastlane');
-
-        Inertia::version(function () {
-            return md5_file(__DIR__ . '/../../public/mix-manifest.json');
-        });
     }
 }

@@ -10,7 +10,7 @@ return [
      * public directory.
      */
     'asset_logo_img'        => 'vendor/fastlane/img/app-logo.png',
-    'asset_login_bg'        => 'vendor/fastlane/img/login-bg-black.jpg',
+    'asset_login_bg'        => 'vendor/fastlane/img/login-bg.jpg',
 
     /**
      * Determine whether cache of models are enabled.

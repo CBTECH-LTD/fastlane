@@ -12,11 +12,11 @@
 }
 
 .title-bar__title {
-    @apply text-3xl text-gray-700 font-extrabold;
+    @apply text-3xl text-gray-900 font-extrabold;
 }
 
 .title-bar__subtitle {
-    @apply text-lg text-gray-500 font-semibold;
+    @apply text-xl text-gray-600 font-semibold;
 }
 
 .title-bar-wrapper.is-floating {

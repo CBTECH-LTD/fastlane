@@ -25,7 +25,7 @@
             <tbody>
             @foreach ($items as $key => $item)
                 <tr class="table__row">
-                    {{ ${'row_'.$key} ?? '' }}
+                    {{ ${'row_'.$item->id} ?? '' }}
                 </tr>
             @endforeach
             </tbody>

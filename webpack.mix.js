@@ -19,14 +19,12 @@ mix
     .copy('resources/icons', 'public/icons')
     .copy('resources/img', 'public/img')
     .js('resources/js/app.js', 'public')
-    .extract([
-        '@inertiajs/inertia',
-        '@inertiajs/inertia-vue',
-        'ajv',
-        'axios',
-        'lodash',
-        'vue'
-    ])
+    // .extract([
+    //     'ajv',
+    //     'axios',
+    //     'lodash',
+    //     'vue'
+    // ])
     .postCss('resources/css/app.css', 'public', [
         require('tailwindcss')('resources/tailwind.config.js')
     ])

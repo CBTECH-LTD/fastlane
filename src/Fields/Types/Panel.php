@@ -3,11 +3,11 @@
 namespace CbtechLtd\Fastlane\Fields\Types;
 
 use CbtechLtd\Fastlane\Fields\Field;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
 
 class Panel extends Field
 {
-    protected string $component = 'panel';
+    protected string $formComponent = \CbtechLtd\Fastlane\View\Components\Form\Panel::class;
 
     public function __construct(string $label, ?string $attribute = null)
     {
@@ -23,14 +23,16 @@ class Panel extends Field
 
     public function withFields(array $fields): self
     {
-        return $this->setConfig('fields', Collection::make($fields));
+        $fields = FieldCollection::make($fields)->map(function (Field $field) {
+            return $field->inPanel($this);
+        });
+
+        return $this->setConfig('fields', $fields);
     }
 
-    public function getFields(): array
+    public function getFields(): FieldCollection
     {
-        return $this->getConfig('fields')->map(function (Field $field) {
-            return $field->inPanel($this);
-        })->all();
+        return $this->getConfig('fields');
     }
 
     public function withIcon(string $icon): self
@@ -38,13 +40,30 @@ class Panel extends Field
         return $this->setConfig('icon', $icon);
     }
 
+    public function getIcon(): string
+    {
+        return $this->getConfig('icon');
+    }
+
+    public function isVisibleOnCreate(): bool
+    {
+        return parent::isVisibleOnCreate()
+            && $this->getFields()->onCreate()->isNotEmpty();
+    }
+
+    public function isVisibleOnUpdate(): bool
+    {
+        return parent::isVisibleOnUpdate()
+            && $this->getFields()->onUpdate()->isNotEmpty();
+    }
+
     public function toArray()
     {
-        return [
-            'attribute' => $this->getAttribute(),
-            'component' => $this->component,
-            'config'    => $this->config->except('fields')->toArray(),
-        ];
+        $data = parent::toArray();
+
+        $data['config'] = Arr::except($data['config'], ['fields']);
+
+        return $data;
     }
 
 }

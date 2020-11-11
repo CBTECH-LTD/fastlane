@@ -9,7 +9,7 @@ use CbtechLtd\Fastlane\Fields\Transformers\CurrencyTransformer;
 
 class Currency extends Field
 {
-    protected string $component = 'currency';
+    protected string $formComponent = 'currency';
 
     public function __construct(string $label, ?string $attribute = null)
     {

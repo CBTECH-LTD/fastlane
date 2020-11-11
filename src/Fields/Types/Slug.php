@@ -6,7 +6,7 @@ use CbtechLtd\Fastlane\Fields\Field;
 
 class Slug extends Field
 {
-    protected string $component = 'slug';
+    protected string $formComponent = 'slug';
     protected bool $generateFromFieldOnUpdate = false;
 
     public function generateFromField(string $fieldName, bool $onUpdate = false): self

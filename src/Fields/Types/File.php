@@ -16,7 +16,7 @@ class File extends Field implements Contracts\HasAttachments
 {
     use Traits\HasAttachments;
 
-    protected string $component = 'file';
+    protected string $formComponent = 'file';
     protected array $accept = [];
 
     public function __construct(string $label, ?string $attribute = null)
@@ -69,7 +69,7 @@ class File extends Field implements Contracts\HasAttachments
         return $this->getConfig('multiple');
     }
 
-    protected function processReadValue($value, ?EntryType $entryType = null)
+    protected function processReadValue($value, string $entryType)
     {
 
         return FileManagerEntryType::queryListing(false, function (QueryBuilder $builder) use ($value) {

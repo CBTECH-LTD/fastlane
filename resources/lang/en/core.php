@@ -4,6 +4,8 @@ return [
     'add'                      => 'Add',
     'save'                     => 'Save',
     'new'                      => 'New',
+    'cancel'                   => 'Cancel',
+    'confirm'                  => 'Confirm',
     'settings'                 => 'Settings',
     'empty_lists'              => 'Nothing to show here.',
     'back_to_list'             => 'Back to list',
@@ -67,6 +69,7 @@ return [
     // Field labels
     'fields'                   => [
         'active'           => 'Active',
+        'inactive'         => 'Inactive',
         'blocks'           => 'Blocks',
         'email'            => 'Email',
         'name'             => 'Name',

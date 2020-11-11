@@ -42,7 +42,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function setupControlPanelRoutes(): void
     {
-        $middleware = array_merge(config('fastlane.control_panel.middleware'), ['inertia:fastlane']);
+        $middleware = config('fastlane.control_panel.middleware');
 
         Route::middleware($middleware)
             ->prefix(config('fastlane.control_panel.url_prefix'))

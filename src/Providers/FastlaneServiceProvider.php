@@ -9,6 +9,7 @@ class FastlaneServiceProvider extends AggregateServiceProvider
     protected $providers = [
         AppServiceProvider::class,
         AuthServiceProvider::class,
+        ViewServiceProvider::class,
         EntryTypesServiceProvider::class,
         ContentBlocksServiceProvider::class,
         RouteServiceProvider::class,

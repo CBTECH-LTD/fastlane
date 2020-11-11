@@ -7,7 +7,7 @@ class BoxedCard extends Component
     public string $icon;
     public bool $spaceless;
 
-    public function __construct(string $icon = '', bool $spaceless = true)
+    public function __construct(string $icon = '', bool $spaceless = false)
     {
         $this->icon = $icon;
         $this->spaceless = $spaceless;

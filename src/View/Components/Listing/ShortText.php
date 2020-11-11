@@ -13,6 +13,8 @@ class ShortText extends Component
 
     public function __construct(Model $model, string $attribute, $value)
     {
+        debug('short Text', $model, $attribute, $value);
+
         $this->model = $model;
         $this->value = $value;
         $this->attribute = $attribute;

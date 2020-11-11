@@ -1,46 +1,52 @@
-@component('fastlane::app')
-
-    <div class="h-screen flex">
-        <div class="flex items-center justify-center w-full md:w-1/2 bg-white px-8 py-12">
-            <div class="max-w-md w-full p-8 rounded">
-                <div class="flex flex-col justify-center items-center">
-                    <img src="{{ asset(config('fastlane.asset_logo_img')) }}" alt="" class="w-20 mb-8">
-                    <h2 class="text-center text-3xl leading-9 font-extrabold text-gray-900">
-                        {{ __('fastlane::core.login.title') }}
-                    </h2>
-                </div>
-
-                <form method="POST" action="{{ route('fastlane.cp.login') }}" class="mt-8">
-                    @csrf
-
-                    @if ($errors->isNotEmpty())
-                        <div class="w-full mb-4 rounded border border-red-200 p-4 bg-red-100 text-red-500">
-                            @foreach($errors as $error)
-                                {{ $error }}
-                            @endforeach
-                        </div>
-                    @endif
-
-                    <x-fl-field :errors="$errors->get('email')">
-                        <x-slot name="label">{{ __('fastlane::core.login.email') }}</x-slot>
-                        <input type="email" name="email" required autofocus class="form-input w-full" placeholder="{{ __('fastlane::core.login.email') }}">
-                    </x-fl-field>
-                    <x-fl-field :errors="$errors->get('password')">
-                        <x-slot name="label">{{ __('fastlane::core.login.password') }}</x-slot>
-                        <input type="password" name="password" required class="form-input w-full" placeholder="{{ __('fastlane::core.login.password') }}">
-                    </x-fl-field>
-                    <div class="py-2 text-right text-sm leading-5">
-                        <x-fl-link href="#" color="gray">
-                            {{ __('fastlane::core.login.forgot') }}
-                        </x-fl-link>
-                    </div>
-                    <div class="mt-2">
-                        <x-fl-button submit full size="lg" color="black">{{ __('fastlane::core.login.button') }}</x-fl-button>
-                    </div>
-                </form>
+@component('fastlane::app', ['bg' => 'bg-gray-200'])
+    <div class="container mx-auto h-screen flex items-center">
+        <div class="hidden md:flex w-4/6 items-center">
+            <div class="flex-shrink">
+                <img src="{{ asset(config('fastlane.asset_logo_img')) }}" alt="" class="w-24 mr-8">
+            </div>
+            <div class="text-left">
+                <h1 class="text-5xl text-brand-500 font-extrabold tracking-wider">{{ config('app.name') }}</h1>
+                <h2 class="text-2xl leading-9 font-semibold text-gray-700">
+                    {{ __('fastlane::core.login.title') }}
+                </h2>
             </div>
         </div>
-        <div class="hidden md:block flex-grow h-full bg-brand-900 right-panel" @if (config('fastlane.asset_login_bg')) style="background-image: url('{{ asset(config('fastlane.asset_login_bg')) }}')" @endif></div>
+        <div class="w-full md:w-2/6">
+            <div class="flex items-center justify-center bg-white p-6 shadow-lg rounded-lg">
+                <div class="w-full">
+                    <form method="POST" action="{{ route('fastlane.cp.login') }}">
+                        @csrf
+
+                        @if ($errors->has('email'))
+                            <div class="w-full mb-4 rounded border border-red-200 p-4 bg-red-100 text-red-500">
+                                {{ $errors->first('email') }}
+                            </div>
+                        @endif
+
+                        <div class="mb-4">
+                            <input type="email" name="email" required autofocus class="form-input w-full p-4" placeholder="{{ __('fastlane::core.login.email') }}">
+                        </div>
+                        <div class="mb-4">
+                            <input type="password" name="password" required class="form-input w-full p-4" placeholder="{{ __('fastlane::core.login.password') }}">
+                        </div>
+
+                        <div class="my-4">
+                            <x-fl-button submit full size="xl" color="brand">{{ __('fastlane::core.login.button') }}</x-fl-button>
+                        </div>
+
+                        <div class="pt-4 text-center text-base leading-5">
+                            <x-fl-link href="#" color="gray">
+                                {{ __('fastlane::core.login.forgot') }}
+                            </x-fl-link>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="text-center text-sm text-gray-600 mt-4">
+                <a href="{{ url('/') }}" class="no-underline hover:underline">{{ \Illuminate\Support\Str::replaceFirst('https://', '', \Illuminate\Support\Str::replaceFirst('http://', '', url('/'))) }}</a>
+            </div>
+        </div>
+
     </div>
 
     @push('styles')

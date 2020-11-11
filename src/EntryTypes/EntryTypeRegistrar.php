@@ -3,28 +3,32 @@
 namespace CbtechLtd\Fastlane\EntryTypes;
 
 use CbtechLtd\Fastlane\Contracts\EntryType as EntryTypeContract;
-use CbtechLtd\Fastlane\Contracts\EntryTypeRepository as Contract;
-use CbtechLtd\Fastlane\Contracts\QueryBuilder as QueryBuilderContract;
+use CbtechLtd\Fastlane\Contracts\EntryTypeRegistrar as Contract;
 use CbtechLtd\Fastlane\Exceptions\EntryTypeNotRegisteredException;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 
-class EntryTypeRepository implements Contract
+class EntryTypeRegistrar implements Contract
 {
     /** @var array|string[] */
-    public static array $bindings = [
-        QueryBuilderContract::class => QueryBuilder::class,
-    ];
+    public static array $bindings = [];
 
     /** @var Collection */
     protected Collection $items;
 
+    /** @var Application */
+    private Application $app;
+
     /**
      * EntryTypeRepository constructor.
+     *
+     * @param Application $app
      */
-    public function __construct()
+    public function __construct(Application $app)
     {
         $this->items = new Collection;
+        $this->app = $app;
     }
 
     /**
@@ -37,8 +41,6 @@ class EntryTypeRepository implements Contract
         Assert::isAOf($class, EntryTypeContract::class);
 
         $this->items->push($class);
-        
-        $class::boot();
     }
 
     /**

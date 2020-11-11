@@ -1,6 +1,6 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Http\Controllers\Account;
+namespace CbtechLtd\Fastlane\Http\Controllers\Settings;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\AccountSettingsMenuBuilder;
 use CbtechLtd\Fastlane\Http\Controllers\Controller;

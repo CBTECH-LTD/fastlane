@@ -1,6 +1,6 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Http\Controllers\Account;
+namespace CbtechLtd\Fastlane\Http\Controllers\Settings;
 
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Http\Requests\AccountUpdateRequest;

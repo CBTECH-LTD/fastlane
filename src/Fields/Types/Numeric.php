@@ -7,7 +7,7 @@ use CbtechLtd\Fastlane\Fields\Field;
 
 class Numeric extends Field
 {
-    protected string $component = 'number';
+    protected string $formComponent = 'number';
 
     public function __construct(string $label, ?string $attribute = null)
     {
@@ -17,7 +17,7 @@ class Numeric extends Field
             'decimals' => 0,
         ]);
     }
-    
+
     /**
      * Set how many decimals the value may have.
      *

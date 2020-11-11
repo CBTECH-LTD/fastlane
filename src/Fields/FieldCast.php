@@ -2,28 +2,36 @@
 
 namespace CbtechLtd\Fastlane\Fields;
 
-use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
+use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
 class FieldCast implements CastsAttributes
 {
+    protected string $entryType;
+
+    public function __construct(string $entryType)
+    {
+        $this->entryType = $entryType;
+    }
+
     public function get($model, string $key, $value, array $attributes)
     {
-        return $this->field($model, $key)->castValue($value);
+        return $this->field($key)->read($value);
     }
 
     public function set($model, string $key, $value, array $attributes)
     {
-        return $this->field($model, $key)->processValue($value);
+        return $this->field($key)->write($value);
     }
 
     /**
-     * @param BaseModel $model
-     * @param string    $key
+     * @param string $key
      * @return Field
      */
-    protected function field(BaseModel $model, string $key): Field
+    protected function field(string $key): Field
     {
-        return $model->getEntryType()->getFields()->flattenFields()->get($key);
+        return FieldCollection::make($this->entryType::fields())
+            ->flattenFields()
+            ->get($key);
     }
 }

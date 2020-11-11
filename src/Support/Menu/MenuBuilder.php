@@ -18,16 +18,6 @@ class MenuBuilder implements Menu
 
         // Generate links to entry types.
         foreach (EntryTypeFacade::all() as $entryTypeClass) {
-//            if (is_a($entryTypeClass, RenderableOnMenu::class)) {
-//                $item = MenuLink::make($entryTypeClass::routes()->index(), $entryTypeClass::pluralName())
-//                    ->group($entryTypeClass::group())
-//                    ->icon($entryTypeClass::icon())
-//                    ->when(function ($user) use ($entryTypeClass) {
-//                        return $user->can('list', $entryTypeClass::model());
-//                    });
-//
-//                $menu->push($item);
-//            }
             if (is_a($entryTypeClass, RenderableOnMenu::class, true) && $entryTypeClass::isVisibleOnMenu()) {
                 $entryTypeClass::renderOnMenu($menu);
             }
@@ -49,7 +39,7 @@ class MenuBuilder implements Menu
                     return $data->all();
                 }
 
-                return [MenuGroup::make($key)->children($data->all())];
+                return [MenuGroup::make($key)->setChildren($data->all())];
             })
             ->all();
     }

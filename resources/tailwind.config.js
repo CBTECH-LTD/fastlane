@@ -15,6 +15,7 @@ const colors = {
         '900': '#272727'
     },
     'info': {
+        default: '#61c5ff',
         '100': '#fcfeff',
         '200': '#ecf8ff',
         '300': '#d3efff',
@@ -26,6 +27,7 @@ const colors = {
         '900': '#002a42'
     },
     'success': {
+        default: '#1bd847',
         '100': '#f7fef9',
         '200': '#e6fceb',
         '300': '#bef7cb',
@@ -37,6 +39,7 @@ const colors = {
         '900': '#062e0f'
     },
     'warning': {
+        default: '#f3ae00',
         '100': '#fffefb',
         '200': '#fff4d8',
         '300': '#ffe7aa',
@@ -48,26 +51,28 @@ const colors = {
         '900': '#332500'
     },
     'danger': {
-        '100': '#fffcfc',
-        '200': '#fef3f3',
-        '300': '#fce6e6',
-        '400': '#f9c8c8',
-        '500': '#f6a9a9',
-        '600': '#f07474',
-        '700': '#e82525',
-        '800': '#9b1010',
-        '900': '#4f0808'
+        default: '#E82626',
+        '100': '#FCDFDF',
+        '200': '#F7B1B1',
+        '300': '#F28282',
+        '400': '#ED5454',
+        '500': '#E82626',
+        '600': '#C61515',
+        '700': '#981010',
+        '800': '#6A0B0B',
+        '900': '#3C0606'
     },
     'brand': {
-        '100': '#fdfdff',
-        '200': '#f5f7ff',
-        '300': '#e9edff',
-        '400': '#ced7ff',
-        '500': '#a8b8ff',
-        '600': '#8097ff',
-        '700': '#4466ff',
-        '800': '#002bea',
-        '900': '#00177c'
+        default: '#2081CF',
+        '100': '#C6E0F6',
+        '200': '#9AC9EF',
+        '300': '#6DB1E8',
+        '400': '#4199E1',
+        '500': '#2081CF',
+        '600': '#1965A3',
+        '700': '#134A77',
+        '800': '#0C2F4B',
+        '900': '#05131F'
     },
 }
 
@@ -76,7 +81,7 @@ module.exports = {
         customForms: theme => ({
             default: {
                 input: {
-                    boxShadow: theme('boxShadow.default')
+                    boxShadow: theme('boxShadow.sm')
                 }
             }
         }),
@@ -121,8 +126,8 @@ module.exports = {
                         primary: null,
                         secondary: colors.gray['900'],
                         accent: {
-                            primary: colors.gray['100'],
-                            secondary: colors.black,
+                            primary: colors.gray['200'],
+                            secondary: colors.gray['900'],
                         }
                     },
                     minimal: {
@@ -134,32 +139,6 @@ module.exports = {
                         }
                     }
                 },
-                brand: {
-                    solid: {
-                        primary: colors.brand['700'],
-                        secondary: colors.brand['100'],
-                        accent: {
-                            primary: colors.brand['800'],
-                            secondary: colors.white,
-                        }
-                    },
-                    outline: {
-                        primary: null,
-                        secondary: colors.brand['800'],
-                        accent: {
-                            primary: colors.brand['100'],
-                            secondary: colors.brand['800'],
-                        }
-                    },
-                    minimal: {
-                        primary: null,
-                        secondary: colors.brand['800'],
-                        accent: {
-                            primary: colors.brand['100'],
-                            secondary: colors.brand['800'],
-                        }
-                    }
-                }
             }
         },
         fontFamily: {

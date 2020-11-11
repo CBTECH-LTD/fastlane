@@ -6,6 +6,6 @@ class DashboardController extends Controller
 {
     public function show()
     {
-        return $this->render('Dashboard', []);
+        return view('fastlane::dashboard');
     }
 }

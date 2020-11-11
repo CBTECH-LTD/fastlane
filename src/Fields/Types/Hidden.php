@@ -7,7 +7,7 @@ use CbtechLtd\Fastlane\Fields\Field;
 
 class Hidden extends Field
 {
-    protected string $component = 'hidden';
+    protected string $formComponent = 'hidden';
 
     protected function getFieldRules(array $data, EntryType $entryType): array
     {

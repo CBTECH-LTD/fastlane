@@ -58,7 +58,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 mb-12 px-12">
+                    <div class="mt-4 mb-12 px-8 w-full">
                         <slot/>
                     </div>
                 </div>
@@ -135,7 +135,7 @@ export default {
 }
 
 .title-bar-wrapper.is-floating {
-    @apply pb-4 bg-white border-b border-brand-200  shadow-lg;
+    @apply pb-4 bg-white border-b border-brand-200 shadow-lg;
 }
 
 .title-bar-wrapper.is-floating .title-bar {

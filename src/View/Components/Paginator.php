@@ -3,9 +3,10 @@
 namespace CbtechLtd\Fastlane\View\Components;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 
-class Paginator extends Component
+class Paginator extends Component implements Arrayable
 {
     private LengthAwarePaginator $paginator;
 
@@ -14,7 +15,13 @@ class Paginator extends Component
         $this->paginator = $paginator;
     }
 
+
     public function render()
+    {
+        return view('fastlane::components.paginator', $this->toArray());
+    }
+
+    public function toArray()
     {
         $pages = Collection::make($this->paginator->getUrlRange($this->paginator->currentPage() - 3, $this->paginator->currentPage() + 3))
             ->filter(fn($v, $k) => $k > 0 && $k <= $this->paginator->lastPage())
@@ -25,7 +32,7 @@ class Paginator extends Component
             ])
             ->values();
 
-        return view('fastlane::components.paginator', [
+        return [
             'currentPage'     => $this->paginator->currentPage(),
             'lastPage'        => $this->paginator->lastPage(),
             'total'           => $this->paginator->total(),
@@ -36,7 +43,7 @@ class Paginator extends Component
             'lastPageUrl'     => $this->paginator->url($this->paginator->lastPage()),
             'hasMoreBefore'   => $this->hasMoreBefore($pages),
             'hasMoreAfter'    => $this->hasMoreAfter($pages),
-        ]);
+        ];
     }
 
     protected function hasMoreBefore(Collection $pages): bool

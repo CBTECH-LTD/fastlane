@@ -4,7 +4,7 @@ namespace CbtechLtd\Fastlane\Contracts;
 
 use CbtechLtd\Fastlane\Contracts\EntryType as EntryTypeContract;
 
-interface EntryTypeRepository
+interface EntryTypeRegistrar
 {
     /**
      * Register an entry type class in the repository.

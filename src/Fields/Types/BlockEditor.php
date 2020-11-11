@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 
 class BlockEditor extends Field
 {
-    protected string $component = 'blockEditor';
+    protected string $formComponent = 'blockEditor';
 
     public function __construct(string $label, ?string $attribute = null)
     {
@@ -44,7 +44,7 @@ class BlockEditor extends Field
         return parent::toArray();
     }
 
-    protected function processReadValue($value, ?EntryType $entryType = null)
+    protected function processReadValue($value, string $entryType)
     {
         $val = is_array($value) ? $value : json_decode($value ?? '[]', true);
 

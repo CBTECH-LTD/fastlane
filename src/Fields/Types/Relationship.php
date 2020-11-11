@@ -10,7 +10,7 @@ use Closure;
 
 abstract class Relationship extends Field
 {
-    protected string $component = 'select';
+    protected string $formComponent = 'select';
     protected EntryType $relatedEntryType;
     protected array $columns = [];
 

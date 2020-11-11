@@ -1,5 +1,5 @@
 .flash-message {
-    @apply mb-2 p-2 border-l-4 flex items-start;
+    @apply mb-2 px-2 py-1 rounded border-l-4 flex items-start;
 }
 
 .flash-message--type-success {
@@ -16,4 +16,12 @@
 
 .flash-message--type-info {
     @apply text-purple-700 bg-purple-200 border-purple-300;
+}
+
+.flash-message__icon {
+    @apply ml-2 mr-4 text-4xl;
+}
+
+.flash-message__content {
+    @apply mt-4 text-sm font-normal tracking-wide leading-relaxed;
 }

@@ -4,12 +4,12 @@
             <span class="absolute left-0 top-0 -ml-4 text-red-600">*</span>
         @endif
         @isset($label)
-            <label class="block relative font-medium text-base text-gray-600 mb-4 @if ($stacked) md:w-2/5 lg:w-2/6 @else w-full @endif @if ($required) label--required @endif">
+            <label class="block relative font-medium text-base text-gray-800 mb-2 @if ($stacked) md:w-2/5 lg:w-2/6 @else w-full @endif @if ($required) label--required @endif">
                 <span @if (!empty($errors)) class="text-red-600" @endif>
                     {{ $label ?? '' }}
                 </span>
-                <span class="block relative text-sm text-gray-500 font-normal mt-2 pr-4">
-                    {{ $description ?? '' }}
+                <span class="ml-2 relative text-sm italic text-gray-600 font-normal">
+                    {{ $help ?? '' }}
                 </span>
             </label>
         @endisset

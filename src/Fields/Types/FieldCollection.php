@@ -2,7 +2,6 @@
 
 namespace CbtechLtd\Fastlane\Fields\Types;
 
-use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\UndefinedValue;
 use Illuminate\Support\Collection;
@@ -10,8 +9,6 @@ use Webmozart\Assert\Assert;
 
 class FieldCollection extends Collection
 {
-    protected EntryType $entryType;
-
     public static function make($items = []): FieldCollection
     {
         return new static($items);
@@ -29,19 +26,6 @@ class FieldCollection extends Collection
     }
 
     /**
-     * Set the entry type which owns this field collection.
-     *
-     * @param EntryType $entryType
-     * @return $this
-     */
-    public function setEntryType(EntryType $entryType): self
-    {
-        $this->entryType = $entryType;
-
-        return $this;
-    }
-
-    /**
      * Get the create rules of the fields.
      *
      * @param array $data
@@ -49,9 +33,8 @@ class FieldCollection extends Collection
      */
     public function getCreateRules(array $data): array
     {
-        return $this->getCollection()
-            ->mapWithKeys(fn(Field $field) => $field->getCreateRules($data, $this->entryType))
-            ->all();
+        // TODO
+        return [];
     }
 
     /**
@@ -62,9 +45,7 @@ class FieldCollection extends Collection
      */
     public function getUpdateRules(array $data): array
     {
-        return $this->getCollection()
-            ->mapWithKeys(fn(Field $field) => $field->getUpdateRules($data, $this->entryType))
-            ->all();
+        return $this->flattenFields()->getCollection()->flatMap->getUpdateRules($data)->toArray();
     }
 
     /**
@@ -103,18 +84,18 @@ class FieldCollection extends Collection
         return Collection::make($this->items);
     }
 
-    public function flattenFields(): Collection
+    public function flattenFields(): FieldCollection
     {
-        return Collection::make($this->items)
-            ->mapWithKeys(function (Field $field) {
+        $fields = Collection::make($this->items)
+            ->flatMap(function (Field $field) {
                 if ($field instanceof Panel) {
-                    return FieldCollection::make($field->getFields())
-                        ->setEntryType($this->entryType)
-                        ->all();
+                    return $field->getFields()->all();
                 }
 
                 return [$field->getAttribute() => $field];
             });
+
+        return $this->newInstance($fields->all());
     }
 
     public function panels(): FieldCollection
@@ -142,16 +123,7 @@ class FieldCollection extends Collection
                 return $field->isVisibleOnCreate();
             })
             ->mapWithKeys(function (Field $field) {
-                $field->setArrayFormat('create');
-
-                if ($field instanceof Panel) {
-                    return FieldCollection::make($field->getFields())
-                        ->setEntryType($this->entryType)
-                        ->onCreate()
-                        ->all();
-                }
-
-                return [$field->getAttribute() => $field];
+                return [$field->getAttribute() => $field->setArrayFormat('create')];
             })->all();
 
         return $this->newInstance($items);
@@ -164,16 +136,7 @@ class FieldCollection extends Collection
                 return $field->isVisibleOnUpdate();
             })
             ->mapWithKeys(function (Field $field) {
-                $field->setArrayFormat('update');
-
-                if ($field instanceof Panel) {
-                    return FieldCollection::make($field->getFields())
-                        ->setEntryType($this->entryType)
-                        ->onUpdate()
-                        ->all();
-                }
-
-                return [$field->getAttribute() => $field];
+                return [$field->getAttribute() => $field->setArrayFormat('update')];
             })->all();
 
         return $this->newInstance($items);
@@ -198,6 +161,18 @@ class FieldCollection extends Collection
     {
         return $this->flattenFields()->filter(
             fn(Field $field) => ! $field instanceof Relationship
+        )->toBase();
+    }
+
+    /**
+     * Get all computed attributes.
+     *
+     * @return Collection
+     */
+    public function getComputedAttributes(): Collection
+    {
+        return $this->getAttributes()->filter(
+            fn(Field $field) => $field->isComputed()
         );
     }
 

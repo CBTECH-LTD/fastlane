@@ -3,14 +3,18 @@
 namespace CbtechLtd\Fastlane\Contracts;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryTypeRouteCollection;
-use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
-use CbtechLtd\Fastlane\Http\Transformers\EntryResource;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use CbtechLtd\Fastlane\Repositories\Repository;
+use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
 
 interface EntryType
 {
+    /**
+     * Setup the entry type.
+     *
+     * @throws \ReflectionException
+     */
+    public static function boot(): void;
+
     /**
      * Determine a unique identifier.
      *
@@ -19,120 +23,35 @@ interface EntryType
     public static function key(): string;
 
     /**
-     * The model used by the entry type.
+     * The singular and plural name of the entry type.
      *
-     * @return Model|string
+     * @return array
      */
-    public static function model(): string;
-
-    /**
-     * The singular name of the entry type.
-     *
-     * @return string
-     */
-    public static function name(): string;
-
-    /**
-     * The plural name of the entry type.
-     *
-     * @return string
-     */
-    public static function pluralName(): string;
+    public static function label(): array;
 
     /**
      * The icon to be used or empty for no icon.
      *
-     * @return string
-     */
-    public static function icon(): string;
-
-    /**
-     * The authorization policy to be registered.
-     *
      * @return string|null
      */
-    public static function policy(): ?string;
+    public static function icon(): ?string;
 
     /**
-     * The list of fields of the entry type.
+     * The repository that should be used to query the entry type.
      *
-     * @return array
+     * @return Repository
      */
-    public static function fields(): array;
+    public static function repository(): Repository;
 
     /**
-     * Bootstrap the entry type.
-     *
-     * @return void
-     */
-    public static function boot(): void;
-
-    /**
-     * Get an instance of the entry type query builder.
-     *
-     * @return QueryBuilder
-     */
-    public static function query(): QueryBuilder;
-
-    /**
-     * Get an instance of the entry type query builder
-     * to fetch items to the listing page.
-     *
-     * @param bool          $paginate
-     * @param callable|null $callback
-     * @return LengthAwarePaginator|Collection
-     */
-    public static function queryListing(bool $paginate = true, ?callable $callback = null);
-
-    /**
-     * Get an instance of the entry type query builder
-     * to fetch items
-     *
-     * @param string|int    $id
-     * @param callable|null $callback
-     * @return EntryType|null
-     */
-    public static function queryEntry($id, ?callable $callback = null): ?EntryType;
-
-    /**
-     * Get a new instance of the entry type.
-     *
-     * @param Model|null $model
-     * @return EntryType
-     */
-    public static function newInstance(?Model $model = null): EntryType;
-
-    /**
-     * Get the key (ID) of the underlying model.
-     *
-     * @return mixed
-     */
-    public function entryKey();
-
-    /**
-     * Get the route key of the underlying model.
-     *
-     * @return mixed
-     */
-    public function entryRouteKey();
-
-    /**
-     * Generate a string to be used as the description
-     * of the underlying model.
-     *
-     * @return string
-     */
-    public function entryTitle(): string;
-
-    /**
-     * Determine the controller used by the entry type.
+     * The controller that should process requests to this entry type.
      *
      * @return string
      */
     public static function controller(): string;
 
     /**
-     * Determine the available route of the entry type.
+     * The route collection that should be registered for this entry type.
      *
      * @return EntryTypeRouteCollection
      */
@@ -144,47 +63,26 @@ interface EntryType
     public static function install(): void;
 
     /**
-     * Get the underlying Model instance.
+     * The list of fields of the entry type.
      *
-     * @return Model
+     * @return array
      */
-    public function modelInstance(): Model;
+    public static function fields(): array;
 
     /**
-     * Get the collection of all resolved fields.
+     * Get the route key from the given model.
      *
-     * @return FieldCollection
+     * @param BaseModel $model
+     * @return string
      */
-    public function getFields(): FieldCollection;
+    public static function entryRouteKey(BaseModel $model): string;
 
     /**
-     * Create the underlying model with the request data.
+     * Generate a string to be used as the description
+     * of the given model.
      *
-     * @param array $data
-     * @return EntryType
+     * @param BaseModel $model
+     * @return string
      */
-    public function store(array $data): EntryType;
-
-    /**
-     * Update the underlying model with the request data.
-     *
-     * @param array $data
-     * @return $this
-     */
-    public function update(array $data): self;
-
-    /**
-     * Delete the instance of the underlying model.
-     *
-     * @return \CbtechLtd\Fastlane\EntryTypes\EntryType
-     * @throws \Exception
-     */
-    public function delete(): self;
-
-    /**
-     * Get an Entry Resource instance representing the entry type.
-     *
-     * @return EntryResource
-     */
-    public function toResource(): EntryResource;
+    public static function entryTitle(BaseModel $model): string;
 }

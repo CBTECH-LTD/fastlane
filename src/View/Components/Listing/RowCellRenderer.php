@@ -22,11 +22,10 @@ class RowCellRenderer extends Component
     public function renderedComponent()
     {
         $component = $this->field->listingComponent();
-        $instance = new $component($this->model, $this->field->getAttribute(), $this->getValue());
 
         $props = ' :model="$model" attribute="' . $this->field->getAttribute() . '" :value="$getValue()"';
 
-        return $instance instanceof ReactiveComponent
+        return is_a($component, ReactiveComponent::class, true)
             ? '<livewire:' . $component::tag() . $props . '/>'
             : '<x-' . $component::tag() . $props . '/>';
     }
@@ -38,6 +37,6 @@ class RowCellRenderer extends Component
 
     public function getValue()
     {
-        return optional($this->model->{$this->field->getAttribute()})->value();
+        return $this->model->{$this->field->getAttribute()};
     }
 }

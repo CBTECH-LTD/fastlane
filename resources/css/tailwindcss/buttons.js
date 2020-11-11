@@ -121,6 +121,15 @@ module.exports = plugin(function ({ addComponents, theme, config }) {
         }
     })
 
+    addButton('-xl', {
+        padding: `${theme('padding.4')} ${theme('padding.6')}`,
+        fontSize: theme('fontSize.xl'),
+        fontWeight: theme('fontWeight.semibold'),
+        '.btn-icon': {
+            fontSize: theme('fontSize.xl')
+        }
+    })
+
     // Add color variants...
     let colors = {}
 

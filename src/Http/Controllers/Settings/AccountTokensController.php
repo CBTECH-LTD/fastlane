@@ -1,6 +1,6 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Http\Controllers\Account;
+namespace CbtechLtd\Fastlane\Http\Controllers\Settings;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
 use CbtechLtd\Fastlane\Facades\EntryType;

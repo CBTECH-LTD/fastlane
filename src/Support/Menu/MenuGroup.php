@@ -1,80 +1,61 @@
-<?php
+<?php declare(strict_types = 1);
 
 namespace CbtechLtd\Fastlane\Support\Menu;
 
 use CbtechLtd\Fastlane\Support\Menu\Contracts\MenuItem;
+use CbtechLtd\Fastlane\View\Components\Component;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Webmozart\Assert\Assert;
 
-class MenuGroup implements MenuItem
+class MenuGroup extends MenuItem
 {
-    private string $label;
-    private ?string $icon = null;
+    public string $label;
+    public array $children = [];
     private ?\Closure $whenFn = null;
-    private Collection $children;
 
-    public function __construct(string $label)
+    public function __construct(string $label, array $children = [])
     {
         $this->label = $label;
-        $this->children = new Collection;
+        $this->setChildren($children);
     }
 
-    public static function make(string $label): MenuGroup
+    public static function make(string $label, array $children = []): MenuGroup
     {
-        return new static($label);
+        return new static($label, $children);
     }
 
-    public function icon(string $icon): self
+    public function setChildren(array $children): self
     {
-        $this->icon = $icon;
+        $interface = Component::class;
+        Assert::allIsInstanceOf($children, $interface, 'All children must extend ' . $interface);
+
+        $this->children = Collection::make($children)->filter(fn(Component $child) => $child->shouldRender())->all();
         return $this;
     }
 
-    public function getGroup(): string
-    {
-        return '';
-    }
 
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
-
-    public function children(array $children): self
-    {
-        $interface = MenuItem::class;
-        Assert::allImplementsInterface($children, $interface, 'All children must implement ' . $interface);
-
-        $this->children = Collection::make($children);
-        return $this;
-    }
-
-    public function getChildren(): Collection
-    {
-        return $this->children;
-    }
-
-    public function when(\Closure $whenFn): MenuItem
+    public function when(\Closure $whenFn): self
     {
         $this->whenFn = $whenFn;
         return $this;
     }
 
-    public function build($user): ?array
+    public function render()
     {
-        $isVisible = $this->whenFn ? call_user_func($this->whenFn, $user) : true;
-
-        if (! $isVisible) {
-            return null;
-        }
-
-        return [
-            'type'     => 'group',
+        return view('fastlane::components.menu-group', [
+            'children' => $this->children,
             'label'    => $this->label,
-            'icon'     => $this->icon,
-            'children' => Collection::make($this->children)->map(
-                fn(MenuItem $child) => $child->build($user)
-            ),
-        ];
+        ]);
+    }
+
+    public function shouldRender()
+    {
+        return $this->whenFn ? call_user_func($this->whenFn, Auth::user()) : true;
+    }
+
+    public function getGroup(): string
+    {
+        return '';
     }
 }

@@ -4,13 +4,30 @@ namespace CbtechLtd\Fastlane;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Lang;
+use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class Fastlane
 {
-    protected static array $flashMessages = [];
     protected static array $translations = [];
+
+    /**
+     * Add a flash message to the session.
+     *
+     * @param string      $type
+     * @param string      $message
+     * @param string|null $icon
+     */
+    public static function flashMessage(string $type, string $message, ?string $icon = null): void
+    {
+        $newMsg = (object)compact('type', 'message', 'icon');
+
+        $msgs = array_merge(session()->get('fastlane-messages', []), [$newMsg]);
+
+        Livewire::dispatch('fastlaneMessageAdded', $newMsg);
+        session()->flash('fastlane-messages', $msgs);
+    }
 
     /**
      * Add a success message to the session.
@@ -20,13 +37,7 @@ class Fastlane
      */
     public static function flashSuccess(string $message, ?string $icon = null): void
     {
-        static::$flashMessages[] = [
-            'type'    => 'success',
-            'message' => $message,
-            'icon'    => $icon,
-        ];
-
-        session()->flash('fastlane-messages', static::$flashMessages);
+        static::flashMessage('success', $message, $icon);
     }
 
     /**
@@ -37,13 +48,7 @@ class Fastlane
      */
     public static function flashAlert(string $message, ?string $icon = null): void
     {
-        static::$flashMessages[] = [
-            'type'    => 'alert',
-            'message' => $message,
-            'icon'    => $icon,
-        ];
-
-        session()->flash('fastlane-messages', static::$flashMessages);
+        static::flashMessage('alert', $message, $icon);
     }
 
     /**
@@ -54,13 +59,7 @@ class Fastlane
      */
     public static function flashDanger(string $message, ?string $icon = null): void
     {
-        static::$flashMessages[] = [
-            'type'    => 'danger',
-            'message' => $message,
-            'icon'    => $icon,
-        ];
-
-        session()->flash('fastlane-messages', static::$flashMessages);
+        static::flashMessage('danger', $message, $icon);
     }
 
     /**
@@ -70,7 +69,7 @@ class Fastlane
      */
     public static function getFlashMessages(): array
     {
-        return static::$flashMessages;
+        return session()->get('fastlane-messages', []);
     }
 
     /**

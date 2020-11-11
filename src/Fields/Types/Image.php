@@ -4,7 +4,7 @@ namespace CbtechLtd\Fastlane\Fields\Types;
 
 class Image extends File
 {
-    protected string $component = 'image';
+    protected string $formComponent = 'image';
 
     protected array $accept = [
         'image/jpeg',
