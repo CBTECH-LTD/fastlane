@@ -42,6 +42,13 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
     /** @var string */
     protected static string $controller = BackendUserController::class;
 
+    public static function boot(): void
+    {
+        parent::boot();
+
+        Gate::policy(User::class, BackendUserPolicy::class);
+    }
+
     /**
      * @inheritDoc
      */

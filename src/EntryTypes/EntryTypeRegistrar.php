@@ -40,6 +40,8 @@ class EntryTypeRegistrar implements Contract
     {
         Assert::isAOf($class, EntryTypeContract::class);
 
+        $class::boot();
+
         $this->items->push($class);
     }
 

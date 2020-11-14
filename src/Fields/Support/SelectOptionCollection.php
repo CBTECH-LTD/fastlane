@@ -50,9 +50,9 @@ class SelectOptionCollection implements Arrayable
 
     public function select(array $values): self
     {
-        foreach ($this->items as $item) {
-            $item->select(in_array($item->getValue(), $values));
-        }
+        $this->collection()->each(
+            fn(SelectOption $option) => $option->select(in_array($option->getValue(), $values))
+        );
 
         return $this;
     }
@@ -71,12 +71,13 @@ class SelectOptionCollection implements Arrayable
         }
 
         $this->items = call_user_func_array($this->lazyLoader, $payload);
+        $this->lazyLoaded = true;
 
         return $this;
     }
 
     public function toArray()
     {
-        return Collection::make($this->load()->items)->toArray();
+        return $this->load()->collection()->toArray();
     }
 }

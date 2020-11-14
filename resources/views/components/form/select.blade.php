@@ -14,8 +14,8 @@
         @else
             {{-- Otherwise just render a select --}}
             <select name="{{ $field->getAttribute() }}" class="form-select w-full">
-                @foreach ($field->getOptions()->all() as $option)
-                    <option value="{{ $option->getValue() }}" @if ($option->getValue() === $value) selected @endif>
+                @foreach ($options as $option)
+                    <option value="{{ $option->getValue() }}" @if ($option->isSelected()) selected="selected" @endif>
                         {{ $option->getLabel() }}
                     </option>
                 @endforeach

@@ -4,10 +4,8 @@ namespace CbtechLtd\Fastlane\Fields\Types;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Field;
-use CbtechLtd\Fastlane\Fields\Support\SelectOption;
 use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 
 class Select extends Field
 {
@@ -116,9 +114,7 @@ class Select extends Field
             $value = Arr::wrap(is_array($value) ? $value : \json_decode($value));
         }
 
-        return SelectOptionCollection::make(
-            Collection::make($value)->map(fn($value) => SelectOption::make($value, $value))->all()
-        );
+        return $value;
     }
 
     protected function processWriteValue($value, ?EntryType $entryType = null)

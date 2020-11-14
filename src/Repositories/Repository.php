@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\Repositories;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
+use CbtechLtd\Fastlane\Exceptions\DeleteEntryException;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
@@ -158,19 +159,27 @@ abstract class Repository
     public function store(array $data): BaseModel
     {
         // Initialize an instance of the model.
-        $model = app()->make($this->model);
+        $model = $this->newModel();
+
+        $fields = FieldCollection::make($this->entryType::fields())->onCreate();
 
         // Validate the request data against the proper fields
         // then fill the model with such data and finally save it.
-        // TODO: Get only fields available for create.
-        $fields = [];
-
         $this->fillModel($model, $fields, $data);
         $this->saveModel($model, $fields, $data);
 
         return $model;
     }
 
+    /**
+     * Update an existent instance of the underlying model
+     * with the given dataset.
+     *
+     * @param       $id
+     * @param array $data
+     * @return BaseModel
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function update($id, array $data): BaseModel
     {
         $model = $this->findOrFail($id);
@@ -181,6 +190,24 @@ abstract class Repository
         // then fill the model with such data and finally save it.
         $this->fillModel($model, $fields, $data);
         $this->saveModel($model, $fields, $data);
+
+        return $model;
+    }
+
+    /**
+     * Delete the entry model matching the given id.
+     *
+     * @param $id
+     * @return BaseModel
+     * @throws DeleteEntryException
+     */
+    public function delete($id): BaseModel
+    {
+        $model = $this->findOrFail($id);
+
+        if (! $model->delete()) {
+            throw new DeleteEntryException;
+        }
 
         return $model;
     }

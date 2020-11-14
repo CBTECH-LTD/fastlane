@@ -39,7 +39,9 @@ class EntryController extends Controller
     {
         $repository = $this->getRepository();
 
-        Gate::authorize('list', $repository->getModel());
+        if (Gate::getPolicyFor($repository->getModel())) {
+            Gate::authorize('list', $repository->getModel());
+        }
 
         $fields = $this->getFields()->onListing();
         $columns = $fields->getAttributes()->keys()->all();
@@ -61,11 +63,19 @@ class EntryController extends Controller
         ], $viewModel);
     }
 
+    /**
+     * Show the form to create a new entry.
+     *
+     * @return mixed
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
     public function create()
     {
         $entry = $this->getRepository()->newModel();
 
-        Gate::authorize('create', $entry);
+        if (Gate::getPolicyFor($entry)) {
+            Gate::authorize('create', $entry);
+        }
 
         $fields = $this->getFields()->onCreate();
         $viewModel = new EntryViewModel($this->entryType, $fields, $entry);
@@ -75,6 +85,38 @@ class EntryController extends Controller
             "fastlane::{$this->entryType::key()}.create",
             "fastlane::entries.create",
         ], $viewModel);
+    }
+
+    /**
+     * Store the new entry.
+     *
+     * @param Request $request
+     */
+    public function store(Request $request)
+    {
+        $model = $this->getRepository()->getModel();
+
+        if (Gate::getPolicyFor($model)) {
+            Gate::authorize('create', $model);
+        }
+
+        $fields = $this->getFields()->onCreate();
+        $entry = $this->getRepository()->store($request->all());
+
+        Fastlane::flashSuccess(
+            __('fastlane::core.flash.created', ['name' => $this->entryType::label()['singular']]),
+            'thumbs-up'
+        );
+
+        if ($this->entryType::routes()->has('edit')) {
+            return Redirect::to($this->entryType::routes()->get('edit')->url($entry));
+        }
+
+        if ($this->entryType::routes()->get('index')) {
+            return Redirect::to($this->entryType::routes()->get('index')->url());
+        }
+
+        return Redirect::back();
     }
 
     /**
@@ -88,7 +130,9 @@ class EntryController extends Controller
     {
         $entry = $this->getRepository()->findOrFail($id);
 
-        Gate::authorize('update', $entry);
+        if (Gate::getPolicyFor($entry)) {
+            Gate::authorize('update', $entry);
+        }
 
         $fields = $this->getFields()->onUpdate();
         $viewModel = new EntryViewModel($this->entryType, $fields, $entry);
@@ -100,9 +144,21 @@ class EntryController extends Controller
         ], $viewModel);
     }
 
+    /**
+     * Update the given entry.
+     *
+     * @param Request $request
+     * @param         $id
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
     public function update(Request $request, $id)
     {
-        Gate::authorize('update', $this->getRepository()->findOrFail($id));
+        $entry = $this->getRepository()->findOrFail($id);
+
+        if (Gate::getPolicyFor($entry)) {
+            Gate::authorize('update', $entry);
+        }
 
         $this->getRepository()->update($id, $request->all());
 

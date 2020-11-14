@@ -57,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../../config/config.php', 'fastlane');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/accountant.php', 'accountant');
         $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
         $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'fastlane');
         $this->registerViews();
