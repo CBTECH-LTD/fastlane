@@ -19,7 +19,7 @@ abstract class FormComponent extends Component
         $this->field = $field;
         $this->model = $model;
         $this->entryType = $entryType;
-        $this->value = $this->readValue();
+        $this->value = old($this->field->getAttribute(), $this->readValue());
     }
 
     public function readValue()

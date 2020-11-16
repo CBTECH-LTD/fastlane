@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Fields\Types;
 
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\UndefinedValue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Webmozart\Assert\Assert;
 
@@ -28,10 +29,11 @@ class FieldCollection extends Collection
     /**
      * Get the create rules of the fields.
      *
+     * @param Model $model
      * @param array $data
      * @return array
      */
-    public function getCreateRules(array $data): array
+    public function getCreateRules(Model $model, array $data): array
     {
         // TODO
         return [];
@@ -40,24 +42,27 @@ class FieldCollection extends Collection
     /**
      * Get the update rules of the fields.
      *
+     * @param Model $model
      * @param array $data
      * @return array
      */
-    public function getUpdateRules(array $data): array
+    public function getUpdateRules(Model $model, array $data): array
     {
-        return $this->flattenFields()->getCollection()->flatMap->getUpdateRules($data)->toArray();
+        return $this->flattenFields()->getCollection()->flatMap->getUpdateRules($model, $data)->toArray();
     }
 
     /**
      * Get the fields data with their complete set of information,
      * including field properties and configuration.
      *
+     * @param Model  $model
+     * @param string $entryType
      * @return array
      */
-    public function getData(): array
+    public function getData(Model $model, string $entryType): array
     {
         $attributes = $this->getAttributes()->mapWithKeys(fn(Field $field) => [
-            $field->getAttribute() => $field->read($this->entryType->modelInstance()->{$field->getAttribute()}, $this->entryType),
+            $field->getAttribute() => $field->read($model, $entryType),
         ])->filter(fn($value) => ! $value instanceof UndefinedValue);
 
         $relationships = $this->getRelationships()->map(function (Relationship $field) {

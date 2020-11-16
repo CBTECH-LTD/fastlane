@@ -9,6 +9,7 @@ use CbtechLtd\Fastlane\EntryTypes\RendersOnMenu;
 use CbtechLtd\Fastlane\Fields\Support\SelectOption;
 use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
 use CbtechLtd\Fastlane\Fields\Types\ActiveToggle;
+use CbtechLtd\Fastlane\Fields\Types\Email;
 use CbtechLtd\Fastlane\Fields\Types\Panel;
 use CbtechLtd\Fastlane\Fields\Types\Select;
 use CbtechLtd\Fastlane\Fields\Types\ShortText;
@@ -57,7 +58,7 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
         return [
             Panel::make('Profile')->withFields([
                 ShortText::make('Name')->required()->listable()->sortable(),
-                ShortText::make('Email')->required()->unique()->listable()->sortable()->withHelp('An unique email'),
+                Email::make('Email')->required()->unique()->listable()->sortable()->withHelp('An unique email'),
                 Select::make('Role')->withOptions(SelectOptionCollection::lazy(function () {
                     return Role::all()->map(fn(Role $role) => SelectOption::make($role->name, $role->name))->all();
                 })),

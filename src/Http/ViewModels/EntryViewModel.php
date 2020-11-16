@@ -2,7 +2,6 @@
 
 namespace CbtechLtd\Fastlane\Http\ViewModels;
 
-use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Http\ViewModels\Traits\WithLinks;
 use CbtechLtd\Fastlane\Http\ViewModels\Traits\WithMeta;
@@ -79,15 +78,7 @@ class EntryViewModel extends ViewModel
      */
     public function data(): array
     {
-        return $this->fields->flattenFields()
-            ->getCollection()
-            ->mapWithKeys(function (Field $field) {
-                $value = $field->read($this->model, $this->entryType);
-
-                return [
-                    $field->getAttribute() => $value,
-                ];
-            })->toArray();
+        return $this->fields->getData($this->model, $this->entryType);
     }
 
     public function fields(): FieldCollection

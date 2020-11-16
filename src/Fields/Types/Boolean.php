@@ -2,8 +2,8 @@
 
 namespace CbtechLtd\Fastlane\Fields\Types;
 
-use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Field;
+use Illuminate\Database\Eloquent\Model;
 
 class Boolean extends Field
 {
@@ -48,7 +48,7 @@ class Boolean extends Field
         return (bool)$value;
     }
 
-    protected function processWriteValue($value, ?EntryType $entryType = null)
+    protected function processWriteValue(Model $model, string $entryType, $value)
     {
         return (bool)$value;
     }

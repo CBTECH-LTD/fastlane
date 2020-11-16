@@ -3,7 +3,7 @@
     <x-slot name="help">{{ $field->getHelp() }}</x-slot>
     <div class="w-full">
         <input {{ $attributes->merge([
-        'type' => 'text',
+        'type' => $field->getInputType(),
         'name' => $field->getAttribute(),
         'placeholder' => $field->getPlaceholder(),
         'required' => $field->isRequired() ? 'required' : null,

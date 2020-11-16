@@ -266,12 +266,19 @@ abstract class Field implements Arrayable
         ]);
     }
 
-    public function getUpdateRules(array $data): array
+    /**
+     * Get the rules when updating the field.
+     *
+     * @param Model $model
+     * @param array $data
+     * @return array
+     */
+    public function getUpdateRules(Model $model, array $data): array
     {
         $customRules = $this->rules->get('update')($data);
 
         $rules = array_merge(
-            ['sometimes', $this->buildBaseRules($data)],
+            [$this->buildBaseRules($model, $data)],
             [Arr::get($this->getFieldRules($data), $this->getAttribute(), '')],
             [$customRules],
         );
@@ -433,6 +440,15 @@ abstract class Field implements Arrayable
         return $this;
     }
 
+    /**
+     * Read the field attribute from the model and send it
+     * through the processReadValue, which can be customized
+     * by the field instance.
+     *
+     * @param Model  $model
+     * @param string $entryType
+     * @return mixed
+     */
     public function read(Model $model, string $entryType)
     {
         $value = $model->{$this->getAttribute()};
@@ -448,13 +464,21 @@ abstract class Field implements Arrayable
         return $this->processReadValue($value, $entryType);
     }
 
-    public function write($value, ?EntryType $entryType = null)
+    /**
+     * Write to the field attribute in the given model.
+     *
+     * @param Model  $model
+     * @param string $entryType
+     * @param        $value
+     * @return void
+     */
+    public function write(Model $model, string $entryType, $value): void
     {
-        if (is_callable($this->writeResolverCallback)) {
-            return $this->writeResolverCallback->call($this, $value, $entryType);
-        }
+        $value = is_callable($this->writeResolverCallback)
+            ? $this->writeResolverCallback->call($this, $model, $entryType, $value)
+            : $this->processWriteValue($model, $entryType, $value);
 
-        return $this->processWriteValue($value, $entryType);
+        $model->{$this->getAttribute()} = $value;
     }
 
     /**
@@ -540,17 +564,22 @@ abstract class Field implements Arrayable
      * @param array $data
      * @return string
      */
-    protected function buildBaseRules(array $data): string
+    protected function buildBaseRules(Model $model, array $data): string
     {
         $rules = $this->isRequired()
             ? ['required']
             : ['nullable'];
 
         if ($this->isUnique()) {
-            // TODO: UNIQUE
-//            $rules[] = (string)($this->getConfig('unique') instanceof Unique)
-//                ? $this->getConfig('unique')
-//                : new Unique($entryType->modelInstance()->getTable(), $this->getAttribute());
+            $uniqueRule = (string)($this->getConfig('unique') instanceof Unique)
+                ? $this->getConfig('unique')
+                : new Unique($model->getTable(), $this->getAttribute());
+
+            if ($model->exists) {
+                $uniqueRule->ignoreModel($model);
+            }
+
+            $rules[] = $uniqueRule;
         }
 
         $rules = array_merge(
@@ -646,12 +675,27 @@ abstract class Field implements Arrayable
         return $this;
     }
 
+    /**
+     * Process the given value right after it's been read from the model.
+     *
+     * @param        $value
+     * @param string $entryType
+     * @return mixed
+     */
     protected function processReadValue($value, string $entryType)
     {
         return $value;
     }
 
-    protected function processWriteValue($value, ?EntryType $entryType = null)
+    /**
+     * Prepare the given value before it's got saved in the model.
+     *
+     * @param Model  $model
+     * @param string $entryType
+     * @param        $value
+     * @return mixed
+     */
+    protected function processWriteValue(Model $model, string $entryType, $value)
     {
         return $value;
     }

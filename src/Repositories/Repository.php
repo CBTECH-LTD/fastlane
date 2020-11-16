@@ -156,7 +156,7 @@ abstract class Repository
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(array $data): BaseModel
+    public function store(array $data): Model
     {
         // Initialize an instance of the model.
         $model = $this->newModel();
@@ -165,7 +165,7 @@ abstract class Repository
 
         // Validate the request data against the proper fields
         // then fill the model with such data and finally save it.
-        $this->fillModel($model, $fields, $data);
+        $this->fillModel($model, $fields, $fields->getCreateRules($model, $data), $data);
         $this->saveModel($model, $fields, $data);
 
         return $model;
@@ -180,7 +180,7 @@ abstract class Repository
      * @return BaseModel
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function update($id, array $data): BaseModel
+    public function update($id, array $data): Model
     {
         $model = $this->findOrFail($id);
 
@@ -188,7 +188,7 @@ abstract class Repository
 
         // Validate the request data against the proper fields
         // then fill the model with such data and finally save it.
-        $this->fillModel($model, $fields, $data);
+        $this->fillModel($model, $fields, $fields->getUpdateRules($model, $data), $data);
         $this->saveModel($model, $fields, $data);
 
         return $model;
@@ -240,24 +240,19 @@ abstract class Repository
     /**
      * Set the fillable attributes of the model.
      *
-     * @param BaseModel       $model
+     * @param Model           $model
      * @param FieldCollection $fields
+     * @param array           $rules
      * @param array           $data
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function fillModel(BaseModel $model, FieldCollection $fields, array $data): void
+    protected function fillModel(Model $model, FieldCollection $fields, array $rules, array $data): void
     {
-        $data = Validator::make($data, $fields->getUpdateRules($data))->validated();
+        $data = Validator::make($data, $rules)->validated();
 
-        $data = $fields->flattenFields()->getCollection()->mapWithKeys(function (Field $field) use ($data) {
-            return [
-                // TODO: We should send the incoming data through the field so it
-                //       can manipulate and prepare it for saving.
-                $field->getAttribute() => Arr::get($data, $field->getAttribute()),
-            ];
-        })->all();
-
-        $model->fill(Validator::make($data, $fields->getUpdateRules($data))->validated());
+        $fields->flattenFields()->getCollection()->each(function (Field $field) use ($model, $data) {
+            $field->write($model, $this->entryType, Arr::get($data, $field->getAttribute()));
+        });
     }
 
     /**

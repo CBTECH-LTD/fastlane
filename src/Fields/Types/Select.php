@@ -2,9 +2,9 @@
 
 namespace CbtechLtd\Fastlane\Fields\Types;
 
-use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
 class Select extends Field
@@ -117,7 +117,7 @@ class Select extends Field
         return $value;
     }
 
-    protected function processWriteValue($value, ?EntryType $entryType = null)
+    protected function processWriteValue(Model $model, string $entryType, $value)
     {
         if ($this->isMultiple()) {
             $value = \json_encode(Arr::wrap($value));
