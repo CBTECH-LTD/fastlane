@@ -75,7 +75,7 @@ abstract class Repository
         }
 
         // Initialize the model query builder.
-        $query = $this->model->newModelQuery()->select(
+        $query = $this->model->newQuery()->select(
             $this->getColumnListing(array_merge($queryCols, $columns))
         );
 
