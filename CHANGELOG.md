@@ -2,6 +2,13 @@
 
 All notable changes to `fastlane` will be documented in this file
 
+## [0.12.3] - 2020-11-20
+
+### Fixed
+- Select input was becoming empty if not changed.
+
+---
+
 ## [0.12.2] - 2020-11-05
 
 ### Fixed

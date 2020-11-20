@@ -54,9 +54,7 @@ export default {
             }
 
             if (this.field.config.multiple) {
-                return map(this.field.value, v => {
-                    return v.value
-                })
+                return map(this.field.value, v => v.value)
             }
 
             return this.field.value.value
