@@ -24,6 +24,10 @@ class Select extends Field
                 return $opt->selected(in_array($opt->getValue(), $value))->isSelected();
             })->values();
 
+        if (! $this->isMultiple()) {
+            $this->value = $this->value->first();
+        }
+
         return $this;
     }
 

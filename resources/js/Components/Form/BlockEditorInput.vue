@@ -54,11 +54,7 @@ export default {
          * so we can access it easily.
          */
         availableBlocks () {
-            const availableBlocks = this.field.config.blocks
-
-            console.log(availableBlocks)
-
-            return availableBlocks
+            return this.field.config.blocks
         }
     },
 
