@@ -20,9 +20,10 @@ class CurrencyFieldValue extends FieldValue
 
         $numberFormatter = new \NumberFormatter(
             config('fastlane.currency.locale', config('app.locale')),
-            \NumberFormatter::DECIMAL
+            \NumberFormatter::CURRENCY
         );
 
+        $numberFormatter->setSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, '.');
         $numberFormatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, 0);
 
         $this->formatter = new IntlMoneyFormatter(
@@ -33,6 +34,6 @@ class CurrencyFieldValue extends FieldValue
 
     public function asMoney(): string
     {
-        return config('fastlane.currency.symbol') . ' ' . $this->formatter->format($this->money);
+        return $this->formatter->format($this->money);
     }
 }
