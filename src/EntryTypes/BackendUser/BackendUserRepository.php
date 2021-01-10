@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\EntryTypes\BackendUser;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
+use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Repositories\Repository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ class BackendUserRepository extends Repository
     protected function beforeFetchListing(Builder $query): void
     {
         if (Auth::guard('fastlane-cp')->check()) {
-            $query->where('id', '!=', Auth::user()->getKey());
+            $query->where('id', '!=', Fastlane::user()->getKey());
         }
     }
 }

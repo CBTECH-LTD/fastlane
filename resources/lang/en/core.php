@@ -1,6 +1,7 @@
 <?php declare(strict_types = 1);
 
 return [
+    'loading'                  => 'Loading entries',
     'add'                      => 'Add',
     'add_more'                 => 'Add more',
     'save'                     => 'Save',
@@ -24,21 +25,21 @@ return [
     'content'                  => [
         'singular_name' => 'Content',
         'plural_name'   => 'Contents',
-        'identifier'    => 'contents',
+        'key'           => 'contents',
     ],
 
     // File Manager Entry Type
     'file_manager'             => [
         'singular_name' => 'File',
         'plural_name'   => 'Files',
-        'identifier'    => 'files',
+        'key'           => 'files',
     ],
 
     // Backend User Entry Type
     'user'                     => [
         'singular_name' => 'User',
         'plural_name'   => 'Users',
-        'identifier'    => 'users',
+        'key'           => 'users',
     ],
 
     // Account Settings

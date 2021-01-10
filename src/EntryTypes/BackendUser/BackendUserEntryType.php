@@ -26,16 +26,8 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
     const PERM_MANAGE_ACCESS_TOKENS = 'manage personal access tokens';
     const ROLE_SYSTEM_ADMIN = 'system admin';
 
-    /** @var string */
-    protected static string $key = 'users';
-
     /** @var string|null */
     protected static ?string $icon = 'user';
-
-    protected static array $label = [
-        'singular' => 'User',
-        'plural'   => 'Users',
-    ];
 
     /** @var string */
     protected static string $repository = BackendUserRepository::class;
@@ -43,11 +35,33 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
     /** @var string */
     protected static string $controller = BackendUserController::class;
 
+    /**
+     * @throws \ReflectionException
+     */
     public static function boot(): void
     {
         parent::boot();
 
         Gate::policy(User::class, BackendUserPolicy::class);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function key(): string
+    {
+        return __('fastlane::core.user.key');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function label(): array
+    {
+        return [
+            'singular' => __('fastlane::core.user.singular_name'),
+            'plural'   => __('fastlane::core.user.plural_name'),
+        ];
     }
 
     /**
@@ -64,9 +78,9 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
                 })),
             ])->withIcon('id-card'),
 
-            Panel::make('Settings')->withFields([
+            Panel::make(__('fastlane::core.settings'))->withFields([
                 ActiveToggle::make()->listable(),
-            ])->withIcon('cog'),
+            ])->withIcon('tools'),
         ];
     }
 

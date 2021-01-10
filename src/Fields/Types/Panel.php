@@ -9,7 +9,7 @@ class Panel extends Field
 {
     protected string $formComponent = \CbtechLtd\Fastlane\View\Components\Form\Panel::class;
 
-    public function __construct(string $label, ?string $attribute = null)
+    public function __construct(string $label = '', ?string $attribute = null)
     {
         parent::__construct($label, $attribute);
 

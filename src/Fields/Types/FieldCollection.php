@@ -114,14 +114,24 @@ class FieldCollection extends Collection
 
     public function onListing(): FieldCollection
     {
-        $items = Collection::make($this->items)->filter(function (Field $field) {
-            return $field->setArrayFormat('listing')->isListable();
-        })->all();
+        $items = Collection::make($this->items)
+            ->flatMap(function (Field $field) {
+                if (! $field->isListable()) {
+                    return [];
+                }
+
+                if ($field instanceof Panel) {
+                    return $field->getFields()->onListing();
+                }
+
+                return [$field->setArrayFormat('listing')];
+            })->all();
 
         return $this->newInstance($items);
     }
 
-    public function onCreate(): FieldCollection
+    public
+    function onCreate(): FieldCollection
     {
         $items = Collection::make($this->items)
             ->filter(function (Field $field) {
@@ -134,7 +144,8 @@ class FieldCollection extends Collection
         return $this->newInstance($items);
     }
 
-    public function onUpdate(): FieldCollection
+    public
+    function onUpdate(): FieldCollection
     {
         $items = Collection::make($this->items)
             ->filter(function (Field $field) {
@@ -152,7 +163,8 @@ class FieldCollection extends Collection
      *
      * @return array
      */
-    public function toArray()
+    public
+    function toArray()
     {
         return $this->getCollection()->toArray();
     }
@@ -162,7 +174,8 @@ class FieldCollection extends Collection
      *
      * @return Collection
      */
-    public function getAttributes(): Collection
+    public
+    function getAttributes(): Collection
     {
         return $this->flattenFields()->filter(
             fn(Field $field) => ! $field instanceof Relationship
@@ -174,7 +187,8 @@ class FieldCollection extends Collection
      *
      * @return Collection
      */
-    public function getComputedAttributes(): Collection
+    public
+    function getComputedAttributes(): Collection
     {
         return $this->getAttributes()->filter(
             fn(Field $field) => $field->isComputed()
@@ -186,15 +200,18 @@ class FieldCollection extends Collection
      *
      * @return Collection
      */
-    public function getRelationships(): Collection
+    public
+    function getRelationships(): Collection
     {
         return $this->flattenFields()->filter(
             fn(Field $field) => $field instanceof Relationship
         );
     }
 
-    protected function newInstance(?array $data = null): FieldCollection
-    {
+    protected
+    function newInstance(
+        ?array $data = null
+    ): FieldCollection {
         return tap(clone $this, function (FieldCollection $collection) use ($data) {
             if (is_array($data)) {
                 $collection->items = $data;

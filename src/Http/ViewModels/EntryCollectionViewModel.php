@@ -141,6 +141,10 @@ class EntryCollectionViewModel extends ViewModel
      */
     private function getItemsCollection(): Collection
     {
+        if (empty($this->data)) {
+            return Collection::make();
+        }
+
         return Collection::make(
             ($this->hasPagination()) ? $this->data->items() : $this->data->all()
         );

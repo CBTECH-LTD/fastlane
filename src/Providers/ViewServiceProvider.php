@@ -14,13 +14,14 @@ use CbtechLtd\Fastlane\View\Components\ItemActionDelete;
 use CbtechLtd\Fastlane\View\Components\Link;
 use CbtechLtd\Fastlane\View\Components\Listing;
 use CbtechLtd\Fastlane\View\Components\ListingItemAction;
+use CbtechLtd\Fastlane\View\Components\Livewire;
 use CbtechLtd\Fastlane\View\Components\MenuWrapper;
 use CbtechLtd\Fastlane\View\Components\Paginator;
 use CbtechLtd\Fastlane\View\Components\Spinner;
 use CbtechLtd\Fastlane\View\Components\TableCard;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
+use Livewire\Livewire as LivewireFacade;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -54,9 +55,12 @@ class ViewServiceProvider extends ServiceProvider
 
             // Form components
             Field::class,
+            Form\BlockEditor::class,
             Form\Panel::class,
             Form\Select::class,
             Form\ShortText::class,
+            Form\Slug::class,
+            Form\Textarea::class,
             Form\Toggle::class,
 
             // Listing components
@@ -82,10 +86,11 @@ class ViewServiceProvider extends ServiceProvider
 
             // Listing
             Listing\ReactiveToggle::class,
+            Livewire\ListingTable::class,
         ];
 
         foreach ($components as $component) {
-            Livewire::component($component::tag(), $component);
+            LivewireFacade::component($component::tag(), $component);
         }
     }
 }

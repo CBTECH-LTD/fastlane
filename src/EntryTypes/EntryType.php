@@ -107,7 +107,7 @@ abstract class EntryType implements EntryTypeContract
      */
     public static function entryRouteKey(BaseModel $model): string
     {
-        return $model->getRouteKey();
+        return $model->getRouteKey() ?? '';
     }
 
     /**

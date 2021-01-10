@@ -44,16 +44,15 @@ class EntryController extends Controller
         }
 
         $fields = $this->getFields()->onListing();
-        $columns = $fields->getAttributes()->keys()->all();
 
-        $data = $repository->get($columns, $this->itemsPerPage);
-
-        $viewModel = (new EntryCollectionViewModel($this->entryType, $fields, $data))
+        $viewModel = (new EntryCollectionViewModel($this->entryType, $fields, []))
             ->withMeta([
-                'order' => [
+                'itemsPerPage' => $this->itemsPerPage,
+                'order'        => [
                     'field'  => Str::replaceFirst('-', '', $request->input('order')),
                     'isDesc' => Str::startsWith($request->input('order'), '-'),
                 ],
+                'order_str'    => $request->input('order'),
             ]);
 
         return view()->first([

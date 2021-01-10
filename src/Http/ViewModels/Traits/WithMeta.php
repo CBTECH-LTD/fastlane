@@ -46,7 +46,9 @@ trait WithMeta
                 'routes'     => $this->entryType::routes(),
                 'schema'     => $this->buildSchemaForMeta(),
             ],
-        ])->map(function ($value) {
+        ])
+        ->merge($this->meta)
+        ->map(function ($value) {
             return is_callable($value)
                 ? call_user_func($value, $this)
                 : $value;

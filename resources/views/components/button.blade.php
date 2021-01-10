@@ -13,5 +13,5 @@
         </span>
 @endif
 
-<x-fl-spinner wire:loading.class.remove="hidden"></x-fl-spinner>
+{{--<x-fl-spinner wire:loading.class.remove="hidden"></x-fl-spinner>--}}
 </{{ $buttonTag }}>

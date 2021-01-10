@@ -2,15 +2,16 @@
 
 namespace CbtechLtd\Fastlane\EntryTypes\Content;
 
-use CbtechLtd\Fastlane\EntryTypes\EntryType;
-use CbtechLtd\Fastlane\EntryTypes\RendersOnMenu\RendersOnMenu;
 use CbtechLtd\Fastlane\Contracts\RenderableOnMenu;
-use CbtechLtd\Fastlane\Support\Schema\Fields\BlockEditorField;
-use CbtechLtd\Fastlane\Support\Schema\Fields\FieldPanel;
-use CbtechLtd\Fastlane\Support\Schema\Fields\SlugField;
-use CbtechLtd\Fastlane\Support\Schema\Fields\StringField;
-use CbtechLtd\Fastlane\Support\Schema\Fields\TextField;
-use CbtechLtd\Fastlane\Support\Schema\Fields\ToggleField;
+use CbtechLtd\Fastlane\EntryTypes\EntryType;
+use CbtechLtd\Fastlane\EntryTypes\RendersOnMenu;
+use CbtechLtd\Fastlane\Fields\Types\ActiveToggle;
+use CbtechLtd\Fastlane\Fields\Types\BlockEditor;
+use CbtechLtd\Fastlane\Fields\Types\Panel;
+use CbtechLtd\Fastlane\Fields\Types\ShortText;
+use CbtechLtd\Fastlane\Fields\Types\Slug;
+use CbtechLtd\Fastlane\Fields\Types\Textarea;
+use CbtechLtd\Fastlane\Http\Controllers\ContentController;
 
 class ContentEntryType extends EntryType implements RenderableOnMenu
 {
@@ -18,61 +19,59 @@ class ContentEntryType extends EntryType implements RenderableOnMenu
 
     const PERM_MANAGE_CONTENT = 'manage contents';
 
-    public function identifier(): string
+    /** @var string|null */
+    protected static ?string $icon = 'layer-group';
+
+    /** @var string */
+    protected static string $repository = ContentRepository::class;
+
+    /** @var string */
+    protected static string $controller = ContentController::class;
+
+    /**
+     * @inheritDoc
+     */
+    public static function key(): string
     {
-        return __('fastlane::core.content.identifier');
+        return __('fastlane::core.content.key');
     }
 
-    public function model(): string
-    {
-        return Content::class;
-    }
-
-    public function name(): string
-    {
-        return __('fastlane::core.content.singular_name');
-    }
-
-    public function pluralName(): string
-    {
-        return __('fastlane::core.content.plural_name');
-    }
-
-    public function icon(): string
-    {
-        return 'layer-group';
-    }
-
-    public function fields(): array
+    /**
+     * @inheritDoc
+     */
+    public static function label(): array
     {
         return [
-            StringField::make('name', __('fastlane::core.fields.name'))
-                ->required()
-                ->showOnIndex()
-                ->sortable(),
-
-            SlugField::make('slug', __('fastlane::core.fields.slug'))
-                ->makeFromField('name')
-                ->required()
-                ->showOnIndex()
-                ->sortable(),
-
-            BlockEditorField::make('blocks', __('fastlane::core.fields.blocks')),
-
-            FieldPanel::make(__('fastlane::core.settings'))->withIcon('tools')
-                ->withFields([
-                    StringField::make('meta_title', __('fastlane::core.fields.meta_title')),
-                    TextField::make('meta_description', __('fastlane::core.fields.meta_description')),
-
-                    ToggleField::make('is_active', __('fastlane::core.fields.active'))
-                        ->required()
-                        ->showOnIndex(),
-                ]),
+            'singular' => __('fastlane::core.content.singular_name'),
+            'plural'   => __('fastlane::core.content.plural_name'),
         ];
     }
 
-    public function query(): QueryBuilder
+    /**
+     * @inheritDoc
+     */
+    public static function fields(): array
     {
-        return new QueryBuilder($this);
+        return [
+            Panel::make('Content')->withFields([
+                ShortText::make(__('fastlane::core.fields.name'), 'name')->required()->listable()->sortable(),
+
+                Slug::make(__('fastlane::core.fields.slug'), 'slug')
+                    ->generateFromField('name')
+                    ->required()
+                    ->listable()
+                    ->sortable(),
+
+                BlockEditor::make(__('fastlane::core.fields.blocks'), 'blocks'),
+            ]),
+
+            Panel::make(__('fastlane::core.settings'))
+                ->withFields([
+                    ShortText::make(__('fastlane::core.fields.meta_title'), 'meta_title'),
+                    Textarea::make(__('fastlane::core.fields.meta_description'), 'meta_description'),
+                    ActiveToggle::make()->listable(),
+                ])
+                ->withIcon('tools'),
+        ];
     }
 }

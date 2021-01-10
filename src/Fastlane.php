@@ -2,7 +2,9 @@
 
 namespace CbtechLtd\Fastlane;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
@@ -11,6 +13,27 @@ use Spatie\Permission\Models\Role;
 class Fastlane
 {
     protected static array $translations = [];
+
+    /**
+     * Determine whether there's an user authenticated
+     * in the control panel.
+     *
+     * @return bool
+     */
+    public static function isAuthenticated(): bool
+    {
+        return Auth::guard('fastlane-cp')->check();
+    }
+
+    /**
+     * Get the authenticated user in control panel.
+     *
+     * @return Authenticatable|null
+     */
+    public static function user(): ?Authenticatable
+    {
+        return Auth::guard('fastlane-cp')->user();
+    }
 
     /**
      * Add a flash message to the session.

@@ -62,10 +62,11 @@ abstract class Repository
      * pagination is not required.
      *
      * @param array    $columns
+     * @param array    $filters
      * @param int|null $perPage
      * @return Collection|LengthAwarePaginator|\Illuminate\Support\Collection
      */
-    public function get(array $columns = [], ?int $perPage = 20)
+    public function get(array $columns = [], array $filters = [], ?int $perPage = 20)
     {
         // Get the columns we want to retrieve from the database.
         $queryCols = ['id'];
@@ -79,9 +80,10 @@ abstract class Repository
             $this->getColumnListing(array_merge($queryCols, $columns))
         );
 
-        $query->orderBy(...explode(':', $this->defaultOrder));
+        if ($orderBy = Arr::get($filters, 'order', $this->defaultOrder)) {
+            $query->orderBy(...explode(':', $orderBy));
+        }
 
-        // TODO: Add filters / scopes .
         $this->beforeFetchListing($query);
 
         $result = is_null($perPage)

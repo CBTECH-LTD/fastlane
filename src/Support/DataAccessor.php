@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Support;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 /**
  * Class DataAccessor
@@ -36,7 +37,7 @@ use Illuminate\Support\Arr;
  *
  * @package CbtechLtd\Fastlane\Http\ViewModels
  */
-class DataAccessor implements \ArrayAccess, Arrayable
+class DataAccessor implements \ArrayAccess, Arrayable, \Serializable
 {
     private array $data;
 
@@ -99,5 +100,15 @@ class DataAccessor implements \ArrayAccess, Arrayable
     public function offsetUnset($offset)
     {
         //
+    }
+
+    public function serialize()
+    {
+        return Collection::make($this->data)->toJson();
+    }
+
+    public function unserialize($serialized)
+    {
+        $this->data = \json_decode($serialized);
     }
 }

@@ -4,13 +4,13 @@ namespace CbtechLtd\Fastlane\Fields\Types;
 
 use CbtechLtd\Fastlane\ContentBlocks\ContentBlockCollection;
 use CbtechLtd\Fastlane\Contracts\ContentBlockRepository;
-use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Field;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 class BlockEditor extends Field
 {
-    protected string $formComponent = 'blockEditor';
+    protected string $formComponent = \CbtechLtd\Fastlane\View\Components\Form\BlockEditor::class;
 
     public function __construct(string $label, ?string $attribute = null)
     {
@@ -57,7 +57,7 @@ class BlockEditor extends Field
         })->filter();
     }
 
-    protected function processWriteValue($value, ?EntryType $entryType = null)
+    protected function processWriteValue(Model $model, string $entryType, $value)
     {
         return json_encode($value);
     }

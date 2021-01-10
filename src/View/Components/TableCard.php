@@ -13,7 +13,6 @@ class TableCard extends Component
         $this->autoSize = $autoSize;
     }
 
-
     public function render()
     {
         return view('fastlane::components.table-card');
