@@ -180,9 +180,9 @@ abstract class EntryType implements EntryTypeContract
      * @return void
      * @throws \ReflectionException
      */
-    protected function installRolesAndPermissions(): void
+    protected static function installRolesAndPermissions(): void
     {
-        $reflector = new ReflectionClass($this);
+        $reflector = new ReflectionClass(static::class);
         $constants = Collection::make($reflector->getConstants());
 
         // Create permissions for all constants starting with PERM_.
@@ -206,7 +206,7 @@ abstract class EntryType implements EntryTypeContract
      * @param Collection $permissions
      * @return void
      */
-    protected function installPermissions(Collection $permissions): void
+    protected static function installPermissions(Collection $permissions): void
     {
         $permissions->each(function ($value) {
             Fastlane::createPermission($value);

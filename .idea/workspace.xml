@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="364ae98d-ffb8-45a8-9262-18c771981701" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/src/EntryTypes/BackendUser/Commands/CreateSystemAdminCommand.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/EntryTypes/BackendUser/Commands/CreateSystemAdminCommand.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/EntryTypes/EntryType.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/EntryTypes/EntryType.php" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1mt2xxDIMKvI2nkunF7y3Sglr8i" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="364ae98d-ffb8-45a8-9262-18c771981701" name="Default Changelist" comment="" />
+      <created>1610298816797</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1610298816797</updated>
+      <workItem from="1610298817900" duration="327000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="951" y="1319" width="672" height="678" key="search.everywhere.popup" timestamp="1610299121003">
+      <screen x="0" y="27" width="2560" height="2133" />
+    </state>
+    <state x="951" y="1319" width="672" height="678" key="search.everywhere.popup/0.27.2560.2133@0.27.2560.2133" timestamp="1610299121003" />
+  </component>
+</project>

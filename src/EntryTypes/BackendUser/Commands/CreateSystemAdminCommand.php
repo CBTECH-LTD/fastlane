@@ -59,7 +59,7 @@ class CreateSystemAdminCommand extends Command
 
         $user->name = $name;
         $user->email = $email;
-        $user->setPasswordAttribute($password);
+        $user->password = $password;
 
         $user->save();
 
