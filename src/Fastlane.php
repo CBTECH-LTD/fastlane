@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Lang;
@@ -15,6 +16,16 @@ class Fastlane
     protected static array $translations = [];
 
     /**
+     * Get the stateful guard for the control panel.
+     *
+     * @return StatefulGuard
+     */
+    public static function guard(): StatefulGuard
+    {
+        return Auth::guard('fastlane-cp');
+    }
+
+    /**
      * Determine whether there's an user authenticated
      * in the control panel.
      *
@@ -22,7 +33,7 @@ class Fastlane
      */
     public static function isAuthenticated(): bool
     {
-        return Auth::guard('fastlane-cp')->check();
+        return static::guard()->check();
     }
 
     /**
@@ -32,7 +43,7 @@ class Fastlane
      */
     public static function user(): ?Authenticatable
     {
-        return Auth::guard('fastlane-cp')->user();
+        return static::guard()->user();
     }
 
     /**
@@ -42,14 +53,18 @@ class Fastlane
      * @param string      $message
      * @param string|null $icon
      */
-    public static function flashMessage(string $type, string $message, ?string $icon = null): void
+    public static function flashMessage(string $type, string $message, ?string $icon = null, $livewireComponent = null): void
     {
         $newMsg = (object)compact('type', 'message', 'icon');
 
         $msgs = array_merge(session()->get('fastlane-messages', []), [$newMsg]);
 
-        Livewire::dispatch('fastlaneMessageAdded', $newMsg);
         session()->flash('fastlane-messages', $msgs);
+
+        if ($livewireComponent) {
+            $livewireComponent->emitTo('fl-flash-messages', 'fastlaneMessageAdded', $newMsg);
+            $livewireComponent->emitTo('fl-flash-messages', 'fastlaneMessagesUpdated', $msgs);
+        }
     }
 
     /**
@@ -58,9 +73,9 @@ class Fastlane
      * @param string      $message
      * @param string|null $icon
      */
-    public static function flashSuccess(string $message, ?string $icon = null): void
+    public static function flashSuccess(string $message, ?string $icon = null, $livewireComponent = null): void
     {
-        static::flashMessage('success', $message, $icon);
+        static::flashMessage('success', $message, $icon, $livewireComponent);
     }
 
     /**
@@ -69,9 +84,9 @@ class Fastlane
      * @param string      $message
      * @param string|null $icon
      */
-    public static function flashAlert(string $message, ?string $icon = null): void
+    public static function flashAlert(string $message, ?string $icon = null, $livewireComponent = null): void
     {
-        static::flashMessage('alert', $message, $icon);
+        static::flashMessage('alert', $message, $icon, $livewireComponent);
     }
 
     /**
@@ -80,9 +95,9 @@ class Fastlane
      * @param string      $message
      * @param string|null $icon
      */
-    public static function flashDanger(string $message, ?string $icon = null): void
+    public static function flashDanger(string $message, ?string $icon = null, $livewireComponent = null): void
     {
-        static::flashMessage('danger', $message, $icon);
+        static::flashMessage('danger', $message, $icon, $livewireComponent);
     }
 
     /**
@@ -128,7 +143,7 @@ class Fastlane
     public static function createPermission(string $name, string $guard = 'fastlane-cp'): void
     {
         Permission::firstOrCreate([
-            'name'       => $name,
+            'name' => $name,
             'guard_name' => $guard,
         ]);
     }
@@ -142,7 +157,7 @@ class Fastlane
     {
         /** @var Role $role */
         $role = Role::firstOrCreate([
-            'name'       => $name,
+            'name' => $name,
             'guard_name' => $guard,
         ]);
 

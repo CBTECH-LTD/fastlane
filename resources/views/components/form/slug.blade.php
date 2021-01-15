@@ -3,6 +3,7 @@
     <x-slot name="help">{{ $field->getHelp() }}</x-slot>
     <div class="w-full">
         <input {{ $attributes->merge([
+        'wire:model.lazy' => 'data.' . $field->getAttribute(),
         'type' => 'text',
         'name' => $field->getAttribute(),
         'placeholder' => $field->getPlaceholder(),

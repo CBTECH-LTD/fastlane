@@ -7,6 +7,7 @@ use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Fields\Types\Slug;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 abstract class ContentBlock implements ContentBlockContract, Arrayable
@@ -14,6 +15,7 @@ abstract class ContentBlock implements ContentBlockContract, Arrayable
     protected Collection $fields;
     protected bool $shallow = false;
     protected array $values = [];
+    protected Model $model;
 
     public static function make(): self
     {
@@ -28,12 +30,20 @@ abstract class ContentBlock implements ContentBlockContract, Arrayable
     public function shallow(bool $value = true): self
     {
         $this->shallow = $value;
+
         return $this;
     }
 
     public function field(string $field): Field
     {
         return $this->fields->get($field);
+    }
+
+    public function withModel(Model $model): self
+    {
+        $this->model = $model;
+
+        return $this;
     }
 
     public function withValues(array $data): self
@@ -50,11 +60,11 @@ abstract class ContentBlock implements ContentBlockContract, Arrayable
     public function toArray(): array
     {
         return [
-            'key'    => static::key(),
-            'name'   => static::name(),
+            'key' => static::key(),
+            'name' => static::name(),
             'fields' => $this->shallow ? [] : $this->fields->map(function (Field $field) {
                 return array_merge($field->toArray(), [
-                    'value' => $field->read($this->values[$field->getAttribute()] ?? null),
+                    'value' => $field->read($this->model, $this->values[$field->getAttribute()] ?? null),
                 ]);
             }),
         ];
@@ -62,13 +72,11 @@ abstract class ContentBlock implements ContentBlockContract, Arrayable
 
     protected function resolveFields(): void
     {
-        $this->fields = (new FieldCollection($this->fields()));
-
-        $defaultFields = Collection::make([
+        $defaultFields = new FieldCollection([
             Slug::make('ID')->required()->unique(),
         ]);
 
-        $this->fields = $defaultFields->merge($this->fields())
+        $this->fields = $defaultFields->merge((new FieldCollection($this->fields())))
             ->mapWithKeys(function (Field $field) {
                 return [
                     $field->getAttribute() => $field,

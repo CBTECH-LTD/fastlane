@@ -1,6 +1,7 @@
 export function ItemActionDelete () {
     return {
         waitingConfirmation: false,
+        attemptingDelete: false,
         classes: 'bg-transparent',
         init () {
             this.$watch('waitingConfirmation', (val) => {
@@ -13,10 +14,13 @@ export function ItemActionDelete () {
         cancel () {
             this.waitingConfirmation = false
         },
-        confirm () {
-            this.waitingConfirmation = false
+        async confirm () {
+            this.attemptingDelete = true
 
-            this.$wire.confirmAction()
+            await this.$wire.confirmAction()
+            
+            this.attemptingDelete = false
+            this.waitingConfirmation = false
         },
     }
 }

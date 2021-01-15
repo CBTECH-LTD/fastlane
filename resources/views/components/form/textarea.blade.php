@@ -3,6 +3,7 @@
     <x-slot name="help">{{ $field->getHelp() }}</x-slot>
     <div class="w-full">
         <textarea {{ $attributes->merge([
+        'wire:model.lazy' => 'data.' . $field->getAttribute(),
         'name' => $field->getAttribute(),
         'placeholder' => $field->getPlaceholder(),
         'required' => $field->isRequired() ? 'required' : null,

@@ -1,4 +1,4 @@
-@component('fastlane::app', ['bg' => 'bg-gray-200'])
+@component('fastlane::layouts.base', ['bg' => 'bg-gray-200'])
     <div class="container mx-auto h-screen flex items-center">
         <div class="hidden md:flex w-4/6 items-center">
             <div class="flex-shrink">

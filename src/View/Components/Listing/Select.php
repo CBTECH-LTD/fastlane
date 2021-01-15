@@ -2,25 +2,21 @@
 
 namespace CbtechLtd\Fastlane\View\Components\Listing;
 
-use CbtechLtd\Fastlane\View\Components\Component;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
-class Select extends Component
+class Select extends ListingComponent
 {
-    public Model $model;
-    public string $attribute;
-    public $value;
-
-    public function __construct(Model $model, string $attribute, $value)
-    {
-        $this->model = $model;
-        $this->value = Arr::wrap($value);
-        $this->attribute = $attribute;
-    }
-
     public function render()
     {
         return view('fastlane::components.listing.select');
+    }
+
+    protected function initiateValue($value)
+    {
+        if ($this->field->isMultiple()) {
+            $value = json_decode($value);
+        }
+
+        return Arr::wrap($value);
     }
 }

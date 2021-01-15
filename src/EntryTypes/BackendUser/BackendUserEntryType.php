@@ -75,7 +75,7 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
                 Email::make('Email')->required()->unique()->listable()->sortable()->withHelp('An unique email'),
                 Select::make('Role')->withOptions(SelectOptionCollection::lazy(function () {
                     return Role::all()->map(fn(Role $role) => SelectOption::make($role->name, $role->name))->all();
-                })),
+                }))->listable()->sortable(),
             ])->withIcon('id-card'),
 
             Panel::make(__('fastlane::core.settings'))->withFields([

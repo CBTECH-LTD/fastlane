@@ -108,7 +108,7 @@ class Select extends Field
         return $this->isMultiple() ? 'array' : 'string';
     }
 
-    protected function processReadValue($value, string $entryType)
+    protected function processReadValue(Model $model, $value, string $entryType)
     {
         if ($this->isMultiple()) {
             $value = Arr::wrap(is_array($value) ? $value : \json_decode($value));

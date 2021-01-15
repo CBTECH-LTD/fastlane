@@ -23,7 +23,7 @@ class RowCellRenderer extends Component
     {
         $component = $this->field->listingComponent();
 
-        $props = ' :model="$model" attribute="' . $this->field->getAttribute() . '" :value="$getValue()"';
+        $props = ' :field="$field" :model="$model" attribute="' . $this->field->getAttribute() . '" :value="$getValue()"';
 
         return is_a($component, ReactiveComponent::class, true)
             ? '<livewire:' . $component::tag() . $props . '/>'

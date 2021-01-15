@@ -72,7 +72,7 @@ class BelongsTo extends Relationship
         return new UndefinedValue;
     }
 
-    protected function processReadValue($value, string $entryType)
+    protected function processReadValue(Model $model, $value, string $entryType)
     {
         return SelectOptionCollection::make([
             SelectOption::make(

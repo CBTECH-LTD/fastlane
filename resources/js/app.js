@@ -5,14 +5,18 @@
  */
 
 import 'alpinejs'
-import { Modal } from './components/modal'
+import { BlockEditor } from './components/block-editor'
 import { ItemActionDelete } from './components/item-action-delete'
-import { StickyTitleBar } from './components/sticky-title-bar'
+import { Modal } from './components/modal'
+import { Select } from './components/select'
 import { Spinner } from './components/spinner'
+import { StickyTitleBar } from './components/sticky-title-bar'
 
 window.fl = {
+    BlockEditor,
     ItemActionDelete,
     Modal,
+    Select,
     Spinner,
     StickyTitleBar,
 }

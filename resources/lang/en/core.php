@@ -15,6 +15,7 @@ return [
     'delete_entry_title'       => 'Delete this entry?',
     'delete_entry_description' => 'Once you delete an entry, there is no going back. Please be certain.',
     'delete_entry_button'      => 'Delete this entry',
+    'select_block'             => 'Select the block you want to add',
 
     // Dashboard
     'dashboard'                => [

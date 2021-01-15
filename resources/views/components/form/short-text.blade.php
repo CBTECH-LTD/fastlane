@@ -9,6 +9,7 @@
         'required' => $field->isRequired() ? 'required' : null,
         'class' => 'w-full form-input',
         'value' => $value,
+        'wire:model.lazy' => 'data.' . $field->getAttribute()
     ]) }}>
     </div>
 </x-fl-field>

@@ -133,14 +133,14 @@ class EntryController extends Controller
             Gate::authorize('update', $entry);
         }
 
-        $fields = $this->getFields()->onUpdate();
-        $viewModel = new EntryViewModel($this->entryType, $fields, $entry);
-
         return view()->first([
             "cp.{$this->entryType::key()}.edit",
             "fastlane::{$this->entryType::key()}.edit",
             "fastlane::entries.edit",
-        ], $viewModel);
+        ], [
+            'model' => $entry,
+            'entryType' => $this->entryType,
+        ]);
     }
 
     /**

@@ -10,19 +10,27 @@ class Form extends ReactiveComponent
 {
     public string $formId;
     public string $method;
-    public string $action;
+    public string $title;
+    public string $subtitle;
     public FieldCollection $fields;
     public Model $model;
     public string $entryType;
+    public array $actions = [];
 
-    public function mount(string $formId, string $method, string $action, FieldCollection $fields, Model $model, string $entryType)
+    public function mount(string $title, string $subtitle, string $formId, string $method, FieldCollection $fields, Model $model, string $entryType)
     {
+        $this->title = $title;
+        $this->subtitle = $subtitle;
         $this->method = $method;
-        $this->action = $action;
         $this->formId = $formId;
         $this->fields = $fields;
         $this->model = $model;
         $this->entryType = $entryType;
+    }
+
+    public function submit()
+    {
+        dd('test');
     }
 
     public function render()

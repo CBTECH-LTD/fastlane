@@ -48,7 +48,7 @@ class ContentBlockRepository implements ContentBlockRepositoryContract
      */
     public function findByKey(string $key): string
     {
-        if (! $item = $this->items->first(fn(string $class) => $class::key() === $key)) {
+        if (! $item = $this->items->first(fn (string $class) => $class::key() === $key)) {
             throw ContentBlockNotRegisteredException::keyNotRegistered($key);
         }
 
@@ -64,7 +64,7 @@ class ContentBlockRepository implements ContentBlockRepositoryContract
      */
     public function findByClass(string $class): string
     {
-        if (! $item = $this->items->first(fn(string $c) => $c === $class)) {
+        if (! $item = $this->items->first(fn (string $c) => $c === $class)) {
             throw ContentBlockNotRegisteredException::classNotRegistered($class);
         }
 

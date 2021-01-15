@@ -17,6 +17,13 @@ class Select extends FormComponent
 
     protected function prepareOptions(): SelectOptionCollection
     {
-        return $this->field->getOptions()->select(Arr::wrap($this->value));
+        $value = Arr::wrap($this->value);
+        $options = $this->field->getOptions();
+
+        if ($this->field->isTaggable()) {
+            $options->withTags($value);
+        }
+
+        return $options->select($value);
     }
 }

@@ -1,15 +1,29 @@
-.
-.form-input.v-select .vs__dropdown-toggle {
+.form-input.ss-main {
     padding: 0;
-    border: none;
-    border-radius: 0;
 }
 
-.form-input.v-select .vs__selected,
-.form-input.v-select .vsl__combobox {
-    padding: 0;
-    margin: 0;
-    color: #000;
+.form-input.ss-main .ss-single-selected,
+.form-input.ss-main .ss-multi-selected {
+    @apply flex items-center justify-between;
+    height: 42px;
+    border: 0;
+}
+
+.form-input.ss-main .ss-content.ss-open {
+    @apply border-gray-200 shadow;
+}
+
+.form-input.ss-main .ss-content .ss-search input {
+    @apply bg-gray-300 border-0 p-4;
+    outline: none;
+}
+
+.form-input.ss-main .ss-content .ss-search input:focus {
+    outline: none;
+}
+
+.form-input.ss-main .ss-multi-selected .ss-add {
+    @apply m-0 px-4;
 }
 
 .form-checkbox {

@@ -43,7 +43,7 @@ class Boolean extends Field
         return [$this->getAttribute() => 'boolean'];
     }
 
-    protected function processReadValue($value, string $entryType)
+    protected function processReadValue(Model $model, $value, string $entryType)
     {
         return (bool)$value;
     }

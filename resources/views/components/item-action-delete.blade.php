@@ -14,6 +14,10 @@
             </x-fl-button>
             <x-fl-button color="danger" left-icon="trash" x-on:click="confirm">
                 @lang('fastlane::core.confirm')
+
+                <template x-if="attemptingDelete">
+                    <x-fl-spinner :active="true"></x-fl-spinner>
+                </template>
             </x-fl-button>
         </div>
     </div>

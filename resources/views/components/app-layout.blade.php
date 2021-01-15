@@ -1,4 +1,4 @@
-@component('fastlane::app')
+@component('fastlane::layouts.base')
     <div class="flex flex-col">
         <div class="fixed top-0 w-full h-20 bg-white border-b border-gray-200 z-40 flex justify-between">
             {{-- App Logo --}}
@@ -31,32 +31,10 @@
             {{-- Main Area --}}
             <div class="w-full flex flex-row overflow-x-hidden px-4">
                 @isset($sidebar))
-                <div>{{ $sidebar }}</div>
+                    <div>{{ $sidebar }}</div>
                 @endisset
                 <div class="flex-grow mb-8" style="border-radius: 2rem">
-                    @isset($title)
-                        <div x-data="fl.StickyTitleBar()" x-init="init()" class="title-bar-wrapper">
-                            <div class="title-bar">
-                                <div class="w-4/6">
-                                    <h1 class="title-bar__title">
-                                        {{ $title }}
-                                    </h1>
-                                    <div class="title-bar__subtitle">
-                                        {{ $subtitle ?? '' }}
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    {{ $actions ?? '' }}
-                                </div>
-                            </div>
-                        </div>
-                    @endisset
-
-                    <livewire:fl-flash-messages></livewire:fl-flash-messages>
-
-                    <div class="mt-4 mb-12 px-8 w-full">
-                        {{ $slot }}
-                    </div>
+                    {{ $slot }}
                 </div>
             </div>
         </div>

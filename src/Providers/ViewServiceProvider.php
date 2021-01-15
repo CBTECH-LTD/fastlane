@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\Providers;
 
 use CbtechLtd\Fastlane\Support\Menu\MenuLink;
 use CbtechLtd\Fastlane\View\Components\AppLayout;
+use CbtechLtd\Fastlane\View\Components\AppMainArea;
 use CbtechLtd\Fastlane\View\Components\BoxedCard;
 use CbtechLtd\Fastlane\View\Components\Button;
 use CbtechLtd\Fastlane\View\Components\Field;
@@ -38,6 +39,7 @@ class ViewServiceProvider extends ServiceProvider
     {
         $components = [
             AppLayout::class,
+            AppMainArea::class,
             Button::class,
             Icon::class,
             Link::class,
@@ -87,6 +89,7 @@ class ViewServiceProvider extends ServiceProvider
             // Listing
             Listing\ReactiveToggle::class,
             Livewire\ListingTable::class,
+            Livewire\EditForm::class,
         ];
 
         foreach ($components as $component) {

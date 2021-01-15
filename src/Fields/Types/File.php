@@ -9,6 +9,7 @@ use CbtechLtd\Fastlane\EntryTypes\FileManager\FileManagerEntryType;
 use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Transformers\FileTransformer;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -69,7 +70,7 @@ class File extends Field implements Contracts\HasAttachments
         return $this->getConfig('multiple');
     }
 
-    protected function processReadValue($value, string $entryType)
+    protected function processReadValue(Model $model, $value, string $entryType)
     {
 
         return FileManagerEntryType::queryListing(false, function (QueryBuilder $builder) use ($value) {

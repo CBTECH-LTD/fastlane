@@ -24,15 +24,20 @@ class BlockEditor extends Field
     public function disableBlocks(array $blockClasses): self
     {
         return $this->setConfig('blocks', $this->getConfig('blocks')->filter(
-            fn(string $class) => ! in_array($class, $blockClasses)
+            fn (string $class) => ! in_array($class, $blockClasses)
         ));
     }
 
     public function withBlocks(array $blockClasses): self
     {
         return $this->setConfig('blocks', Collection::make(app(ContentBlockRepository::class)->all())->filter(
-            fn(string $class) => in_array($class, $blockClasses)
+            fn (string $class) => in_array($class, $blockClasses)
         ));
+    }
+
+    public function getBlocks(): ContentBlockCollection
+    {
+        return $this->getConfig('blocks');
     }
 
     public function toArray()
@@ -44,16 +49,16 @@ class BlockEditor extends Field
         return parent::toArray();
     }
 
-    protected function processReadValue($value, string $entryType)
+    protected function processReadValue(Model $model, $value, string $entryType)
     {
         $val = is_array($value) ? $value : json_decode($value ?? '[]', true);
 
-        return Collection::make($val)->map(function (array $block) {
+        return Collection::make($val)->map(function (array $block) use ($model) {
             if (! $instance = app(ContentBlockRepository::class)->findByKey($block['block'])) {
                 return null;
             }
 
-            return $instance::make()->withValues($block);
+            return $instance::make()->withValues($block)->withModel($model);
         })->filter();
     }
 

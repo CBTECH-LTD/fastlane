@@ -61,9 +61,9 @@ class FieldCollection extends Collection
      */
     public function getData(Model $model, string $entryType): array
     {
-        $attributes = $this->getAttributes()->mapWithKeys(fn(Field $field) => [
+        $attributes = $this->getAttributes()->mapWithKeys(fn (Field $field) => [
             $field->getAttribute() => $field->read($model, $entryType),
-        ])->filter(fn($value) => ! $value instanceof UndefinedValue);
+        ])->filter(fn ($value) => ! $value instanceof UndefinedValue);
 
         $relationships = $this->getRelationships()->map(function (Relationship $field) {
             // TODO: ONLY LOAD RELATIONSHIP IF IT'S IN A $with VARIABLE IN THE ENTRY TYPE INSTANCE
@@ -130,8 +130,7 @@ class FieldCollection extends Collection
         return $this->newInstance($items);
     }
 
-    public
-    function onCreate(): FieldCollection
+    public function onCreate(): FieldCollection
     {
         $items = Collection::make($this->items)
             ->filter(function (Field $field) {
@@ -144,8 +143,7 @@ class FieldCollection extends Collection
         return $this->newInstance($items);
     }
 
-    public
-    function onUpdate(): FieldCollection
+    public function onUpdate(): FieldCollection
     {
         $items = Collection::make($this->items)
             ->filter(function (Field $field) {
@@ -163,8 +161,7 @@ class FieldCollection extends Collection
      *
      * @return array
      */
-    public
-    function toArray()
+    public function toArray()
     {
         return $this->getCollection()->toArray();
     }
@@ -174,11 +171,10 @@ class FieldCollection extends Collection
      *
      * @return Collection
      */
-    public
-    function getAttributes(): Collection
+    public function getAttributes(): Collection
     {
         return $this->flattenFields()->filter(
-            fn(Field $field) => ! $field instanceof Relationship
+            fn (Field $field) => ! $field instanceof Relationship
         )->toBase();
     }
 
@@ -187,11 +183,10 @@ class FieldCollection extends Collection
      *
      * @return Collection
      */
-    public
-    function getComputedAttributes(): Collection
+    public function getComputedAttributes(): Collection
     {
         return $this->getAttributes()->filter(
-            fn(Field $field) => $field->isComputed()
+            fn (Field $field) => $field->isComputed()
         );
     }
 
@@ -200,16 +195,14 @@ class FieldCollection extends Collection
      *
      * @return Collection
      */
-    public
-    function getRelationships(): Collection
+    public function getRelationships(): Collection
     {
         return $this->flattenFields()->filter(
-            fn(Field $field) => $field instanceof Relationship
+            fn (Field $field) => $field instanceof Relationship
         );
     }
 
-    protected
-    function newInstance(
+    protected function newInstance(
         ?array $data = null
     ): FieldCollection {
         return tap(clone $this, function (FieldCollection $collection) use ($data) {

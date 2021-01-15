@@ -461,7 +461,7 @@ abstract class Field implements Arrayable
             return $this->getDefault();
         }
 
-        return $this->processReadValue($value, $entryType);
+        return $this->processReadValue($model, $value, $entryType);
     }
 
     /**
@@ -678,11 +678,12 @@ abstract class Field implements Arrayable
     /**
      * Process the given value right after it's been read from the model.
      *
+     * @param Model  $model
      * @param        $value
      * @param string $entryType
      * @return mixed
      */
-    protected function processReadValue($value, string $entryType)
+    protected function processReadValue(Model $model, $value, string $entryType)
     {
         return $value;
     }
