@@ -50,29 +50,29 @@ abstract class Field implements Arrayable
     public function __construct(string $label, ?string $attribute = null)
     {
         $this->config = new Collection([
-            'label'           => $label,
-            'attribute'       => $attribute ?? Str::slug($label, '_'),
-            'placeholder'     => $label,
-            'help'            => new HtmlString(''),
-            'required'        => false,
-            'unique'          => false,
-            'sortable'        => false,
-            'default'         => null,
-            'panel'           => null,
-            'computed'        => false,
+            'label' => $label,
+            'attribute' => $attribute ?? Str::slug($label, '_'),
+            'placeholder' => $label,
+            'help' => new HtmlString(''),
+            'required' => false,
+            'unique' => false,
+            'sortable' => false,
+            'default' => null,
+            'panel' => null,
+            'computed' => false,
             'listingColWidth' => $this->listingColWidth,
         ]);
 
         $this->visibility = new Collection([
             'listing' => false,
-            'create'  => true,
-            'update'  => true,
+            'create' => true,
+            'update' => true,
         ]);
 
         $this->rules = new Collection([
             'config' => Collection::make(),
-            'create' => fn() => '',
-            'update' => fn() => '',
+            'create' => fn () => '',
+            'update' => fn () => '',
         ]);
     }
 
@@ -224,6 +224,7 @@ abstract class Field implements Arrayable
             };
 
         $this->rules->put('create', $callback);
+
         return $this;
     }
 
@@ -242,6 +243,7 @@ abstract class Field implements Arrayable
             };
 
         $this->rules->put('update', $callback);
+
         return $this;
     }
 
@@ -262,7 +264,7 @@ abstract class Field implements Arrayable
         );
 
         return array_merge(Arr::except($this->getFieldRules($data), $this->getAttribute()), [
-            $this->getAttribute() => Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|',),
+            $this->getAttribute() => Collection::make($rules)->filter(fn ($r) => ! empty($r))->implode('|', ),
         ]);
     }
 
@@ -284,7 +286,7 @@ abstract class Field implements Arrayable
         );
 
         return array_merge(Arr::except($this->getFieldRules($data), $this->getAttribute()), [
-            $this->getAttribute() => Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|',),
+            $this->getAttribute() => Collection::make($rules)->filter(fn ($r) => ! empty($r))->implode('|', ),
         ]);
     }
 
@@ -360,6 +362,7 @@ abstract class Field implements Arrayable
     public function listable(): self
     {
         $this->visibility->put('listing', true);
+
         return $this;
     }
 
@@ -381,6 +384,7 @@ abstract class Field implements Arrayable
     public function hideOnCreate(): self
     {
         $this->visibility->put('create', false);
+
         return $this;
     }
 
@@ -402,6 +406,7 @@ abstract class Field implements Arrayable
     public function hideOnUpdate(): self
     {
         $this->visibility->put('update', false);
+
         return $this;
     }
 
@@ -437,6 +442,7 @@ abstract class Field implements Arrayable
         Assert::inArray($format, ['listing', 'create', 'update']);
 
         $this->arrayFormat = $format;
+
         return $this;
     }
 
@@ -490,6 +496,7 @@ abstract class Field implements Arrayable
     public function readUsing(callable $callable): self
     {
         $this->readResolverCallback = $callable;
+
         return $this;
     }
 
@@ -502,6 +509,7 @@ abstract class Field implements Arrayable
     public function writeUsing(callable $callable): self
     {
         $this->writeResolverCallback = $callable;
+
         return $this;
     }
 
@@ -529,12 +537,13 @@ abstract class Field implements Arrayable
         })();
 
         return [
-            'attribute'  => $this->getConfig('attribute'),
+            'type' => static::class,
+            'attribute' => $this->getConfig('attribute'),
             'components' => [
-                'form'    => $this->formComponent(),
+                'form' => $this->formComponent(),
                 'listing' => $this->listingComponent(),
             ],
-            'config'     => $config,
+            'config' => $config,
         ];
     }
 
@@ -617,7 +626,7 @@ abstract class Field implements Arrayable
     protected function getRuleConfig(string $rule): self
     {
         return $this->rules->get('config')->first(
-            fn($r) => $r['rule'] === $rule
+            fn ($r) => $r['rule'] === $rule
         );
     }
 
@@ -635,6 +644,7 @@ abstract class Field implements Arrayable
         }
 
         $this->rules->get('config')->push(compact('rule', 'params'));
+
         return $this;
     }
 
@@ -647,7 +657,7 @@ abstract class Field implements Arrayable
     protected function unsetRuleConfig(string $rule): self
     {
         $this->rules->put('config', $this->rules->get('config')->filter(
-            fn($r) => $r['rule'] !== $rule
+            fn ($r) => $r['rule'] !== $rule
         ));
 
         return $this;
@@ -666,12 +676,14 @@ abstract class Field implements Arrayable
     protected function setConfig(string $key, $value): self
     {
         $this->config->put($key, $value);
+
         return $this;
     }
 
     protected function mergeConfig(array $config): self
     {
         $this->config = $this->config->merge($config);
+
         return $this;
     }
 

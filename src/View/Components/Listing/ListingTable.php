@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace CbtechLtd\Fastlane\View\Components\Livewire;
+namespace CbtechLtd\Fastlane\View\Components\Listing;
 
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Http\ViewModels\EntryCollectionViewModel;

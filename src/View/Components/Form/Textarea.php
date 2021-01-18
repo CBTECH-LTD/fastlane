@@ -2,12 +2,7 @@
 
 namespace CbtechLtd\Fastlane\View\Components\Form;
 
-class Textarea extends FormComponent
+class Textarea extends FieldComponent
 {
-    public function render()
-    {
-        return view('fastlane::components.form.textarea', [
-            'value' => $this->value,
-        ]);
-    }
+    protected string $view = 'fastlane::components.form.textarea';
 }

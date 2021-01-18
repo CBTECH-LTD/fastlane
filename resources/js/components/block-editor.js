@@ -15,8 +15,8 @@ export function BlockEditor (options) {
             document.body.style.overflow = 'auto'
         },
 
-        selectNewBlock (key) {
-            alert(`${key}: ${this.newBlockPosition}`)
+        async selectNewBlock (key) {
+            await this.$wire.addBlock(key, this.newBlockPosition)
         }
     }
 }

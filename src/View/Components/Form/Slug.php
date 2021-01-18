@@ -2,12 +2,7 @@
 
 namespace CbtechLtd\Fastlane\View\Components\Form;
 
-class Slug extends FormComponent
+class Slug extends FieldComponent
 {
-    public function render()
-    {
-        return view('fastlane::components.form.slug', [
-            'value' => $this->value,
-        ]);
-    }
+    protected string $view = 'fastlane::components.form.slug';
 }

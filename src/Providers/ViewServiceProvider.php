@@ -15,7 +15,6 @@ use CbtechLtd\Fastlane\View\Components\ItemActionDelete;
 use CbtechLtd\Fastlane\View\Components\Link;
 use CbtechLtd\Fastlane\View\Components\Listing;
 use CbtechLtd\Fastlane\View\Components\ListingItemAction;
-use CbtechLtd\Fastlane\View\Components\Livewire;
 use CbtechLtd\Fastlane\View\Components\MenuWrapper;
 use CbtechLtd\Fastlane\View\Components\Paginator;
 use CbtechLtd\Fastlane\View\Components\Spinner;
@@ -31,17 +30,18 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->registerBladeComponents();
-        $this->registerLivewireComponents();
+        $this->registerComponents();
     }
 
-    protected function registerBladeComponents(): void
+    protected function registerComponents(): void
     {
         $components = [
             AppLayout::class,
             AppMainArea::class,
             Button::class,
+            FlashMessages::class,
             Icon::class,
+            ItemActionDelete::class,
             Link::class,
             ListingItemAction::class,
             Paginator::class,
@@ -57,6 +57,8 @@ class ViewServiceProvider extends ServiceProvider
 
             // Form components
             Field::class,
+            Form\Form::class,
+            Form\EditForm::class,
             Form\BlockEditor::class,
             Form\Panel::class,
             Form\Select::class,
@@ -70,30 +72,18 @@ class ViewServiceProvider extends ServiceProvider
             Listing\Boolean::class,
             Listing\ShortText::class,
             Listing\Select::class,
-        ];
-
-        foreach ($components as $component) {
-            Blade::component($component, $component::tag());
-        }
-    }
-
-    protected function registerLivewireComponents(): void
-    {
-        $components = [
-            FlashMessages::class,
-            ItemActionDelete::class,
-
-            // Form
-            Form\Form::class,
-
-            // Listing
             Listing\ReactiveToggle::class,
-            Livewire\ListingTable::class,
-            Livewire\EditForm::class,
+            Listing\ListingTable::class,
         ];
 
         foreach ($components as $component) {
-            LivewireFacade::component($component::tag(), $component);
+            if (is_a($component, \Livewire\Component::class, true)) {
+                LivewireFacade::component($component::tag(), $component);
+
+                continue;
+            }
+
+            Blade::component($component, $component::tag());
         }
     }
 }

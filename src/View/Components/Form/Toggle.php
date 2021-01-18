@@ -2,12 +2,12 @@
 
 namespace CbtechLtd\Fastlane\View\Components\Form;
 
-class Toggle extends FormComponent
+class Toggle extends FieldComponent
 {
-    public function render()
+    protected string $view = 'fastlane::components.form.toggle';
+
+    protected function readValue()
     {
-        return view('fastlane::components.form.toggle', [
-            'value' => (bool)$this->value,
-        ]);
+        return (bool) $this->field->read($this->model, $this->entryType);
     }
 }

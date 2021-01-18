@@ -48,11 +48,11 @@ class EntryController extends Controller
         $viewModel = (new EntryCollectionViewModel($this->entryType, $fields, []))
             ->withMeta([
                 'itemsPerPage' => $this->itemsPerPage,
-                'order'        => [
-                    'field'  => Str::replaceFirst('-', '', $request->input('order')),
+                'order' => [
+                    'field' => Str::replaceFirst('-', '', $request->input('order')),
                     'isDesc' => Str::startsWith($request->input('order'), '-'),
                 ],
-                'order_str'    => $request->input('order'),
+                'order_str' => $request->input('order'),
             ]);
 
         return view()->first([
@@ -99,7 +99,6 @@ class EntryController extends Controller
             Gate::authorize('create', $model);
         }
 
-        $fields = $this->getFields()->onCreate();
         $entry = $this->getRepository()->store($request->all());
 
         Fastlane::flashSuccess(
@@ -133,14 +132,14 @@ class EntryController extends Controller
             Gate::authorize('update', $entry);
         }
 
+        $fields = $this->getFields()->onUpdate();
+        $viewModel = new EntryViewModel($this->entryType, $fields, $entry);
+
         return view()->first([
             "cp.{$this->entryType::key()}.edit",
             "fastlane::{$this->entryType::key()}.edit",
             "fastlane::entries.edit",
-        ], [
-            'model' => $entry,
-            'entryType' => $this->entryType,
-        ]);
+        ], $viewModel);
     }
 
     /**
@@ -176,7 +175,7 @@ class EntryController extends Controller
      */
     protected function getFields(): FieldCollection
     {
-        return once(fn() => new FieldCollection($this->entryType::fields()));
+        return once(fn () => new FieldCollection($this->entryType::fields()));
     }
 
     /**

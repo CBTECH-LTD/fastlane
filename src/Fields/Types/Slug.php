@@ -2,9 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Fields\Types;
 
-use CbtechLtd\Fastlane\Fields\Field;
-
-class Slug extends Field
+class Slug extends ShortText
 {
     protected string $formComponent = \CbtechLtd\Fastlane\View\Components\Form\Slug::class;
     protected bool $generateFromFieldOnUpdate = false;

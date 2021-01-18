@@ -3,15 +3,14 @@
     <x-slot name="help">{{ $field->getHelp() }}</x-slot>
     <div class="w-full">
         <textarea {{ $attributes->merge([
-        'wire:model.lazy' => 'data.' . $field->getAttribute(),
-        'name' => $field->getAttribute(),
-        'placeholder' => $field->getPlaceholder(),
-        'required' => $field->isRequired() ? 'required' : null,
-        'class' => 'w-full form-input',
-        'cols' => '30',
-        'row' => '5',
-    ]) }}>
-        {{ $value }}
-    </textarea>
+            'name' => $field->getAttribute(),
+            'placeholder' => $field->getPlaceholder(),
+            'required' => $field->isRequired() ? 'required' : null,
+            'value' => $value,
+            'wire:model.lazy' => 'data.' . $field->getAttribute(),
+            'class' => 'w-full form-input',
+            'cols' => '30',
+            'rows' => '5',
+        ]) }}></textarea>
     </div>
 </x-fl-field>

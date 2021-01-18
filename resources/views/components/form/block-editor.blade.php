@@ -9,7 +9,7 @@
         </div>
 
         {{-- Blocks selector --}}
-        <div class="w-full flex flex-wrap justify-center my-4" x-data="fl.BlockEditor()">
+        <div x-cloak class="w-full flex flex-wrap justify-center my-4" x-data="fl.BlockEditor()">
             <div class="flex justify-center w-48 border-t border-gray-800 border-dashed">
                 <x-fl-button x-show="!shouldShowAvailableBlocks" color="black" left-icon="plus" size="sm" class="-mt-4" x-on:click="showAvailableBlocks(0)">
                     {{ __('fastlane::core.add') }}

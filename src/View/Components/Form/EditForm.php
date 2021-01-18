@@ -1,14 +1,12 @@
 <?php declare(strict_types = 1);
 
-namespace CbtechLtd\Fastlane\View\Components\Livewire;
+namespace CbtechLtd\Fastlane\View\Components\Form;
 
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
-use CbtechLtd\Fastlane\Http\ViewModels\EntryCollectionViewModel;
 use CbtechLtd\Fastlane\Http\ViewModels\EntryViewModel;
 use CbtechLtd\Fastlane\View\Components\ReactiveComponent;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
@@ -20,13 +18,13 @@ class EditForm extends ReactiveComponent
     public string $formId;
     public array $data;
 
-    public function mount(string $entryType, Model $model)
+    protected $listeners = ['fieldUpdated'];
+
+    public function mount(string $entryType, Model $model, string $formId)
     {
         $this->entryType = $entryType;
         $this->model = $model;
-        $this->formId = Str::uuid()->toString();
-
-        $this->data = $this->getFields()->onUpdate()->getData($this->model, $this->entryType);
+        $this->data = $this->fields->onUpdate()->getData($this->model, $this->entryType);
     }
 
     public function submit(): void
@@ -44,27 +42,27 @@ class EditForm extends ReactiveComponent
         );
     }
 
+    public function fieldUpdated(array $payload)
+    {
+        $this->data[$payload['attribute']] = $payload['value'];
+    }
+
     public function render()
     {
+        dd($this->fields);
+
         $viewModel = $this->buildViewModel()->toArray();
 
         return view('fastlane::components.livewire.edit-form', $viewModel);
     }
 
-    /**
-     * Get fields of the entry type.
-     *
-     * @return FieldCollection
-     */
-    protected function getFields(): FieldCollection
+    public function getFieldsProperty(): FieldCollection
     {
-        return once(fn () => new FieldCollection($this->entryType::fields()));
+        return new FieldCollection($this->entryType::fields());
     }
 
     protected function buildViewModel(): EntryViewModel
     {
-        $fields = $this->getFields()->onUpdate();
-
-        return new EntryViewModel($this->entryType, $fields, $this->model);
+        return new EntryViewModel($this->entryType, $this->fields, $this->model);
     }
 }

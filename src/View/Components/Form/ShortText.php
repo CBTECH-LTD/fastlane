@@ -2,12 +2,7 @@
 
 namespace CbtechLtd\Fastlane\View\Components\Form;
 
-class ShortText extends FormComponent
+class ShortText extends FieldComponent
 {
-    public function render()
-    {
-        return view('fastlane::components.form.short-text', [
-            'value' => $this->value,
-        ]);
-    }
+    protected string $view = 'fastlane::components.form.short-text';
 }

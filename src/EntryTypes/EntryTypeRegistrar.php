@@ -64,7 +64,7 @@ class EntryTypeRegistrar implements Contract
      */
     public function findByKey(string $key): string
     {
-        if (! $item = $this->items->first(fn(string $class) => $class::key() === $key)) {
+        if (! $item = $this->items->first(fn (string $class) => $class::key() === $key)) {
             throw EntryTypeNotRegisteredException::keyNotRegistered($key);
         }
 
@@ -80,7 +80,7 @@ class EntryTypeRegistrar implements Contract
      */
     public function findByClass(string $class): string
     {
-        if (! $item = $this->items->first(fn(string $c) => $c === $class)) {
+        if (! $item = $this->items->first(fn (string $c) => $c === $class)) {
             throw EntryTypeNotRegisteredException::classNotRegistered($class);
         }
 

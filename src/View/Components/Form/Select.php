@@ -5,14 +5,15 @@ namespace CbtechLtd\Fastlane\View\Components\Form;
 use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
 use Illuminate\Support\Arr;
 
-class Select extends FormComponent
+class Select extends FieldComponent
 {
-    public function render()
+    protected string $view = 'fastlane::components.form.select';
+
+    protected function viewData(): array
     {
-        return view('fastlane::components.form.select', [
-            'value'   => $this->value,
+        return [
             'options' => $this->prepareOptions()->collection(),
-        ]);
+        ];
     }
 
     protected function prepareOptions(): SelectOptionCollection
