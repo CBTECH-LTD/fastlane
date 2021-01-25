@@ -5,6 +5,7 @@ namespace CbtechLtd\Fastlane\Http\ViewModels;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Http\ViewModels\Traits\WithLinks;
 use CbtechLtd\Fastlane\Http\ViewModels\Traits\WithMeta;
+use CbtechLtd\Fastlane\Models\Entry;
 use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
 use Illuminate\Support\Collection;
 use Spatie\ViewModels\ViewModel;
@@ -15,7 +16,7 @@ class EntryViewModel extends ViewModel
 
     private string $entryType;
     private FieldCollection $fields;
-    private BaseModel $model;
+    private Entry $model;
 
     /** @var string[] */
     protected $ignore = ['withMeta', 'withLinks'];
@@ -25,16 +26,16 @@ class EntryViewModel extends ViewModel
      *
      * @param string          $entryType
      * @param FieldCollection $fields
-     * @param BaseModel       $model
+     * @param Entry           $model
      */
-    public function __construct(string $entryType, FieldCollection $fields, BaseModel $model)
+    public function __construct(string $entryType, FieldCollection $fields, Entry $model)
     {
         $this->entryType = $entryType;
         $this->fields = $fields;
         $this->model = $model;
     }
 
-    public function model(): BaseModel
+    public function model(): Entry
     {
         return $this->model;
     }

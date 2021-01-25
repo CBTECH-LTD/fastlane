@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\EntryTypes\BackendUser\Model;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\BackendUserEntryType;
+use CbtechLtd\Fastlane\Models\Entry;
 use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
 use CbtechLtd\Fastlane\Support\Eloquent\Concerns\FromEntryType;
 use Illuminate\Auth\Authenticatable;
@@ -19,18 +20,15 @@ use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends BaseModel implements
+class User extends Entry implements
     AuthenticatableContract,
     AuthorizableContract,
     CanResetPasswordContract
 {
-    use Notifiable, Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasRoles, HasApiTokens, FromEntryType;
+    use Notifiable, Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasRoles, HasApiTokens;
 
     /** @var string */
     protected $table = 'fastlane_users';
-
-    /** @var string|BackendUserEntryType */
-    protected static string $entryType = BackendUserEntryType::class;
 
     /**
      * The attributes that should be mass assignable.
@@ -67,18 +65,6 @@ class User extends BaseModel implements
      * @var string[]
      */
     protected $with = ['roles'];
-
-    /**
-     * Configure the model booting method.
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function (User $user) {
-            $user->setPasswordAttribute(Str::random(12));
-        });
-    }
 
     public function newEloquentBuilder($query)
     {

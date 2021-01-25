@@ -16,7 +16,7 @@ class FileManagerEntryType extends EntryType
     protected static string $controller = FileManagerEntryType::class;
 
     /** @var string */
-    protected static string $repository = FileManagerRepository::class;
+    protected static string $repository = FileManagerEntryRepository::class;
 
     protected static string $key = 'files';
 

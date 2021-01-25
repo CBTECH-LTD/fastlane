@@ -6,9 +6,13 @@ use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Fields\Types\Relationship;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait FromEntryType
 {
+    static array $entryTypes = [];
+
     /**
      * @return string|EntryType
      */

@@ -3,8 +3,8 @@
 namespace CbtechLtd\Fastlane\Contracts;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryTypeRouteCollection;
-use CbtechLtd\Fastlane\Repositories\Repository;
-use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
+use CbtechLtd\Fastlane\Models\Entry;
+use CbtechLtd\Fastlane\Repositories\EntryRepository;
 
 interface EntryType
 {
@@ -37,18 +37,18 @@ interface EntryType
     public static function icon(): ?string;
 
     /**
-     * The repository that should be used to query the entry type.
-     *
-     * @return Repository
-     */
-    public static function repository(): Repository;
-
-    /**
-     * The controller that should process requests to this entry type.
+     * The database table that holds the entry type entities.
      *
      * @return string
      */
-    public static function controller(): string;
+    public static function table(): string;
+
+    /**
+     * The repository that should be used to query the entry type.
+     *
+     * @return EntryRepository
+     */
+    public static function repository(): EntryRepository;
 
     /**
      * The route collection that should be registered for this entry type.
@@ -72,17 +72,17 @@ interface EntryType
     /**
      * Get the route key from the given model.
      *
-     * @param BaseModel $model
+     * @param Entry $model
      * @return string
      */
-    public static function entryRouteKey(BaseModel $model): string;
+    public static function entryRouteKey(Entry $model): string;
 
     /**
      * Generate a string to be used as the description
      * of the given model.
      *
-     * @param BaseModel $model
+     * @param Entry $model
      * @return string
      */
-    public static function entryTitle(BaseModel $model): string;
+    public static function entryTitle(Entry $model): string;
 }

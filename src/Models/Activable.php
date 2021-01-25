@@ -1,6 +1,6 @@
 <?php
 
-namespace CbtechLtd\Fastlane\Support\Eloquent\Concerns;
+namespace CbtechLtd\Fastlane\Models;
 
 use CbtechLtd\Fastlane\Exceptions\ActiveStateException;
 

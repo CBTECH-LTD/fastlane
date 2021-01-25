@@ -2,11 +2,12 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers;
 
+use CbtechLtd\Fastlane\Facades\EntryType;
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Http\ViewModels\EntryCollectionViewModel;
 use CbtechLtd\Fastlane\Http\ViewModels\EntryViewModel;
-use CbtechLtd\Fastlane\Repositories\Repository;
+use CbtechLtd\Fastlane\Repositories\EntryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
@@ -22,12 +23,42 @@ class EntryController extends Controller
     protected string $entryType;
 
     /**
+     * The instance of the repository used by the requested entry type.
+     *
+     * @var EntryRepository
+     */
+    protected EntryRepository $repository;
+
+    /**
+     * The collection of fields of the requested entry type.
+     *
+     * @var FieldCollection
+     */
+    protected FieldCollection $fields;
+
+    /**
      * Define how many items must be shown in the listing page.
      * If no pagination is required, set it to null.
      *
      * @var int|null
      */
     protected ?int $itemsPerPage = 20;
+
+    /**
+     * EntryController constructor.
+     *
+     * @param EntryRepository $repository
+     */
+    public function __construct()
+    {
+        $this->middleware(function (Request $request, $next) {
+            $this->entryType = EntryType::findByKey($request->segment(3));
+            $this->repository = $this->entryType::repository();
+            $this->fields = (new FieldCollection($this->entryType::fields()));
+
+            return $next($request);
+        });
+    }
 
     /**
      * List the entries.
@@ -37,13 +68,13 @@ class EntryController extends Controller
      */
     public function index(Request $request)
     {
-        $repository = $this->getRepository();
-
-        if (Gate::getPolicyFor($repository->getModel())) {
-            Gate::authorize('list', $repository->getModel());
+        // TODO: Maybe register the policy in this controller __construct method,
+        //       based on what is configured in the EntryType class.
+        if (Gate::getPolicyFor($this->repository->getModel())) {
+            Gate::authorize('list', $this->repository->getModel());
         }
 
-        $fields = $this->getFields()->onListing();
+        $fields = $this->fields->onListing();
 
         $viewModel = (new EntryCollectionViewModel($this->entryType, $fields, []))
             ->withMeta([
@@ -70,13 +101,13 @@ class EntryController extends Controller
      */
     public function create()
     {
-        $entry = $this->getRepository()->newModel();
+        $entry = $this->repository->newModel();
 
         if (Gate::getPolicyFor($entry)) {
             Gate::authorize('create', $entry);
         }
 
-        $fields = $this->getFields()->onCreate();
+        $fields = $this->fields->onCreate();
         $viewModel = new EntryViewModel($this->entryType, $fields, $entry);
 
         return view()->first([
@@ -166,26 +197,5 @@ class EntryController extends Controller
         );
 
         return Redirect::back();
-    }
-
-    /**
-     * Get fields of the entry type.
-     *
-     * @return FieldCollection
-     */
-    protected function getFields(): FieldCollection
-    {
-        return once(fn () => new FieldCollection($this->entryType::fields()));
-    }
-
-    /**
-     * Get the repository of the entry type.
-     *
-     * @return Repository
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     */
-    protected function getRepository(): Repository
-    {
-        return $this->entryType::repository();
     }
 }

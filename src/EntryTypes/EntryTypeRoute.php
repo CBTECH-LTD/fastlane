@@ -4,6 +4,7 @@ namespace CbtechLtd\Fastlane\EntryTypes;
 
 use CbtechLtd\Fastlane\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Fastlane;
+use CbtechLtd\Fastlane\Http\Controllers\EntryController;
 use Illuminate\Routing\Router;
 
 class EntryTypeRoute
@@ -48,7 +49,7 @@ class EntryTypeRoute
         $this->path = $path;
         $this->name = $name;
         $this->handler = $name;
-        $this->controller = $entryType::controller();
+        $this->controller = EntryController::class;
     }
 
     public function uses(string $controller, string $handler): self

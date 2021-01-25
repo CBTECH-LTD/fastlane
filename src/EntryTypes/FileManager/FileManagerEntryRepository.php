@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File as FileFacade;
 use Illuminate\Support\Str;
 
-class FileManagerRepository extends Repository
+class FileManagerEntryRepository extends Repository
 {
     public function __construct(File $model)
     {

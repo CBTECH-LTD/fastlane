@@ -3647,7 +3647,7 @@ function Select(options) {
 
       this.instance = new slim_select__WEBPACK_IMPORTED_MODULE_0___default.a({
         select: this.$el,
-        closeOnSelect: !!options.taggable,
+        closeOnSelect: this.multiple === false,
         addable: options.taggable ? function (value) {
           if (value.trim() === '') {
             return false;
@@ -3660,7 +3660,7 @@ function Select(options) {
             return it.value;
           }) : data.value;
 
-          _this.$wire.set(_this.attribute, value);
+          _this.$wire.set('value', value);
         }
       });
     }

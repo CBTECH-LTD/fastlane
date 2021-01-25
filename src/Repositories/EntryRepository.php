@@ -6,6 +6,7 @@ use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Exceptions\DeleteEntryException;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
+use CbtechLtd\Fastlane\Models\Entry;
 use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
 use CbtechLtd\Fastlane\Support\Eloquent\Concerns\Hashable;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,19 +16,25 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 
-abstract class Repository
+class EntryRepository
 {
     /** @var EntryType | string */
     protected string $entryType;
 
-    /** @var BaseModel */
-    protected BaseModel $model;
+    /** @var Entry */
+    protected Entry $model;
 
     /** @var string */
     protected string $defaultOrder = 'created_at:desc';
 
     /** @var string */
     protected string $key;
+
+    public function __construct(string $entryType)
+    {
+        $this->setEntryType($entryType);
+        $this->model = (new Entry)->setEntryType($entryType);
+    }
 
     public function setEntryType(string $entryType): self
     {
@@ -38,9 +45,9 @@ abstract class Repository
     /**
      * Get the underlying model.
      *
-     * @return BaseModel
+     * @return Model
      */
-    public function getModel(): BaseModel
+    public function getModel(): Model
     {
         return $this->model;
     }

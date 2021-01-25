@@ -23,10 +23,7 @@ class ContentEntryType extends EntryType implements RenderableOnMenu
     protected static ?string $icon = 'layer-group';
 
     /** @var string */
-    protected static string $repository = ContentRepository::class;
-
-    /** @var string */
-    protected static string $controller = ContentController::class;
+    protected static string $table = 'fastlane_contents';
 
     /**
      * @inheritDoc

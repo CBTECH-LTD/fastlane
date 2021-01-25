@@ -10,7 +10,7 @@ export function Select (options) {
         init () {
             this.instance = new SlimSelect({
                 select: this.$el,
-                closeOnSelect: !!options.taggable,
+                closeOnSelect: this.multiple === false,
                 addable: options.taggable
                     ? function (value) {
                         if (value.trim() === '') {
@@ -25,9 +25,9 @@ export function Select (options) {
                         ? data.map(it => it.value)
                         : data.value
 
-                    this.$wire.set(this.attribute, value)
+                    this.$wire.set('value', value)
                 }
             })
-        },
+        }
     }
 }

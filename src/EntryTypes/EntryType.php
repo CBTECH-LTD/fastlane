@@ -4,9 +4,8 @@ namespace CbtechLtd\Fastlane\EntryTypes;
 
 use CbtechLtd\Fastlane\Contracts\EntryType as EntryTypeContract;
 use CbtechLtd\Fastlane\Fastlane;
-use CbtechLtd\Fastlane\Http\Controllers\EntriesController;
-use CbtechLtd\Fastlane\Repositories\Repository;
-use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
+use CbtechLtd\Fastlane\Models\Entry;
+use CbtechLtd\Fastlane\Repositories\EntryRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -43,18 +42,13 @@ abstract class EntryType implements EntryTypeContract
     protected static ?string $icon = 'list';
 
     /**
-     * The controller that should process requests to this entry type.
+     * The database table that holds the entry type entities.
+     * This property will be used by the Entry model to load the
+     * registries from the proper table.
      *
-     * @return string
+     * @var string
      */
-    protected static string $controller = EntriesController::class;
-
-    /**
-     * The repository that should be used to query the entry type.
-     *
-     * @return string
-     */
-    protected static string $repository;
+    protected static string $table;
 
     /**
      * Setup the entry type.
@@ -79,10 +73,6 @@ abstract class EntryType implements EntryTypeContract
                 'plural'   => Str::plural($singularLabel),
             ];
         }
-
-        // TODO: Resolve repository.
-
-        // TODO: Resolve controller.
     }
 
     /**
@@ -105,7 +95,7 @@ abstract class EntryType implements EntryTypeContract
     /**
      * @inheritDoc
      */
-    public static function entryRouteKey(BaseModel $model): string
+    public static function entryRouteKey(Entry $model): string
     {
         return $model->getRouteKey() ?? '';
     }
@@ -113,15 +103,9 @@ abstract class EntryType implements EntryTypeContract
     /**
      * @inheritDoc
      */
-    public static function entryTitle(BaseModel $model): string
+    public static function entryTitle(Entry $model): string
     {
-        // If the model has a toString method we just use it
-        // to generate the title.
-        if (method_exists($model, 'toString')) {
-            return $model->toString();
-        }
-
-        // Model has no toString method, so we use its route key.
+        // Using route key as the title.
         // Hey fellow developer, it's not very readable!
         return static::entryRouteKey($model);
     }
@@ -150,20 +134,23 @@ abstract class EntryType implements EntryTypeContract
         return static::$icon;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public static function repository(): Repository
+    public static function table(): string
     {
-        return once(fn() => app()->make(static::$repository, [static::class])->setEntryType(static::class));
+        if (isset(static::$table)) {
+            return static::$table;
+        }
+
+        return Str::slug(
+            Str::pluralStudly(Str::replaceLast('EntryType', '', static::key())), '_'
+        );
     }
 
     /**
      * @inheritDoc
      */
-    public static function controller(): string
+    public static function repository(): EntryRepository
     {
-        return static::$controller;
+        return once(fn () => app()->make(EntryRepository::class, ['entryType' => static::class]));
     }
 
     /**

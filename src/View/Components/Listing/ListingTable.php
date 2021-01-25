@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 class ListingTable extends ReactiveComponent
 {
-    public bool $dataLoaded = true;
+    public bool $dataLoaded = false;
     public string $entryType;
     public int $itemsPerPage;
     public int $page = 1;

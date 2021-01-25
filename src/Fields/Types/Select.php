@@ -100,7 +100,7 @@ class Select extends Field
 
     public function getOptions(): SelectOptionCollection
     {
-        return $this->getConfig('options')->load();
+        return $this->getConfig('options');
     }
 
     public function castUsing()

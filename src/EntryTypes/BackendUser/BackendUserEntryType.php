@@ -30,7 +30,7 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
     protected static ?string $icon = 'user';
 
     /** @var string */
-    protected static string $repository = BackendUserRepository::class;
+    protected static string $repository = BackendUserEntryRepository::class;
 
     /** @var string */
     protected static string $controller = BackendUserController::class;
@@ -74,7 +74,7 @@ class BackendUserEntryType extends EntryType implements RenderableOnMenu
                 ShortText::make('Name')->required()->listable()->sortable(),
                 Email::make('Email')->required()->unique()->listable()->sortable()->withHelp('An unique email'),
                 Select::make('Role')->withOptions(SelectOptionCollection::lazy(function () {
-                    return Role::all()->map(fn(Role $role) => SelectOption::make($role->name, $role->name))->all();
+                    return Role::all()->map(fn (Role $role) => SelectOption::make($role->name, $role->name))->all();
                 }))->listable()->sortable(),
             ])->withIcon('id-card'),
 

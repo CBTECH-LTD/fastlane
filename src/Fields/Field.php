@@ -36,12 +36,6 @@ abstract class Field implements Arrayable
     /** @var int */
     protected int $listingColWidth = 0;
 
-    /** @var EntryType|string */
-    protected string $entryType;
-
-    /** @var Model */
-    protected Model $model;
-
     public static function make(...$attributes): self
     {
         return new static(...$attributes);
@@ -76,15 +70,7 @@ abstract class Field implements Arrayable
         ]);
     }
 
-    public function resolve(string $entryType, Model $model): self
-    {
-        $this->entryType = $entryType;
-        $this->model = $model;
-
-        return $this;
-    }
-
-    public function formComponent(): string
+        public function formComponent(): string
     {
         return $this->formComponent;
     }
@@ -444,6 +430,16 @@ abstract class Field implements Arrayable
         $this->arrayFormat = $format;
 
         return $this;
+    }
+
+    /**
+     * Get the field which is used to generate the slug.
+     *
+     * @return string
+     */
+    public function getBaseField(): string
+    {
+        return $this->getConfig('baseField');
     }
 
     /**

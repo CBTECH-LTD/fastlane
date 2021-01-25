@@ -4,11 +4,12 @@ namespace CbtechLtd\Fastlane\EntryTypes\BackendUser;
 
 use CbtechLtd\Fastlane\EntryTypes\BackendUser\Model\User;
 use CbtechLtd\Fastlane\Fastlane;
+use CbtechLtd\Fastlane\Models\Entry;
 use CbtechLtd\Fastlane\Repositories\Repository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-class BackendUserRepository extends Repository
+class BackendUserEntryRepository extends Repository
 {
     public function __construct(User $model)
     {

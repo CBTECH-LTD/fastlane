@@ -1,46 +1,56 @@
-<?php declare(strict_types = 1);
+<?php
 
 namespace CbtechLtd\Fastlane\View\Components\Form;
 
-use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Http\ViewModels\EntryViewModel;
 use CbtechLtd\Fastlane\View\Components\ReactiveComponent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Redirect;
 
-class EditForm extends ReactiveComponent
+class CreateForm extends ReactiveComponent
 {
-    public string $entryType;
     public Model $model;
+    public string $entryType;
     public array $actions = [];
     public string $formId;
     public array $data;
 
-    protected $listeners = ['fieldUpdated'];
+    protected $listeners = [
+        'fastlane::fieldUpdated' => 'fieldUpdated',
+    ];
 
-    public function mount(string $entryType, Model $model, string $formId)
+    public function mount(string $entryType, string $formId)
     {
         $this->entryType = $entryType;
-        $this->model = $model;
+        $this->model = $this->entryType::repository()->getModel();
         $this->data = $this->fields->getData($this->model, $this->entryType);
     }
 
-    public function submit(): void
+    public function submit()
     {
         if (Gate::getPolicyFor($this->model)) {
-            Gate::forUser(Fastlane::user())->authorize('update', $this->model);
+            Gate::authorize('create', $this->model);
         }
 
-        $this->entryType::repository()->update($this->model->getKey(), $this->data);
+        $entry = $this->entryType::repository()->store($this->data);
 
         Fastlane::flashSuccess(
-            __('fastlane::core.flash.updated', ['name' => $this->entryType::label()['singular']]),
-            'thumbs-up',
-            $this
+            __('fastlane::core.flash.created', ['name' => $this->entryType::label()['singular']]),
+            'thumbs-up'
         );
+
+        if ($this->entryType::routes()->has('edit')) {
+            return Redirect::to($this->entryType::routes()->get('edit')->url($entry));
+        }
+
+        if ($this->entryType::routes()->get('index')) {
+            return Redirect::to($this->entryType::routes()->get('index')->url());
+        }
+
+        return Redirect::back();
     }
 
     public function fieldUpdated(array $payload)
@@ -50,8 +60,6 @@ class EditForm extends ReactiveComponent
 
     public function render()
     {
-//        $entry = new EntryInstance($this->entryType, $this->fields->onUpdate(), $this->model);
-
         $viewModel = $this->buildViewModel()->toArray();
 
         return view('fastlane::components.livewire.form', $viewModel);
@@ -59,7 +67,7 @@ class EditForm extends ReactiveComponent
 
     public function getFieldsProperty(): FieldCollection
     {
-        return (new FieldCollection($this->entryType::fields()))->onUpdate();
+        return (new FieldCollection($this->entryType::fields()))->onCreate();
     }
 
     protected function buildViewModel(): EntryViewModel

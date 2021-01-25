@@ -43,6 +43,16 @@ class SelectOptionCollection implements Arrayable
         return $this;
     }
 
+    public function isLazy(): bool
+    {
+        return is_callable($this->lazyLoader);
+    }
+
+    public function isLoaded(): bool
+    {
+        return $this->lazyLoaded || ! $this->isLazy();
+    }
+
     public function all(): array
     {
         return $this->items;
@@ -51,7 +61,7 @@ class SelectOptionCollection implements Arrayable
     public function select(array $values): self
     {
         $this->collection()->each(
-            fn(SelectOption $option) => $option->select(in_array($option->getValue(), $values))
+            fn (SelectOption $option) => $option->select(in_array($option->getValue(), $values))
         );
 
         return $this;
@@ -60,7 +70,7 @@ class SelectOptionCollection implements Arrayable
     public function selected(): Collection
     {
         return $this->collection()->filter(
-            fn(SelectOption $option) => $option->isSelected()
+            fn (SelectOption $option) => $option->isSelected()
         );
     }
 

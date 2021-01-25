@@ -36,4 +36,13 @@ abstract class ReactiveFieldComponent extends ReactiveComponent
     {
         return (new FieldCollection($this->entryType::fields()))->find($this->attribute);
     }
+
+    public function updatedValue($value)
+    {
+        $this->emit('fastlane::fieldUpdated', [
+            'attribute' => $this->attribute,
+            'type' => get_class($this->field),
+            'value' => $value,
+        ]);
+    }
 }
