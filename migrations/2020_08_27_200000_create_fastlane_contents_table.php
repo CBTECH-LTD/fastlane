@@ -18,7 +18,6 @@ class CreateFastlaneContentsTable extends Migration
             $table->string('name');
             $table->string('slug')->nullable()->unique();
             $table->json('blocks');
-            $table->boolean('is_active')->default(true);
         });
     }
 

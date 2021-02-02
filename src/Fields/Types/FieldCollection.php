@@ -35,8 +35,7 @@ class FieldCollection extends Collection
      */
     public function getCreateRules(Model $model, array $data): array
     {
-        // TODO
-        return [];
+        return $this->getAttributes()->flatMap->getCreateRules($model, $data)->toArray();
     }
 
     /**
@@ -48,7 +47,7 @@ class FieldCollection extends Collection
      */
     public function getUpdateRules(Model $model, array $data): array
     {
-        return $this->flattenFields()->getCollection()->flatMap->getUpdateRules($model, $data)->toArray();
+        return $this->getAttributes()->flatMap->getUpdateRules($model, $data)->toArray();
     }
 
     /**

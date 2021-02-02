@@ -5,6 +5,7 @@ namespace CbtechLtd\Fastlane\Fields;
 use CbtechLtd\Fastlane\Contracts\EntryType;
 use CbtechLtd\Fastlane\Fields\Rules\Unique;
 use CbtechLtd\Fastlane\Fields\Types\Panel;
+use CbtechLtd\Fastlane\Models\Entry;
 use CbtechLtd\Fastlane\View\Components\Listing\ShortText;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
@@ -236,15 +237,16 @@ abstract class Field implements Arrayable
     /**
      * Retrieve the rules used when creating an entry.
      *
+     * @param Model $model
      * @param array $data
      * @return array
      */
-    public function getCreateRules(array $data): array
+    public function getCreateRules(Model $model, array $data): array
     {
         $customRules = $this->rules->get('create')($data);
 
         $rules = array_merge(
-            [$this->buildBaseRules($data)],
+            [$this->buildBaseRules($model, $data)],
             [Arr::get($this->getFieldRules($data), $this->getAttribute(), '')],
             [$customRules],
         );

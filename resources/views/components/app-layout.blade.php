@@ -1,6 +1,6 @@
 @component('fastlane::layouts.base')
     <div class="flex flex-col">
-        <div class="fixed top-0 w-full h-20 bg-white border-b border-gray-200 z-40 flex justify-between">
+        <div class="fixed top-0 w-full h-20 bg-white border-b border-gray-300 z-40 flex justify-between">
             {{-- App Logo --}}
             <div class="h-20 p-2">
                 <img src="{{ asset(config('fastlane.asset_logo_img')) }}" alt="" class="h-full">
@@ -22,14 +22,14 @@
         </div>
         <div class="mt-20 w-full flex">
             {{-- Navigation items --}}
-            <div class="flex flex-col h-screen sticky overflow-hidden" style="width: 320px; top: 80px;">
+            <div class="flex flex-col h-screen sticky overflow-hidden border-r border-gray-300" style="width: 320px; top: 80px;">
                 <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scroll">
                     <x-fl-menu-wrapper class="my-6 px-2" :items="$menuItems()"></x-fl-menu-wrapper>
                 </div>
             </div>
 
             {{-- Main Area --}}
-            <div class="w-full flex flex-row overflow-x-hidden px-4">
+            <div class="container mx-auto flex flex-row overflow-x-hidden px-4">
                 @isset($sidebar))
                     <div>{{ $sidebar }}</div>
                 @endisset

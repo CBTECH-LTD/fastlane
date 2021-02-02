@@ -12,7 +12,7 @@
             <x-fl-button color="black" variant="minimal" left-icon="undo" class="mr-2" x-on:click="cancel">
                 @lang('fastlane::core.cancel')
             </x-fl-button>
-            <x-fl-button color="danger" left-icon="trash" x-on:click="confirm">
+            <x-fl-button color="danger" left-icon="trash" x-on:click="confirm" x-bind:disabled="attemptingDelete">
                 @lang('fastlane::core.confirm')
 
                 <template x-if="attemptingDelete">

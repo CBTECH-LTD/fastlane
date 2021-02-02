@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\View\Components\Listing;
 
+use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\View\Components\Component;
 use Illuminate\Database\Eloquent\Model;
@@ -9,16 +10,16 @@ use Illuminate\Database\Eloquent\Model;
 abstract class ListingComponent extends Component
 {
     public Field $field;
-    public Model $model;
+    public EntryInstance $entry;
     public string $attribute;
     public $value;
 
-    public function __construct(Field $field, Model $model, string $attribute, $value)
+    public function __construct(EntryInstance $entry, Field $field, string $attribute)
     {
         $this->field = $field;
-        $this->model = $model;
+        $this->entry = $entry;
         $this->attribute = $attribute;
-        $this->value = $this->initiateValue($value);
+        $this->value = $this->initiateValue($entry->get($this->attribute));
     }
 
     protected function initiateValue($value)

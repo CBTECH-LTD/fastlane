@@ -1,14 +1,15 @@
 <?php
 
-use CbtechLtd\Fastlane\Http\Controllers\Account\AccountProfileController;
-use CbtechLtd\Fastlane\Http\Controllers\Account\AccountSecurityController;
-use CbtechLtd\Fastlane\Http\Controllers\Account\AccountTokensController;
+use CbtechLtd\Fastlane\Http\Controllers\Settings\AccountProfileController;
+use CbtechLtd\Fastlane\Http\Controllers\Settings\AccountSecurityController;
+use CbtechLtd\Fastlane\Http\Controllers\Settings\AccountTokensController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\ConfirmPasswordController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\ForgotPasswordController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\LoginController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\ResetPasswordController;
 use CbtechLtd\Fastlane\Http\Controllers\Auth\VerificationController;
 use CbtechLtd\Fastlane\Http\Controllers\DashboardController;
+use CbtechLtd\Fastlane\Http\Controllers\EntryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -67,5 +68,12 @@ Route::middleware(['fastlane.auth:fastlane-cp', 'verified'])->group(function ($r
 //    });
 
     // Register Entry Types routes
-    \CbtechLtd\Fastlane\Fastlane::registerControlPanelRoutes($router);
+    $router->prefix('et/{entryTypeKey}')->group(function ($r) {
+        $r->get('/', [EntryController::class, 'index'])->name('entry-type.index');
+        $r->get('/create', [EntryController::class, 'create'])->name('entry-type.create');
+        $r->post('/', [EntryController::class, 'store'])->name('entry-type.store');
+        $r->get('/{id}', [EntryController::class, 'edit'])->name('entry-type.edit');
+        $r->patch('/{id}', [EntryController::class, 'update'])->name('entry-type.update');
+        $r->delete('/{id}', [EntryController::class, 'delete'])->name('entry-type.delete');
+    });
 });

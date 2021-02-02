@@ -2,6 +2,9 @@
 
 namespace CbtechLtd\Fastlane\View\Components;
 
+use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
+use Webmozart\Assert\Assert;
+
 class TableCard extends Component
 {
     public array $items;
@@ -9,6 +12,8 @@ class TableCard extends Component
 
     public function __construct(array $items, bool $autoSize = false)
     {
+        Assert::allIsAOf($items, EntryInstance::class);
+
         $this->items = $items;
         $this->autoSize = $autoSize;
     }

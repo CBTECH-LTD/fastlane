@@ -8,7 +8,6 @@
             type="{{ $field->getInputType() }}"
             name="{{ $field->getAttribute() }}"
             placeholder="{{ $field->getPlaceholder() }}"
-            @if ($field->isRequired()) required @endif
-    ]) }}>
+            @if ($field->isRequired()) required @endif>
     </div>
 </x-fl-field>

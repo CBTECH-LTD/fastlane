@@ -3,12 +3,12 @@
 namespace CbtechLtd\Fastlane\Repositories;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
+use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use CbtechLtd\Fastlane\Exceptions\DeleteEntryException;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Models\Entry;
-use CbtechLtd\Fastlane\Support\Eloquent\BaseModel;
-use CbtechLtd\Fastlane\Support\Eloquent\Concerns\Hashable;
+use CbtechLtd\Fastlane\Models\HasUuid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -25,9 +25,6 @@ class EntryRepository
     protected Entry $model;
 
     /** @var string */
-    protected string $defaultOrder = 'created_at:desc';
-
-    /** @var string */
     protected string $key;
 
     public function __construct(string $entryType)
@@ -40,6 +37,11 @@ class EntryRepository
     {
         $this->entryType = $entryType;
         return $this;
+    }
+
+    public function newQuery(): RepositoryQuery
+    {
+        return new RepositoryQuery($this->entryType, $this->model->newQuery());
     }
 
     /**
@@ -64,6 +66,11 @@ class EntryRepository
         return $this->key;
     }
 
+    public function getDefaultOrder(): string
+    {
+        return $this->entryType::listingDefaultOrder();
+    }
+
     /**
      * Get a list of items. Set $perPage argument to null if
      * pagination is not required.
@@ -75,29 +82,11 @@ class EntryRepository
      */
     public function get(array $columns = [], array $filters = [], ?int $perPage = 20)
     {
-        // Get the columns we want to retrieve from the database.
-        $queryCols = ['id'];
+        $filters = array_merge([
+            'order' => $this->getDefaultOrder(),
+        ], $filters);
 
-        if (in_array(Hashable::class, class_uses_recursive($this->model))) {
-            $queryCols[] = 'hashid';
-        }
-
-        // Initialize the model query builder.
-        $query = $this->model->newQuery()->select(
-            $this->getColumnListing(array_merge($queryCols, $columns))
-        );
-
-        if ($orderBy = Arr::get($filters, 'order', $this->defaultOrder)) {
-            $query->orderBy(...explode(':', $orderBy));
-        }
-
-        $this->beforeFetchListing($query);
-
-        $result = is_null($perPage)
-            ? $query->get()
-            : $query->paginate($perPage);
-
-        return $this->processListingResult($result);
+        return $this->newQuery()->get($columns, $filters, $perPage);
     }
 
     /**
@@ -119,12 +108,9 @@ class EntryRepository
      * @param string[] $columns
      * @return Model|null
      */
-    public function findOne($id, $columns = ['*']): ?Model
+    public function findOne($id, $columns = ['*']): ?EntryInstance
     {
-        return $this->getModel()->newModelQuery()
-            ->select($columns)
-            ->where($this->getKey(), $id)
-            ->first();
+        return $this->newQuery()->findOne($id, $columns);
     }
 
     /**
@@ -136,10 +122,7 @@ class EntryRepository
      */
     public function findMany(array $ids, $columns = ['*']): Collection
     {
-        return $this->getModel()->newModelQuery()
-            ->select($columns)
-            ->whereIn($this->getKey(), $ids)
-            ->get();
+        return $this->newQuery()->findMany($ids, $columns);
     }
 
     /**
@@ -147,25 +130,21 @@ class EntryRepository
      *
      * @param string|int $id
      * @param string[]   $columns
-     * @return BaseModel
+     * @return EntryInstance
      */
-    public function findOrFail($id, $columns = ['*']): BaseModel
+    public function findOrFail($id, $columns = ['*']): EntryInstance
     {
-        return $this->getModel()->newModelQuery()
-            ->select($columns)
-            ->where($this->getKey(), $id)
-            ->firstOrFail();
+        return $this->newQuery()->findOrFail($id, $columns);
     }
 
     /**
      * Create a new instance of the model.
      *
      * @param array $data
-     * @return BaseModel
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return Entry
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(array $data): Model
+    public function store(array $data): Entry
     {
         // Initialize an instance of the model.
         $model = $this->newModel();
@@ -184,15 +163,13 @@ class EntryRepository
      * Update an existent instance of the underlying model
      * with the given dataset.
      *
-     * @param       $id
+     * @param Entry $model
      * @param array $data
-     * @return BaseModel
+     * @return Entry
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function update($id, array $data): Model
+    public function update(Entry $model, array $data): Entry
     {
-        $model = $this->findOrFail($id);
-
         $fields = FieldCollection::make($this->entryType::fields())->onUpdate();
 
         // Validate the request data against the proper fields
@@ -206,44 +183,17 @@ class EntryRepository
     /**
      * Delete the entry model matching the given id.
      *
-     * @param $id
-     * @return BaseModel
+     * @param EntryInstance $entry
+     * @return EntryInstance
      * @throws DeleteEntryException
      */
-    public function delete($id): BaseModel
+    public function delete(EntryInstance $entry): EntryInstance
     {
-        $model = $this->findOrFail($id);
-
-        if (! $model->delete()) {
+        if (! $entry->model()->delete()) {
             throw new DeleteEntryException;
         }
 
-        return $model;
-    }
-
-    /**
-     * This method is called just before the listing query is
-     * executed. It's a good place to customize the query instead
-     * of messing with all the base query provided by Fastlane.
-     *
-     * @param Builder $query
-     */
-    protected function beforeFetchListing(Builder $query): void
-    {
-        //
-    }
-
-    /**
-     * Process the result of the listing query.
-     * It's a good place to do some custom operation before
-     * returning the list.
-     *
-     * @param Collection|LengthAwarePaginator $result
-     * @return \Illuminate\Support\Collection|Collection|LengthAwarePaginator
-     */
-    protected function processListingResult($result)
-    {
-        return $result;
+        return $entry;
     }
 
     /**
@@ -267,12 +217,12 @@ class EntryRepository
     /**
      * This method is called before saving the model.
      *
-     * @param BaseModel       $model
+     * @param Entry           $model
      * @param FieldCollection $fields
      * @param array           $data
      * @return void
      */
-    protected function beforeSave(BaseModel $model, FieldCollection $fields, array $data): void
+    protected function beforeSave(Entry $model, FieldCollection $fields, array $data): void
     {
         //
     }
@@ -281,11 +231,11 @@ class EntryRepository
      * This method is called right after the model has been saved.
      * It's useful, for example, to handle relationships.
      *
-     * @param BaseModel       $model
+     * @param Entry           $model
      * @param FieldCollection $fields
      * @param array           $data
      */
-    protected function afterSave(BaseModel $model, FieldCollection $fields, array $data): void
+    protected function afterSave(Entry $model, FieldCollection $fields, array $data): void
     {
         //
     }

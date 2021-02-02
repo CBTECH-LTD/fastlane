@@ -2,21 +2,31 @@
 
 namespace CbtechLtd\Fastlane\View\Components;
 
+use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class ItemActionDelete extends ReactiveComponent
 {
-    public string $entryType;
-    public string $entryId;
-    public string $url;
+    public EntryInstance $entry;
     public string $redirect;
 
-    public function mount(string $entryType, string $entryId, string $url, string $redirect)
+    /**
+     * These rules are needed because Livewire requires
+     * that rules must be defined for public models.
+     * It's weird, but otherwise it does not work.
+     *
+     * @var \string[][]
+     */
+    protected $rules = [
+        'entry.entry_type' => ['required'],
+        'entry.entry_id' => ['required'],
+        'entry.for' => ['required'],
+    ];
+
+    public function mount(EntryInstance $entry, string $redirect)
     {
-        $this->entryType = $entryType;
-        $this->entryId = $entryId;
-        $this->url = $url;
+        $this->entry = $entry;
         $this->redirect = $redirect;
     }
 
@@ -28,13 +38,11 @@ class ItemActionDelete extends ReactiveComponent
      */
     public function confirmAction()
     {
-        $entry = $this->entryType::repository()->findOrFail($this->entryId);
-
-        if (Gate::getPolicyFor($this->entryType::repository()->getModel())) {
-            Gate::forUser(Auth::guard('fastlane-cp')->user())->authorize('delete', $entry);
+        if (Gate::getPolicyFor($this->entry->model())) {
+            Gate::forUser(Auth::guard('fastlane-cp')->user())->authorize('delete', $this->entry->model());
         }
 
-        $this->entryType::repository()->delete($this->entryId);
+        $this->entry->type()::repository()->delete($this->entry);
 
         return redirect($this->redirect);
     }

@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\View\Components\Listing;
 
+use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\View\Components\Component;
 use CbtechLtd\Fastlane\View\Components\ReactiveComponent;
@@ -10,20 +11,20 @@ use Illuminate\Support\Facades\Blade;
 
 class RowCellRenderer extends Component
 {
-    public Model $model;
+    public EntryInstance $entry;
     public Field $field;
 
-    public function __construct(Model $model, Field $field)
+    public function __construct(EntryInstance $entry, Field $field)
     {
         $this->field = $field;
-        $this->model = $model;
+        $this->entry = $entry;
     }
 
     public function renderedComponent()
     {
         $component = $this->field->listingComponent();
 
-        $props = ' :field="$field" :model="$model" attribute="' . $this->field->getAttribute() . '" :value="$getValue()"';
+        $props = ' :field="$field" :entry="$entry" attribute="' . $this->field->getAttribute() . '" :value="$getValue()"';
 
         return is_a($component, ReactiveComponent::class, true)
             ? '<livewire:' . $component::tag() . $props . '/>'
@@ -37,6 +38,6 @@ class RowCellRenderer extends Component
 
     public function getValue()
     {
-        return $this->model->{$this->field->getAttribute()};
+        return $this->entry->get($this->field->getAttribute());
     }
 }

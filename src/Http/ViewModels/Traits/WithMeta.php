@@ -43,7 +43,6 @@ trait WithMeta
                 'class'      => $this->entryType,
                 'identifier' => $this->entryType::key(),
                 'label'      => $this->entryType::label(),
-                'routes'     => $this->entryType::routes(),
                 'schema'     => $this->buildSchemaForMeta(),
             ],
         ])

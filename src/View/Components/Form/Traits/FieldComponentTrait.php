@@ -2,14 +2,13 @@
 
 namespace CbtechLtd\Fastlane\View\Components\Form\Traits;
 
-use Illuminate\Database\Eloquent\Model;
+use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use Illuminate\Support\Str;
 
 trait FieldComponentTrait
 {
     protected string $view;
-    public Model $model;
-    public string $entryType;
+    public EntryInstance $entry;
     public string $attribute;
     public $value;
 
@@ -64,6 +63,6 @@ trait FieldComponentTrait
      */
     protected function readValue()
     {
-        return $this->field->read($this->model, $this->entryType);
+        return $this->field->read($this->entry->model(), $this->entry->type());
     }
 }

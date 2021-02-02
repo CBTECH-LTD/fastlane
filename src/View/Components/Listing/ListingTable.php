@@ -2,9 +2,13 @@
 
 namespace CbtechLtd\Fastlane\View\Components\Listing;
 
+use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Http\ViewModels\EntryCollectionViewModel;
+use CbtechLtd\Fastlane\Models\Entry;
 use CbtechLtd\Fastlane\View\Components\ReactiveComponent;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class ListingTable extends ReactiveComponent
@@ -23,7 +27,7 @@ class ListingTable extends ReactiveComponent
         $this->entryType = $entryType;
         $this->itemsPerPage = $itemsPerPage;
         $this->page = $page;
-        $this->order = $order;
+        $this->order = $order ?? $entryType::listingDefaultOrder();
     }
 
     public function loadData(): void
@@ -39,13 +43,14 @@ class ListingTable extends ReactiveComponent
 
     public function render()
     {
-        $viewModel = $this->buildViewModel();
+        $data = $this->buildItems();
 
         return view('fastlane::components.livewire.listing-table', [
-            'items'     => $viewModel->data(),
-            'meta'      => $viewModel->meta(),
-            'links'     => $viewModel->links(),
-            'paginator' => $viewModel->paginator(),
+            'items'     => $data['items'],
+            'paginator' => $data['paginator'],
+            'fields'    => $this->getFields()->getAttributes(),
+            'meta'      => $this->buildMeta(),
+            'links'     => $this->buildLinks(),
         ]);
     }
 
@@ -56,25 +61,36 @@ class ListingTable extends ReactiveComponent
      */
     protected function getFields(): FieldCollection
     {
-        return once(fn() => new FieldCollection($this->entryType::fields()));
+        return once(fn() => (new FieldCollection($this->entryType::fields()))->onListing());
     }
 
-    protected function buildViewModel(): EntryCollectionViewModel
+    protected function buildItems(): array
     {
-        $fields = $this->getFields()->onListing();
-        $columns = $fields->getAttributes()->keys()->all();
+        $columns = $this->getFields()->getCollection()->map(fn (Field $field) => $field->getAttribute())->all();
 
-        $data = $this->dataLoaded
+        $items = $this->dataLoaded
             ? $this->entryType::repository()->get($columns, $this->buildFilters(), $this->itemsPerPage)
-            : [];
+            : new Collection();
 
-        return (new EntryCollectionViewModel($this->entryType, $fields, $data))
-            ->withMeta([
-                'order' => [
-                    'field' => Str::replaceFirst('-', '', $this->order),
-                    'dir'   => Str::startsWith($this->order, '-') ? 'desc' : 'asc',
-                ],
-            ]);
+        return [
+            'items'     => $items->all(),
+            'paginator' => $items instanceof LengthAwarePaginator ? $items : null,
+        ];
+    }
+
+    protected function buildMeta(): array
+    {
+        return [
+            'order' => [
+                'field' => Str::replaceFirst('-', '', $this->order),
+                'dir'   => Str::startsWith($this->order, '-') ? 'desc' : 'asc',
+            ],
+        ];
+    }
+
+    protected function buildLinks(): array
+    {
+        return [];
     }
 
     /**

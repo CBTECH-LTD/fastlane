@@ -2,10 +2,10 @@
 
 namespace CbtechLtd\Fastlane\View\Components\Form;
 
+use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\View\Components\Component;
 use CbtechLtd\Fastlane\View\Components\Form\Traits\FieldComponentTrait;
-use Illuminate\Database\Eloquent\Model;
 
 abstract class FieldComponent extends Component
 {
@@ -16,16 +16,14 @@ abstract class FieldComponent extends Component
     /**
      * FieldComponent constructor.
      *
-     * @param Model  $model
-     * @param string $entryType
-     * @param string $attribute
+     * @param EntryInstance $entry
+     * @param Field         $field
      */
-    public function __construct(Model $model, string $entryType, Field $field)
+    public function __construct(EntryInstance $entry, Field $field)
     {
+        $this->entry = $entry;
         $this->field = $field;
         $this->attribute = $field->getAttribute();
-        $this->model = $model;
-        $this->entryType = $entryType;
         $this->value = $this->initializeValue();
     }
 

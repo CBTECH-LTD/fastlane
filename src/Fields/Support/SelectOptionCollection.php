@@ -40,6 +40,10 @@ class SelectOptionCollection implements Arrayable
             $this->items[] = SelectOption::make($tag, $tag);
         }
 
+        $this->items = $this->collection()
+            ->mapWithKeys(fn (SelectOption $opt) => [ $opt->getValue() => $opt])
+            ->all();
+
         return $this;
     }
 

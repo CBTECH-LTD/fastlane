@@ -14,11 +14,12 @@
         @if (is_a($child->formComponent(), \CbtechLtd\Fastlane\View\Components\Form\ReactiveFieldComponent::class, true))
             @livewire($child->formComponent()::tag(), [
                 'attribute' => $child->getAttribute(),
-                'entryType' => $entryType,
-                'model' => $model,
-            ])
+                'entry' => $entry,
+            ], key($child->getAttribute()))
         @else
-            <x-dynamic-component :component="$child->formComponent()::tag()" :field="$child" :model="$model" :entry-type="$entryType"></x-dynamic-component>
+            <div wire:key="{{ $child->getAttribute() }}">
+                <x-dynamic-component :component="$child->formComponent()::tag()" :field="$child" :entry="$entry"></x-dynamic-component>
+            </div>
         @endif
     @endforeach
 </div>

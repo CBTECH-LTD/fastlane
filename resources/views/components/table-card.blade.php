@@ -25,7 +25,7 @@
             <tbody>
             @foreach ($items as $key => $item)
                 <tr class="table__row">
-                    {{ ${'row_'.$item->id} ?? '' }}
+                    {{ ${'row_'.\Illuminate\Support\Str::slug($item->id(), '_')} ?? '' }}
                 </tr>
             @endforeach
             </tbody>

@@ -23,7 +23,7 @@
     {{--<script src="{{ mix('vendor.js', 'vendor/fastlane') }}" defer></script>--}}
     <script src="{{ mix('app.js', 'vendor/fastlane') }}" defer></script>
 </head>
-<body class="font-sans antialiased h-screen {{ $bg ?? 'bg-gray-100' }}">
+<body class="font-sans antialiased h-screen {{ $bg ?? 'bg-gray-200' }}">
 
 {{ $slot }}
 

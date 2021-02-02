@@ -1,21 +1,20 @@
 <x-fl-app-layout>
     <x-fl-app-main-area>
-        <x-slot name="title">{{ $title }}</x-slot>
-        <x-slot name="subtitle">{{ $meta->get('entryType.label.singular') }}</x-slot>
+        <x-slot name="title">{{ $entry->title() }}</x-slot>
+        <x-slot name="subtitle">{{ $entry->type()::label()['singular'] }}</x-slot>
         <x-slot name="actions">
-            @if ($links->has('top'))
-                <x-fl-button href="{{ $links->get('top') }}" variant="minimal" left-icon="arrow-left" size="lg">@lang('fastlane::core.back_to_list')</x-fl-button>
-            @endif
-            @if ($links->has('create'))
-                <x-fl-button href="{{ $links->get('create') }}" variant="outline" left-icon="plus" size="lg" class="ml-4">@lang('fastlane::core.add_more')</x-fl-button>
-            @endif
+            <x-fl-button href="{{ $entry->links()->get('top') }}" variant="minimal" left-icon="arrow-left" size="lg">@lang('fastlane::core.back_to_list')</x-fl-button>
+
+            @isset($links['create'])
+                <x-fl-button href="{{ $entry->links()->get('create') }}" variant="outline" left-icon="plus" size="lg" class="ml-4">@lang('fastlane::core.add_more')</x-fl-button>
+            @endisset
 
             <x-fl-button submit form="mainForm" class="ml-4" color="success" size="lg" left-icon="save">
                 @lang('fastlane::core.save')
             </x-fl-button>
         </x-slot>
 
-        <div class="mt-4 mb-12 px-8 w-full">
+        <div class="mt-4 mb-12 w-full">
             {{-- SLOT
                 Optionally render content before the form.
             --}}
@@ -24,7 +23,7 @@
             {{-- SLOT
                 The form.
             --}}
-            <livewire:fl-edit-form formId="mainForm" :model="$model" :entry-type="$entryType"></livewire:fl-edit-form>
+            <livewire:fl-entry-form form-id="mainForm" :entry="$entry"></livewire:fl-entry-form>
 
             {{-- SLOT
                 Optionally render content after the form.
@@ -32,7 +31,7 @@
             {{ $afterForm ?? '' }}
         </div>
 
-        @can('delete', $model)
+        @can('delete', $entry->model())
             <x-fl-boxed-card class="mt-8 border-red-500">
                 <x-slot name="title">
                 <span class="flex items-center text-danger-600">
@@ -42,7 +41,7 @@
                 </x-slot>
 
                 <div>
-                    <livewire:fl-item-action-delete :entry-type="$entryType" :entry-id="$model->getRouteKey()" url="{{ $links->get('self') }}" redirect="{{ $links->get('top') }}"></livewire:fl-item-action-delete>
+                    <livewire:fl-item-action-delete :entry="$entry" redirect="{{ $entry->links()->get('top') }}"></livewire:fl-item-action-delete>
                 </div>
             </x-fl-boxed-card>
         @endcan

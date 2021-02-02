@@ -66,7 +66,7 @@ class MenuLink extends MenuItem
     protected function buildLinkClasses(): string
     {
         if (Str::startsWith(request()->url(), $this->href)) {
-            return 'text-brand-800 bg-brand-100';
+            return 'text-brand-800';
         }
 
         return 'bg-transparent text-gray-600 hover:bg-gray-300 hover:text-gray-800';

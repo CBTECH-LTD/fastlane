@@ -76,38 +76,24 @@ abstract class EntryType implements EntryTypeContract
     }
 
     /**
-     * Determine the available route of the entry type.
-     *
-     * @return EntryTypeRouteCollection
-     */
-    public static function routes(): EntryTypeRouteCollection
-    {
-        return EntryTypeRouteCollection::make(static::key(), [
-            EntryTypeRoute::get(static::class, '/', 'index'),
-            EntryTypeRoute::get(static::class, '/new', 'create'),
-            EntryTypeRoute::post(static::class, '/', 'store'),
-            EntryTypeRoute::get(static::class, '/{id}', 'edit'),
-            EntryTypeRoute::patch(static::class, '/{id}', 'update'),
-            EntryTypeRoute::delete(static::class, '/{id}', 'delete'),
-        ]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function entryRouteKey(Entry $model): string
-    {
-        return $model->getRouteKey() ?? '';
-    }
-
-    /**
      * @inheritDoc
      */
     public static function entryTitle(Entry $model): string
     {
         // Using route key as the title.
         // Hey fellow developer, it's not very readable!
-        return static::entryRouteKey($model);
+        return $model->getRouteKey();
+    }
+
+    /**
+     * Determine the default column to be used to order the results
+     * in the listing page.
+     *
+     * @return string
+     */
+    public static function listingDefaultOrder(): string
+    {
+        return 'created_at:desc';
     }
 
     /**

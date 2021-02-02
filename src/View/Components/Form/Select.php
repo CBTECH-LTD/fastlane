@@ -2,8 +2,8 @@
 
 namespace CbtechLtd\Fastlane\View\Components\Form;
 
+use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use CbtechLtd\Fastlane\Fields\Support\SelectOptionCollection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
 class Select extends ReactiveFieldComponent
@@ -12,9 +12,9 @@ class Select extends ReactiveFieldComponent
     public array $options = [];
     public bool $optionsLoaded = false;
 
-    public function mount(Model $model, string $entryType, string $attribute)
+    public function mount(EntryInstance $entry, string $attribute)
     {
-        parent::mount($model, $entryType, $attribute);
+        parent::mount($entry, $attribute);
 
         if ($this->optionsLoaded = $this->field->getOptions()->isLoaded()) {
             $this->loadOptions();

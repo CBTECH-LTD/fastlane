@@ -51,13 +51,6 @@ interface EntryType
     public static function repository(): EntryRepository;
 
     /**
-     * The route collection that should be registered for this entry type.
-     *
-     * @return EntryTypeRouteCollection
-     */
-    public static function routes(): EntryTypeRouteCollection;
-
-    /**
      * Install the Entry Type.
      */
     public static function install(): void;
@@ -70,14 +63,6 @@ interface EntryType
     public static function fields(): array;
 
     /**
-     * Get the route key from the given model.
-     *
-     * @param Entry $model
-     * @return string
-     */
-    public static function entryRouteKey(Entry $model): string;
-
-    /**
      * Generate a string to be used as the description
      * of the given model.
      *
@@ -85,4 +70,12 @@ interface EntryType
      * @return string
      */
     public static function entryTitle(Entry $model): string;
+
+    /**
+     * Determine the default column to be used to order the results
+     * in the listing page.
+     *
+     * @return string
+     */
+    public static function listingDefaultOrder(): string;
 }

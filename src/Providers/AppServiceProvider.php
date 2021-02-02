@@ -85,7 +85,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Blueprint::macro('cmsCommon', function () {
             $this->id('id');
-            $this->uuid('uuid')->nullable();
+            $this->uuid('uuid');
             $this->activable();
             $this->timestamps();
         });

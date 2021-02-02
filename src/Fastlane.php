@@ -169,16 +169,6 @@ class Fastlane
     }
 
     /**
-     * @param Router $router
-     */
-    public static function registerControlPanelRoutes(Router $router): void
-    {
-        foreach (Facades\EntryType::all() as $entryType) {
-            $router->fastlaneControlPanel($entryType::key(), $entryType::routes());
-        }
-    }
-
-    /**
      * Get a list of abilities registered for the Fastlane API.
      *
      * @return string[]

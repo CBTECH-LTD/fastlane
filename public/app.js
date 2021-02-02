@@ -3435,11 +3435,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! alpinejs */ "./node_modules/alpinejs/dist/alpine.js");
 /* harmony import */ var alpinejs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(alpinejs__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _components_block_editor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/block-editor */ "./resources/js/components/block-editor.js");
-/* harmony import */ var _components_item_action_delete__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/item-action-delete */ "./resources/js/components/item-action-delete.js");
-/* harmony import */ var _components_modal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/modal */ "./resources/js/components/modal.js");
-/* harmony import */ var _components_select__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/select */ "./resources/js/components/select.js");
-/* harmony import */ var _components_spinner__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/spinner */ "./resources/js/components/spinner.js");
-/* harmony import */ var _components_sticky_title_bar__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/sticky-title-bar */ "./resources/js/components/sticky-title-bar.js");
+/* harmony import */ var _components_form__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/form */ "./resources/js/components/form.js");
+/* harmony import */ var _components_item_action_delete__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/item-action-delete */ "./resources/js/components/item-action-delete.js");
+/* harmony import */ var _components_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/modal */ "./resources/js/components/modal.js");
+/* harmony import */ var _components_select__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/select */ "./resources/js/components/select.js");
+/* harmony import */ var _components_spinner__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/spinner */ "./resources/js/components/spinner.js");
+/* harmony import */ var _components_sticky_title_bar__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/sticky-title-bar */ "./resources/js/components/sticky-title-bar.js");
 /**
  * -----------------------------------------------------------------
  * Fastlane Control Panel main script.
@@ -3452,13 +3453,15 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 window.fl = {
   BlockEditor: _components_block_editor__WEBPACK_IMPORTED_MODULE_1__["BlockEditor"],
-  ItemActionDelete: _components_item_action_delete__WEBPACK_IMPORTED_MODULE_2__["ItemActionDelete"],
-  Modal: _components_modal__WEBPACK_IMPORTED_MODULE_3__["Modal"],
-  Select: _components_select__WEBPACK_IMPORTED_MODULE_4__["Select"],
-  Spinner: _components_spinner__WEBPACK_IMPORTED_MODULE_5__["Spinner"],
-  StickyTitleBar: _components_sticky_title_bar__WEBPACK_IMPORTED_MODULE_6__["StickyTitleBar"]
+  Form: _components_form__WEBPACK_IMPORTED_MODULE_2__["Form"],
+  ItemActionDelete: _components_item_action_delete__WEBPACK_IMPORTED_MODULE_3__["ItemActionDelete"],
+  Modal: _components_modal__WEBPACK_IMPORTED_MODULE_4__["Modal"],
+  Select: _components_select__WEBPACK_IMPORTED_MODULE_5__["Select"],
+  Spinner: _components_spinner__WEBPACK_IMPORTED_MODULE_6__["Spinner"],
+  StickyTitleBar: _components_sticky_title_bar__WEBPACK_IMPORTED_MODULE_7__["StickyTitleBar"]
 };
 
 /***/ }),
@@ -3521,6 +3524,31 @@ function BlockEditor(options) {
 
 /***/ }),
 
+/***/ "./resources/js/components/form.js":
+/*!*****************************************!*\
+  !*** ./resources/js/components/form.js ***!
+  \*****************************************/
+/*! exports provided: Form */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Form", function() { return Form; });
+function Form(options) {
+  return {
+    submit: function submit() {
+      var _this = this;
+
+      this.$el.focus();
+      setTimeout(function () {
+        _this.$wire.submit();
+      }, 200);
+    }
+  };
+}
+
+/***/ }),
+
 /***/ "./resources/js/components/item-action-delete.js":
 /*!*******************************************************!*\
   !*** ./resources/js/components/item-action-delete.js ***!
@@ -3565,15 +3593,23 @@ function ItemActionDelete() {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                if (!_this2.attemptingDelete) {
+                  _context.next = 2;
+                  break;
+                }
+
+                return _context.abrupt("return");
+
+              case 2:
                 _this2.attemptingDelete = true;
-                _context.next = 3;
+                _context.next = 5;
                 return _this2.$wire.confirmAction();
 
-              case 3:
+              case 5:
                 _this2.attemptingDelete = false;
                 _this2.waitingConfirmation = false;
 
-              case 5:
+              case 7:
               case "end":
                 return _context.stop();
             }

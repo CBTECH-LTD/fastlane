@@ -8,9 +8,9 @@ trait Activable
 {
     public function initializeActivable(): void
     {
-        if (! in_array('is_active', $this->fillable)) {
-            $this->fillable[] = 'is_active';
-        }
+        $this
+            ->mergeFillable(['is_active'])
+            ->mergeCasts(['is_active' => 'boolean']);
     }
 
     public function setActiveStateTo(bool $state): self

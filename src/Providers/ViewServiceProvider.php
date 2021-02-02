@@ -57,8 +57,7 @@ class ViewServiceProvider extends ServiceProvider
 
             // Form components
             Field::class,
-            Form\CreateForm::class,
-            Form\EditForm::class,
+            Form\EntryForm::class,
             Form\BlockEditor::class,
             Form\Panel::class,
             Form\Select::class,

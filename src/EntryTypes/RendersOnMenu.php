@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\EntryTypes;
 
 use CbtechLtd\Fastlane\Contracts\EntryType;
+use CbtechLtd\Fastlane\Fastlane;
 use Illuminate\Support\Collection;
 
 trait RendersOnMenu
@@ -23,18 +24,18 @@ trait RendersOnMenu
      */
     public static function renderOnMenu(Collection $menu): void
     {
-        if ($route = static::routes()->has('index')) {
-            $item = \CbtechLtd\Fastlane\Support\Menu\MenuLink::make(static::routes()->get('index')->url(), static::label()['plural'])
-                ->group(static::menuGroup())
-                ->icon(static::icon() ?? '')
-                ->when(function ($user) {
-                    return static::isVisibleOnMenu();
+        $url = Fastlane::cpRoute('entry-type.index', static::key());
 
-                    // TODO: return $user->can('list', static::model());
-                });
+        $item = \CbtechLtd\Fastlane\Support\Menu\MenuLink::make($url, static::label()['plural'])
+            ->group(static::menuGroup())
+            ->icon(static::icon() ?? '')
+            ->when(function ($user) {
+                return static::isVisibleOnMenu();
 
-            $menu->push($item);
-        }
+                // TODO: return $user->can('list', static::model());
+            });
+
+        $menu->push($item);
     }
 
     /**

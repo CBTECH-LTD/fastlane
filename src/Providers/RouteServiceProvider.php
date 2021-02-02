@@ -25,11 +25,6 @@ class RouteServiceProvider extends ServiceProvider
             $router->aliasMiddleware('fastlane.guest', RedirectIfAuthenticated::class);
         }
 
-        // Add a macro to generate Control Panel routes
-        Router::macro('fastlaneControlPanel', function (string $prefix, EntryTypeRouteCollection $routes) {
-            $routes->register($this);
-        });
-
         // Add a macro to generate relative paths easily.
         UrlGenerator::macro('relative', function (string $routeName, $routeParams = null) {
             return route($routeName, $routeParams, false);

@@ -20,7 +20,6 @@ class CreateFastlaneFilesTable extends Migration
             $table->string('extension', 10)->nullable();
             $table->string('size', 20)->nullable();
             $table->string('mimetype', 50)->nullable();
-            $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('parent_id')->nullable();
 
             $table->foreign('parent_id')

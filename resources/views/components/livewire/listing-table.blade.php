@@ -2,17 +2,17 @@
     @if ($dataLoaded)
         <x-fl-table-card :items="$items">
             <x-slot name="columns">
-                @foreach ($meta->get('entryType.schema') as $column)
+                @foreach ($fields as $column)
                     <th class="table__column" style="width: {{ $column->getListingColWidth() }};">
                     <span class="flex items-center">
                         {{ $column->getLabel() }}
 
                         @if ($column->isSortable())
-                            <x-fl-button wire:click="changeOrder('{{ $meta->get('order.dir') === 'desc' && $meta->get('order.field') === $column->getAttribute() ? '' : '-' }}{{ $column->getAttribute() }}')"
+                            <x-fl-button wire:click="changeOrder('{{ $meta['order']['dir'] === 'desc' && $meta['order']['field'] === $column->getAttribute() ? '' : '-' }}{{ $column->getAttribute() }}')"
                                          variant="minimal"
-                                         color="{{ $meta->get('order.field') === $column->getAttribute() ? 'black' : 'gray' }}"
+                                         color="{{ $meta['order']['field'] === $column->getAttribute() ? 'black' : 'gray' }}"
                                          class="ml-2">
-                                @if ($meta->get('order.dir') === 'desc' && $meta->get('order.field') === $column->getAttribute())
+                                @if ($meta['order']['dir'] === 'desc' && $meta['order']['field'] === $column->getAttribute())
                                     <x-fl-icon name="sort-alpha-down-alt"></x-fl-icon>
                                 @else
                                     <x-fl-icon name="sort-alpha-down"></x-fl-icon>
@@ -26,18 +26,16 @@
             </x-slot>
 
             @foreach ($items as $key => $item)
-                <x-slot :name="'row_'.$item->id">
-                    @foreach ($meta->get('entryType.schema') as $column)
+                <x-slot :name="'row_'.\Illuminate\Support\Str::slug($item->id(), '_')">
+                    @foreach ($fields as $column)
                         <td class="table__cell">
-                            <x-fl-row-cell-renderer :model="$item" :field="$column"></x-fl-row-cell-renderer>
+                            <x-fl-row-cell-renderer :entry="$item" :field="$column"></x-fl-row-cell-renderer>
                         </td>
                     @endforeach
                     <td class="table__cell">
                         <div class="w-full h-full flex items-center justify-end">
                             {{-- Edit --}}
-                            @if ($meta->entryType->routes->has('edit'))
-                                <x-fl-listing-item-action href="{{ $meta->entryType->routes->get('edit')->url($item) }}" icon="pencil-alt" title="Edit"></x-fl-listing-item-action>
-                            @endif
+                            <x-fl-listing-item-action href="{{ $item->links()->get('self') }}" icon="pencil-alt" title="Edit"></x-fl-listing-item-action>
                         </div>
                     </td>
                 </x-slot>
@@ -45,7 +43,7 @@
 
             @if ($paginator)
                 <x-slot name="footer">
-                    <x-fl-paginator :paginator="$paginator" class="my-4"></x-fl-paginator>
+                    <x-fl-paginator :paginator="$paginator" class="my-4 py-4"></x-fl-paginator>
                 </x-slot>
             @endif
         </x-fl-table-card>

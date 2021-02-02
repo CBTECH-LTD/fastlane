@@ -2,6 +2,7 @@
 
 namespace CbtechLtd\Fastlane\Http\Controllers;
 
+use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
 use CbtechLtd\Fastlane\Facades\EntryType;
 use CbtechLtd\Fastlane\Fastlane;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
@@ -18,7 +19,7 @@ class EntryController extends Controller
     /**
      * Determine what entry type class this controller uses for requests.
      *
-     * @var string
+     * @var string | \CbtechLtd\Fastlane\Contracts\EntryType
      */
     protected string $entryType;
 
@@ -74,23 +75,22 @@ class EntryController extends Controller
             Gate::authorize('list', $this->repository->getModel());
         }
 
-        $fields = $this->fields->onListing();
-
-        $viewModel = (new EntryCollectionViewModel($this->entryType, $fields, []))
-            ->withMeta([
-                'itemsPerPage' => $this->itemsPerPage,
-                'order' => [
-                    'field' => Str::replaceFirst('-', '', $request->input('order')),
-                    'isDesc' => Str::startsWith($request->input('order'), '-'),
-                ],
-                'order_str' => $request->input('order'),
-            ]);
-
         return view()->first([
             "cp.{$this->entryType::key()}.index",
             "fastlane::{$this->entryType::key()}.index",
             'fastlane::entries.index',
-        ], $viewModel);
+        ], [
+            'entryType' => $this->entryType,
+            'itemsPerPage' => $this->itemsPerPage,
+            'order' => [
+                'field' => Str::replaceFirst('-', '', $request->input('order')),
+                'isDesc' => Str::startsWith($request->input('order'), '-'),
+                'str' => $request->input('order'),
+            ],
+            'links' => [
+                'create' => Fastlane::cpRoute('entry-type.create', $this->entryType::key()),
+            ],
+        ]);
     }
 
     /**
@@ -107,70 +107,41 @@ class EntryController extends Controller
             Gate::authorize('create', $entry);
         }
 
-        $fields = $this->fields->onCreate();
-        $viewModel = new EntryViewModel($this->entryType, $fields, $entry);
-
         return view()->first([
             "cp.{$this->entryType::key()}.create",
             "fastlane::{$this->entryType::key()}.create",
             "fastlane::entries.create",
-        ], $viewModel);
-    }
-
-    /**
-     * Store the new entry.
-     *
-     * @param Request $request
-     */
-    public function store(Request $request)
-    {
-        $model = $this->getRepository()->getModel();
-
-        if (Gate::getPolicyFor($model)) {
-            Gate::authorize('create', $model);
-        }
-
-        $entry = $this->getRepository()->store($request->all());
-
-        Fastlane::flashSuccess(
-            __('fastlane::core.flash.created', ['name' => $this->entryType::label()['singular']]),
-            'thumbs-up'
-        );
-
-        if ($this->entryType::routes()->has('edit')) {
-            return Redirect::to($this->entryType::routes()->get('edit')->url($entry));
-        }
-
-        if ($this->entryType::routes()->get('index')) {
-            return Redirect::to($this->entryType::routes()->get('index')->url());
-        }
-
-        return Redirect::back();
+        ], [
+            'entry' => EntryInstance::newFromModel($this->entryType, $this->entryType::repository()->newModel())->forCreate(),
+            'links' => [
+                'top' => Fastlane::cpRoute('entry-type.index', $this->entryType::key()),
+            ],
+        ]);
     }
 
     /**
      * Show the editing page for the given id.
      *
      * @param Request $request
+     * @param string  $entryTypeKey
      * @param         $id
      * @return mixed
      */
-    public function edit(Request $request, $id)
+    public function edit(Request $request, string $entryTypeKey, $id)
     {
-        $entry = $this->getRepository()->findOrFail($id);
+        $entry = $this->repository->findOrFail($id)->forUpdate();
 
-        if (Gate::getPolicyFor($entry)) {
-            Gate::authorize('update', $entry);
+        if (Gate::getPolicyFor($entry->model())) {
+            Gate::authorize('update', $entry->model());
         }
-
-        $fields = $this->getFields()->onUpdate();
-        $viewModel = new EntryViewModel($this->entryType, $fields, $entry);
 
         return view()->first([
             "cp.{$this->entryType::key()}.edit",
             "fastlane::{$this->entryType::key()}.edit",
             "fastlane::entries.edit",
-        ], $viewModel);
+        ], [
+            'entry' => $entry,
+        ]);
     }
 
     /**

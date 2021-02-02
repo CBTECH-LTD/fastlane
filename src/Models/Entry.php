@@ -10,23 +10,20 @@ use CbtechLtd\Fastlane\Fields\Field;
 use CbtechLtd\Fastlane\Fields\Types\FieldCollection;
 use CbtechLtd\Fastlane\Fields\Types\Relationship;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Entry extends Model implements Recordable
 {
-    use RecordableTrait, Eventually, Activable, HasDynamicRelations;
+    use RecordableTrait, Eventually, Activable, HasUuid, HasDynamicRelations;
 
     /** @var EntryType | string  */
     protected string $entryType;
 
     protected $table = '';
 
-    protected $fillable = [
-        'uuid',
-    ];
+    protected $fillable = [];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
+    protected $casts = [];
 
     /**
      * Get the model table.
@@ -69,6 +66,11 @@ class Entry extends Model implements Recordable
         }
 
         return $this;
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'uuid';
     }
 
     /**

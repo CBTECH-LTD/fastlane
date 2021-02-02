@@ -15,10 +15,14 @@ export function ItemActionDelete () {
             this.waitingConfirmation = false
         },
         async confirm () {
+            if (this.attemptingDelete) {
+                return
+            }
+
             this.attemptingDelete = true
 
             await this.$wire.confirmAction()
-            
+
             this.attemptingDelete = false
             this.waitingConfirmation = false
         },
