@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": "^7.4|^8.0",
         "altek/accountant": "^3.0.1",
         "altek/eventually": "^2.0",
         "hashids/hashids": "^4.0",

@@ -36,4 +36,4 @@ mix
         },
     })
     .version()
-// .copy('public', '../../public/vendor/fastlane')
+    .copy('public', '../../public/vendor/fastlane')

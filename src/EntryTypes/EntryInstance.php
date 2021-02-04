@@ -98,12 +98,11 @@ class EntryInstance extends Model
 
     public function links(): Collection
     {
-        return once(function () {
-            return Collection::make([
-                'top' => Fastlane::cpRoute('entry-type.index', $this->type()::key()),
-                'create' => Fastlane::cpRoute('entry-type.create', $this->type()::key()),
-                'self' => Fastlane::cpRoute('entry-type.edit', [$this->type()::key(), $this->id()]),
-            ]);
+        return Collection::make([
+            'top' => Fastlane::cpRoute('entry-type.index', $this->type()::key()),
+            'create' => Fastlane::cpRoute('entry-type.create', $this->type()::key()),
+        ])->when($this->exists(), function (Collection $c) {
+            return $c->put('self', Fastlane::cpRoute('entry-type.edit', [$this->type()::key(), $this->id()]));
         });
     }
 
@@ -134,12 +133,12 @@ class EntryInstance extends Model
     public function commit(array $options = [])
     {
         if ($this->model()->exists) {
-            $this->model = $this->type()::repository()->update($this->model(), $options);
-
+            $this->cachedModel = $this->type()::repository()->update($this->model(), $options);
             return $this;
         }
 
-        $this->model = $this->type()::repository()->store($options);
+        $this->cachedModel = $this->type()::repository()->store($options);
+        $this->setAttribute('entry_id', $this->cachedModel->getRouteKey());
 
         return $this;
     }

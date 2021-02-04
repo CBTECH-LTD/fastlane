@@ -65,7 +65,7 @@ class EntryForm extends ReactiveComponent
         $this->authorizeSubmit();
         $this->fillAndSaveModel();
 
-//        return Redirect::to($this->entry->links()->get('self'));
+        return Redirect::to($this->entry->links()->get('self'));
     }
 
     public function fieldUpdated(array $payload)
