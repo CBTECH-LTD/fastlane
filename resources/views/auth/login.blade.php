@@ -14,7 +14,7 @@
         <div class="w-full md:w-2/6">
             <div class="flex items-center justify-center bg-white p-6 shadow-lg rounded-lg">
                 <div class="w-full">
-                    <form method="POST" action="{{ route('fastlane.cp.login') }}">
+                    <form method="POST" action="{{ route('fastlane.cp.login') }}" data-turbo="false">
                         @csrf
 
                         @if ($errors->has('email'))

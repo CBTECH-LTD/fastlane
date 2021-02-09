@@ -1,5 +1,5 @@
 import SlimSelect from 'slim-select'
-import 'slim-select/dist/slimselect.min.css'
+// import 'slim-select/dist/slimselect.min.css'
 
 export function Select (options) {
     return {

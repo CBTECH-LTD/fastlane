@@ -13,6 +13,8 @@
 @import './components/menu.css';
 @import './components/modal.css';
 
+@import '~slim-select/dist/slimselect.css';
+
 [x-cloak] {
     display: none;
 }

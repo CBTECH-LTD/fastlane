@@ -3,6 +3,7 @@
 namespace CbtechLtd\Fastlane\View\Components;
 
 use CbtechLtd\Fastlane\EntryTypes\EntryInstance;
+use CbtechLtd\Fastlane\Fastlane;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
@@ -34,6 +35,7 @@ class ItemActionDelete extends ReactiveComponent
      * Delete the entry.
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws \CbtechLtd\Fastlane\Exceptions\DeleteEntryException
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function confirmAction()
@@ -43,6 +45,12 @@ class ItemActionDelete extends ReactiveComponent
         }
 
         $this->entry->type()::repository()->delete($this->entry);
+
+        Fastlane::flashSuccess(
+            __('fastlane::core.flash.deleted', ['name' => $this->entry->type()::label()['singular']]),
+            'trash',
+            $this
+        );
 
         return redirect($this->redirect);
     }

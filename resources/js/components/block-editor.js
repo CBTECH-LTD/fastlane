@@ -1,6 +1,8 @@
 export function BlockEditor (options) {
     return {
         newBlockPosition: -1,
+        isProcessing: false,
+
         get shouldShowAvailableBlocks () {
             return this.newBlockPosition > -1
         },
@@ -16,7 +18,24 @@ export function BlockEditor (options) {
         },
 
         async selectNewBlock (key) {
-            await this.$wire.addBlock(key, this.newBlockPosition)
+            if (! this.isProcessing) {
+                this.isProcessing = true
+
+                await this.$wire.addBlock(key, this.newBlockPosition)
+
+                this.hideAvailableBlocks()
+                this.isProcessing = false
+            }
+        },
+
+        async removeBlock (position) {
+            if (! this.isProcessing) {
+                this.isProcessing = true
+
+                await this.$wire.removeBlock(position)
+
+                this.isProcessing = false
+            }
         }
     }
 }

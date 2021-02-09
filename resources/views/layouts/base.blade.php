@@ -19,17 +19,17 @@
     @stack('styles')
 
     {{-- Main Script --}}
-    {{--<script src="{{ mix('manifest.js', 'vendor/fastlane') }}" defer></script>--}}
-    {{--<script src="{{ mix('vendor.js', 'vendor/fastlane') }}" defer></script>--}}
     <script src="{{ mix('app.js', 'vendor/fastlane') }}" defer></script>
+
+    {{-- Livewire scripts --}}
+    @livewireScripts
+    <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js" data-turbo-eval="false"></script>
 </head>
 <body class="font-sans antialiased h-screen {{ $bg ?? 'bg-gray-200' }}">
 
 {{ $slot }}
 
 @stack('modals')
-
-@livewireScripts
 
 <script>
     window.fastlane = {

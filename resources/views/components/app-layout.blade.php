@@ -12,7 +12,7 @@
                     <strong class="block font-semibold text-gray-800">{{ auth()->user()->name }}</strong>
                     <span class="block font-normal text-gray-600">{{ auth()->user()->email }}</span>
                 </div>
-                <form action="{{ route('fastlane.cp.logout') }}" method="POST">
+                <form action="{{ route('fastlane.cp.logout') }}" method="POST" data-turbo="false">
                     @csrf
                     <x-fl-button submit variant="minimal" color="black" size="lg" class="text-2xl">
                         <x-fl-icon name="sign-out"></x-fl-icon>

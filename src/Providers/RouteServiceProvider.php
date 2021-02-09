@@ -9,6 +9,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Tonysm\TurboLaravel\Http\Middleware\TurboMiddleware;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -37,7 +38,9 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function setupControlPanelRoutes(): void
     {
-        $middleware = config('fastlane.control_panel.middleware');
+        $middleware = array_merge(config('fastlane.control_panel.middleware'), [
+            TurboMiddleware::class,
+        ]);
 
         Route::middleware($middleware)
             ->prefix(config('fastlane.control_panel.url_prefix'))

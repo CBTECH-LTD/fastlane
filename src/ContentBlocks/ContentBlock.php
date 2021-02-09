@@ -9,6 +9,7 @@ use CbtechLtd\Fastlane\Fields\Types\Slug;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 abstract class ContentBlock implements ContentBlockContract, Arrayable
 {
@@ -62,9 +63,9 @@ abstract class ContentBlock implements ContentBlockContract, Arrayable
         return [
             'key' => static::key(),
             'name' => static::name(),
-            'fields' => $this->shallow ? [] : $this->fields->map(function (Field $field) {
+            'fields' => $this->shallow ? [] : $this->fields->getCollection()->map(function (Field $field) {
                 return array_merge($field->toArray(), [
-                    'value' => $field->read($this->model, $this->values[$field->getAttribute()] ?? null),
+                    'value' => '', // $field->read($this->model, $this->values[$field->getAttribute()] ?? null),
                 ]);
             }),
         ];
@@ -73,7 +74,7 @@ abstract class ContentBlock implements ContentBlockContract, Arrayable
     protected function resolveFields(): void
     {
         $defaultFields = new FieldCollection([
-            Slug::make('ID')->required()->unique(),
+            Slug::make('ID')->required()->unique()->withDefault(Str::uuid()->toString()),
         ]);
 
         $this->fields = $defaultFields->merge((new FieldCollection($this->fields())))
