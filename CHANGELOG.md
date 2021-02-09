@@ -6,6 +6,13 @@ All notable changes to `fastlane` will be documented in this file
 
 ---
 
+## [0.12.5] - 2021-02-09
+
+### Fixed
+- Frontend assets not compiled.
+
+---
+
 ## [0.12.4] - 2021-02-09
 
 ### Removed
