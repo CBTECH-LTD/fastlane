@@ -2,6 +2,17 @@
 
 All notable changes to `fastlane` will be documented in this file
 
+## [x.x.x] - 2021-XX-XX
+
+---
+
+## [0.12.4] - 2021-02-09
+
+### Removed
+- Add more button in the editing page.
+
+---
+
 ## [0.12.3] - 2020-11-20
 
 ### Fixed
@@ -204,7 +215,7 @@ All notable changes to `fastlane` will be documented in this file
 
 ### Fixed
 
-- Class name for Fastlane Users migration. 
+- Class name for Fastlane Users migration.
 
 ---
 
