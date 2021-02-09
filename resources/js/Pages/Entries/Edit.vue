@@ -6,9 +6,6 @@
             <f-button :href="item.links.parent" variant="outline" left-icon="arrow-left">
                 {{ $l('core.back_to_list') }}
             </f-button>
-            <f-button :href="item.links.create" variant="outline" color="success" left-icon="plus" class="ml-4">
-                {{ $l('core.add_more') }}
-            </f-button>
             <f-button submit form="editForm"
                       class="ml-4"
                       color="success"
