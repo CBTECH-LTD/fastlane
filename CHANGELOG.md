@@ -6,6 +6,13 @@ All notable changes to `fastlane` will be documented in this file
 
 ---
 
+## [0.12.6] - 2021-03-26
+
+### Added
+- Code editor to rich editor.
+
+---
+
 ## [0.12.5] - 2021-02-09
 
 ### Fixed
