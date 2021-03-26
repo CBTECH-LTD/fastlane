@@ -81,7 +81,7 @@ export default {
                 toolbar: 'undo redo | formatselect | bold italic link | hr | image imagetools media | \
                             table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | \
                             alignleft aligncenter alignright | \
-                            bullist numlist charmap anchor outdent indent | fullscreen help'
+                            bullist numlist charmap anchor outdent indent | code fullscreen help'
             },
             linkUrl: null,
             linkMenuIsActive: false,
