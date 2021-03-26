@@ -6,6 +6,13 @@ All notable changes to `fastlane` will be documented in this file
 
 ---
 
+## [0.12.7] - 2021-03-26
+
+### Changed
+- PHP required versions.
+
+---
+
 ## [0.12.6] - 2021-03-26
 
 ### Added
