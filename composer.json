@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^7.4",
+        "php": "^7.4||^8.0",
         "altek/accountant": "^2.0",
         "altek/eventually": "^1.0",
         "cbtech-ltd/laravel-json-api-transformer": "^0.2.1",
