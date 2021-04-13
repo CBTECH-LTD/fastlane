@@ -139,16 +139,52 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
 
         $entryInstance = $this->newInstance(null);
 
+        // If the request is trying to create a directory...
+        if ($request->has('directory')) {
+            return $this->makeDirectory($entryInstance, $request->get('directory'), $request->get('parent'));
+        }
+
+        // Otherwise the request is storing an uploaded file.
+        return $this->storeFile($request, $entryInstance);
+    }
+
+    protected function queryItems(QueryBuilder $query): void
+    {
+        $query
+            ->disableCache()
+            ->orderBy('name', 'desc')
+            ->when(request()->input('filter.types'), function (QueryBuilder $q, array $types) {
+                $q->getBuilder()->where(function (Builder $q) use ($types) {
+                    foreach ($types as $type) {
+                        if (Str::endsWith($type, '/*')) {
+                            $q->orWhere('mimetype', 'like', Str::replaceLast('/*', '', $type) . '%');
+                            continue;
+                        }
+
+                        $q->orWhere('mimetype', $type);
+                    }
+                });
+            });
+    }
+
+    /**
+     * @param Request $request
+     * @param EntryInstanceContract $entryInstance
+     * @return EntryInstanceContract
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function storeFile(Request $request, EntryInstanceContract $entryInstance): EntryInstanceContract
+    {
         /** @var PersistentAttachmentHandler $handler */
         $uploadedFile = $request->file('files.0');
         $filePath = $uploadedFile->store('files', Config::get('fastlane.attachments.disk'));
 
         $request->merge([
-            'file'      => $filePath,
+            'file' => $filePath,
             'extension' => FileFacade::extension($filePath),
-            'mimetype'  => $uploadedFile->getMimeType(),
-            'size'      => (string)$uploadedFile->getSize(),
-            'active'    => true,
+            'mimetype' => $uploadedFile->getMimeType(),
+            'size' => (string)$uploadedFile->getSize(),
+            'active' => true,
         ]);
 
         // Validate the request data against the create fields
@@ -170,22 +206,25 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
         return $entryInstance;
     }
 
-    protected function queryItems(QueryBuilder $query): void
+    protected function makeDirectory(EntryInstanceContract $entryInstance, string $directory, ?string $parent = null)
     {
-        $query
-            ->disableCache()
-            ->orderBy('name', 'desc')
-            ->when(request()->input('filter.types'), function (QueryBuilder $q, array $types) {
-                $q->getBuilder()->where(function (Builder $q) use ($types) {
-                    foreach ($types as $type) {
-                        if (Str::endsWith($type, '/*')) {
-                            $q->orWhere('mimetype', 'like', Str::replaceLast('/*', '', $type) . '%');
-                            continue;
-                        }
+        $data = [
+            'file' => "{$parent}/{$directory}",
+            'name' => $directory,
+            'mimetype' => 'fastlane/directory',
+            'extension' => 'DIR',
+            'size' => 0,
+            'is_active' => true,
+        ];
 
-                        $q->orWhere('mimetype', $type);
-                    }
-                });
-            });
+        // Validate the request data against the create fields
+        // and save the validated data in a new variable.
+        $fields = $entryInstance->schema()->getFields();
+
+        $this->hydrateFields($entryInstance, $fields, $data);
+
+        $entryInstance->saveModel();
+
+        return $entryInstance;
     }
 }

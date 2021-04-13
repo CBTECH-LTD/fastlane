@@ -6,6 +6,7 @@
                 <div class="toolbar">
                     <div>
                         <f-button @click="openUploadModal" size="lg" left-icon="cloud-upload-alt" :disabled="!uploadForm || isUploading">Upload</f-button>
+                        <f-button @click="addFolder" color="green" size="lg" left-icon="plus">Add Folder</f-button>
                     </div>
                     <div class="flex items-center">
                         <input type="text" class="w-full form-input" placeholder="Search..." :value="searchTerm" @input="onSearch($event.target.value)">
@@ -33,15 +34,19 @@
                                         <input v-if="canSelectFile(file)" type="checkbox" class="form-checkbox p-3" :checked="file.selected" @input="toggleFile(file)">
                                     </div>
                                     <div class="relative w-full h-32 flex flex-col bg-gray-100 border-2 rounded-lg shadow-md overflow-hidden text-xs" :class="file.selected ? 'border-purple-300' : 'border-transparent'">
-                                        <div class="w-full h-20 flex items-center justify-center bg-purple-200 text-purple-600 text-xs font-semibold uppercase rounded overflow-hidden"
+                                        <div class="w-full h-20 flex items-center justify-center text-purple-600 text-xs font-semibold uppercase rounded overflow-hidden"
+                                             :class="isDirectory(file) ? 'bg-orange-200' : 'bg-purple-200'"
                                              :style="isImage(file) ? `background-image: url('${file.url}'); background-size: cover; background-repeat: no-repeat; background-position: center;` : ''">
-                                            <span v-if="!isImage(file)">{{ file.extension }}</span>
+                                            <span v-if="!isImage(file)">
+                                                <f-icon v-if="isDirectory(file)" name="folder" class="text-5xl" />
+                                                <span v-else>{{ file.extension }}</span>
+                                            </span>
                                         </div>
-                                        <div class="flex flex-col flex-grow justify-center px-1 overflow-hidden">
+                                        <div class="flex flex-col flex-grow justify-center px-1 overflow-hidden text-center">
                                             <span class="truncate w-full">
                                                 {{ file.name }}
                                             </span>
-                                            <a :href="file.url" target="_blank" class="block text-brand-700 underline">Download</a>
+                                            <a v-if="file.url" :href="file.url" target="_blank" class="block text-brand-700 underline">Download</a>
                                         </div>
                                     </div>
                                 </div>
@@ -207,6 +212,18 @@ export default {
             //
         },
 
+        async addFolder () {
+            const folderName = window.prompt('Please, provide the name of the folder to be created', '')
+
+            if (folderName) {
+                await axios.post(this.endpoint, {
+                    directory: folderName,
+                })
+
+                this.loadFiles(this.endpoint)
+            }
+        },
+
         toggleFile (file) {
             if (!this.isMultiple) {
                 this.files.forEach(f => {
@@ -274,6 +291,10 @@ export default {
 
         isImage (file) {
             return file.mimetype && file.mimetype.startsWith('image/')
+        },
+
+        isDirectory (file) {
+            return file.mimetype === 'fastlane/directory'
         },
 
         onSearch (value) {

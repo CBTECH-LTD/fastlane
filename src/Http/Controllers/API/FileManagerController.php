@@ -35,6 +35,12 @@ class FileManagerController extends Controller
         $items = $queryFilter
             ->pipeThrough($this->entryType()->queryBuilder())
             ->get()
+            ->mapToGroups(function (EntryInstance $e) {
+                $type = $e->model()->mimetype ? 'directories' : 'files';
+
+                return [ $type => $e ];
+            })
+            ->flatMap
             ->map(
                 fn(EntryInstance $entry) => (new EntryResource($entry))->toIndex()
             );
