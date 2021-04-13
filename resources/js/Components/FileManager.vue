@@ -49,9 +49,9 @@
                         </transition-group>
                     </template>
                 </div>
-                <div v-if="meta" class="pagination">
-                    <f-paginator :meta="meta" :as-links="false" @changed="(url) => loadFiles(url)"/>
-                </div>
+<!--                <div class="pagination">-->
+<!--                    <f-paginator :meta="meta" :as-links="false" @changed="(url) => loadFiles(url)"/>-->
+<!--                </div>-->
             </div>
         </div>
         <div ref="container"></div>
@@ -401,7 +401,8 @@ export default {
     }
 
     .modal .files {
-        @apply py-16;
+        @apply pt-16 h-full;
+        overflow-y: overlay;
     }
 
     .modal .files__list {

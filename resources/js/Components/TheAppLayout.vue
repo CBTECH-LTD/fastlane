@@ -19,7 +19,7 @@
         </div>
         <div class="mt-20 w-full flex">
             <!-- Navigation items -->
-            <div class="flex flex-col bg-white h-screen sticky overflow-hidden" style="width: 320px; top: 80px;">
+            <div class="flex flex-col bg-white sticky overflow-hidden" style="width: 320px; top: 80px; height: calc(100vh - 80px);">
                 <div class="flex-grow overflow-y-auto overflow-x-hidden custom-scroll">
                     <f-navigation-list class="my-6 px-2" :items="this.$page.menu"/>
                 </div>
