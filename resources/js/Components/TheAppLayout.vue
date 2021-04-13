@@ -26,12 +26,12 @@
             </div>
 
             <!-- Main area -->
-            <div class="w-full flex flex-row overflow-x-hidden px-4">
+            <div class="w-full flex flex-row overflow-x-hidden px-4" style="height: calc(100vh - 80px);">
                 <div v-if="$slots.hasOwnProperty('page-sidebar')">
                     <slot name="page-sidebar"/>
                 </div>
                 <div class="w-full mb-8" style="border-radius: 2rem">
-                    <div v-if="$slots.hasOwnProperty('title')" ref="sticky" class="title-bar-wrapper" :class="stickyBarClass">
+                    <div v-if="$slots.hasOwnProperty('title')" class="title-bar-wrapper" :class="stickyBarClass">
                         <div class="title-bar">
                             <div class="w-4/6">
                                 <h1 class="title-bar__title">
@@ -114,7 +114,7 @@ export default {
 
 <style scoped>
 .title-bar-wrapper {
-    @apply sticky top-0 py-8 z-30 transition-all duration-300 overflow-hidden;
+    @apply z-30 transition-all duration-300 overflow-hidden;
     border-top-left-radius: 2rem;
     border-top-right-radius: 2rem;
 }

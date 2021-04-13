@@ -5,8 +5,10 @@ namespace CbtechLtd\Fastlane\EntryTypes\FileManager;
 use CbtechLtd\Fastlane\EntryTypes\EntryType;
 use CbtechLtd\Fastlane\EntryTypes\QueryBuilder;
 use CbtechLtd\Fastlane\FileAttachment\Contracts\PersistentAttachmentHandler;
+use CbtechLtd\Fastlane\Support\Concerns\RendersOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance;
 use CbtechLtd\Fastlane\Support\Contracts\EntryInstance as EntryInstanceContract;
+use CbtechLtd\Fastlane\Support\Contracts\RenderableOnMenu;
 use CbtechLtd\Fastlane\Support\Contracts\SchemaField;
 use CbtechLtd\Fastlane\Support\Contracts\WithCollectionLinks;
 use CbtechLtd\Fastlane\Support\Contracts\WithCustomController;
@@ -26,8 +28,10 @@ use Illuminate\Support\Facades\File as FileFacade;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class FileManagerEntryType extends EntryType implements WithCustomViews, WithCollectionLinks, WithCustomController
+class FileManagerEntryType extends EntryType implements WithCustomViews, WithCollectionLinks, WithCustomController, RenderableOnMenu
 {
+    use RendersOnMenu;
+
     const PERM_MANAGE_FILES = 'manage files';
 
     public function identifier(): string
@@ -115,6 +119,7 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
     public function collectionLinks(): array
     {
         return [
+            ResourceLink::make('fileManager', ["cp.file-manager.index"]),
             ResourceLink::make('upload', ["cp.{$this->identifier()}.store"]),
         ];
     }
@@ -167,17 +172,20 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
 
     protected function queryItems(QueryBuilder $query): void
     {
-        $query->when(request()->input('filter.types'), function (QueryBuilder $q, array $types) {
-            $q->getBuilder()->where(function (Builder $q) use ($types) {
-                foreach ($types as $type) {
-                    if (Str::endsWith($type, '/*')) {
-                        $q->orWhere('mimetype', 'like', Str::replaceLast('/*', '', $type) . '%');
-                        continue;
-                    }
+        $query
+            ->disableCache()
+            ->orderBy('name', 'desc')
+            ->when(request()->input('filter.types'), function (QueryBuilder $q, array $types) {
+                $q->getBuilder()->where(function (Builder $q) use ($types) {
+                    foreach ($types as $type) {
+                        if (Str::endsWith($type, '/*')) {
+                            $q->orWhere('mimetype', 'like', Str::replaceLast('/*', '', $type) . '%');
+                            continue;
+                        }
 
-                    $q->orWhere('mimetype', $type);
-                }
+                        $q->orWhere('mimetype', $type);
+                    }
+                });
             });
-        });
     }
 }

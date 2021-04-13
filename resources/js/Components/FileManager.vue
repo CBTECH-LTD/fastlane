@@ -1,8 +1,9 @@
 <template>
-    <div tabindex="0" @keydown.esc="close">
-        <div class="fixed top-0 left-0 w-full h-screen bg-black bg-opacity-50 flex items-center justify-center p-8" style="z-index: 2000;">
-            <div class="relative w-full h-full bg-white shadow-lg rounded-lg">
-                <div class="absolute top-0 left-0 w-full h-16 flex items-center justify-between border-b border-gray-200 px-4">
+    <div v-bind="outerContainerAttrs" @keydown.esc="close">
+        <div class="overlay">
+            <div class="mainContainer">
+                <!-- TOOLBAR -->
+                <div class="toolbar">
                     <div>
                         <f-button @click="openUploadModal" size="lg" left-icon="cloud-upload-alt" :disabled="!uploadForm || isUploading">Upload</f-button>
                     </div>
@@ -10,34 +11,37 @@
                         <input type="text" class="w-full form-input" placeholder="Search..." :value="searchTerm" @input="onSearch($event.target.value)">
                         <!--                        <v-select class="form-input w-64 ml-4" clearable :options="fileTypesOptions" :value="searchType" @input="onSearchType"></v-select>-->
                     </div>
-                    <div>
-                        <f-button @click="selectFiles" color="green" size="lg" left-icon="cloud-upload-alt" :disabled="!selectedFiles.length">Select</f-button>
-                        <f-button @click="close" variant="minimal" size="lg" left-icon="close">Cancel</f-button>
+                    <div v-if="selectable || deletable">
+                        <f-button v-if="selectable" @click="selectFiles" color="green" size="lg" left-icon="cloud-upload-alt" :disabled="!selectedFiles.length">Select</f-button>
+                        <f-button v-if="deletable && selectedFiles.length" @click="deleteFiles" color="red" size="lg" left-icon="cloud-upload-alt">Delete Files</f-button>
+                        <f-button v-if="selectable" @click="close" variant="minimal" size="lg" left-icon="close">Cancel</f-button>
                     </div>
                 </div>
-                <div class="h-full py-16">
+
+                <!-- FILES LIST -->
+                <div class="files">
                     <template v-if="isLoading">
                         <div class="flex justify-center items-center w-full h-full">
                             <f-spinner></f-spinner>
                         </div>
                     </template>
                     <template v-else-if="files.length">
-                        <transition-group name="files-list" tag="div" class="w-full max-h-full p-4 flex flex-wrap overflow-x-hidden overflow-y-auto">
+                        <transition-group name="files-list" tag="div" class="files__list">
                             <template v-for="file in files">
-                                <div v-if="file.visible" :key="file.id" class="relative w-1/3 p-1">
+                                <div v-if="file.visible" :key="file.id" class="relative w-32 p-2">
                                     <div class="absolute top-0 left-0 z-10">
                                         <input v-if="canSelectFile(file)" type="checkbox" class="form-checkbox p-3" :checked="file.selected" @input="toggleFile(file)">
                                     </div>
-                                    <div class="relative w-full h-12 flex items-center bg-gray-100 border border-gray-300 rounded-lg shadow-md overflow-hidden">
-                                        <div class="w-16 h-full flex items-center justify-center bg-purple-300 p-2 border-r border-purple-500 text-purple-600 text-xs font-semibold uppercase"
+                                    <div class="relative w-full h-32 flex flex-col bg-gray-100 border-2 rounded-lg shadow-md overflow-hidden text-xs" :class="file.selected ? 'border-purple-300' : 'border-transparent'">
+                                        <div class="w-full h-20 flex items-center justify-center bg-purple-200 text-purple-600 text-xs font-semibold uppercase rounded overflow-hidden"
                                              :style="isImage(file) ? `background-image: url('${file.url}'); background-size: cover; background-repeat: no-repeat; background-position: center;` : ''">
                                             <span v-if="!isImage(file)">{{ file.extension }}</span>
                                         </div>
-                                        <div class="flex-grow flex flex-col justify-center h-full px-2">
-                                        <span class="truncate w-full pr-2">
-                                            {{ file.name }}
-                                        </span>
-                                            <a :href="file.url" target="_blank" class="block text-sm text-brand-700 underline">Download</a>
+                                        <div class="flex flex-col flex-grow justify-center px-1 overflow-hidden">
+                                            <span class="truncate w-full">
+                                                {{ file.name }}
+                                            </span>
+                                            <a :href="file.url" target="_blank" class="block text-brand-700 underline">Download</a>
                                         </div>
                                     </div>
                                 </div>
@@ -45,7 +49,7 @@
                         </transition-group>
                     </template>
                 </div>
-                <div v-if="meta" class="absolute bottom-0 left-0 px-4 w-full h-16 border-t border-gray-200 flex items-center justify-center">
+                <div v-if="meta" class="pagination">
                     <f-paginator :meta="meta" :as-links="false" @changed="(url) => loadFiles(url)"/>
                 </div>
             </div>
@@ -101,6 +105,18 @@ export default {
             type: Array,
             default: () => [],
         },
+        selectable: {
+            type: Boolean,
+            default: true,
+        },
+        deletable: {
+            type: Boolean,
+            default: false,
+        },
+        inline: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     data () {
@@ -135,13 +151,32 @@ export default {
         },
         isMultiple () {
             return this.maxNumberOfFiles === undefined || this.maxNumberOfFiles === null || parseInt(this.maxNumberOfFiles) > 1
+        },
+        outerContainerAttrs () {
+            if (this.inline) {
+                return {
+                    class: 'inline',
+                }
+            }
+
+            return {
+                tabindex: '0',
+                class: 'modal',
+            }
+        },
+        filesListAttrs () {
+            return {
+                class: this.inline ? 'filesList filesList--inline' : 'filesList filesList--overlay',
+            }
         }
     },
 
     methods: {
         close () {
-            this.$emit('close')
-            this.$destroy()
+            if (! this.inline) {
+                this.$emit('close')
+                this.$destroy()
+            }
         },
 
         openUploadModal () {
@@ -166,6 +201,10 @@ export default {
 
         selectFiles () {
             this.$emit('files-selected', this.selectedFiles)
+        },
+
+        deleteFiles () {
+            //
         },
 
         toggleFile (file) {
@@ -326,3 +365,70 @@ export default {
 </script>
 
 <style module src="../../css/components/uppy.dashboard.css"></style>
+
+<style scoped>
+    .files {
+        @apply w-full;
+    }
+
+    .files__list {
+        @apply w-full p-4 flex justify-center flex-wrap;
+    }
+
+    .overlay {
+        @apply w-full;
+    }
+
+    .toolbar {
+        @apply w-full h-16 flex items-center justify-between border-b border-gray-200 px-4;
+    }
+
+    .pagination {
+        @apply px-4 w-full h-16 border-t border-gray-200 flex items-center justify-center;
+    }
+
+    .mainContainer {
+        @apply relative w-full;
+    }
+
+    /**
+     * MODAL
+     */
+
+    .modal .overlay {
+        @apply fixed flex items-center justify-center top-0 left-0 h-screen bg-black bg-opacity-50 p-8;
+        z-index: 2000;
+    }
+
+    .modal .files {
+        @apply py-16;
+    }
+
+    .modal .files__list {
+        @apply max-h-full overflow-x-hidden overflow-y-auto;
+    }
+
+    .modal .toolbar {
+        @apply absolute top-0 left-0;
+    }
+
+    .modal .pagination {
+        @apply absolute bottom-0 left-0;
+    }
+
+    .modal .mainContainer {
+        @apply h-full bg-white shadow-lg rounded-lg;
+    }
+
+    /**
+     * INLINE
+     */
+
+    .inline .filesList {
+
+    }
+
+    .inline .filesList {
+        @apply max-h-full overflow-x-hidden overflow-y-auto;
+    }
+</style>

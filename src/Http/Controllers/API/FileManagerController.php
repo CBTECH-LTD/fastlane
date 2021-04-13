@@ -25,8 +25,8 @@ class FileManagerController extends Controller
     public function index(Request $request)
     {
         $queryFilter = $this->fastlane->getRequest()->buildQueryFilter()
-            ->addOrder('name')
-            ->addOrder('-created_at');
+            ->addOrder('-created_at')
+            ->addOrder('name');
 
         if ($types = $request->input('filter.types')) {
             $queryFilter->addFilter(new WhereMimetype($types));
@@ -38,7 +38,7 @@ class FileManagerController extends Controller
             ->map(
                 fn(EntryInstance $entry) => (new EntryResource($entry))->toIndex()
             );
-        
+
         $collection = EntryResourceCollection::make($items->all())
             ->forEntryType($this->entryType())
             ->withMeta([
