@@ -22,8 +22,17 @@ class File extends BaseModel
         return 'id';
     }
 
+    public function isDirectory(): bool
+    {
+        return $this->mimetype === 'fastlane/directory';
+    }
+
     public function url(): string
     {
+        if ($this->isDirectory()) {
+            return '';
+        }
+
         return Storage::disk(config('fastlane.attachments.disk'))->url($this->file);
     }
 

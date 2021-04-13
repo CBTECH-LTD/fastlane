@@ -44,6 +44,12 @@ class QueryBuilder
         return $this;
     }
 
+    public function removeCache(): self
+    {
+        Cache::forget($this->generateCacheKey());
+        return $this;
+    }
+
     public function cacheFor(int $seconds): self
     {
         $this->cacheSeconds = $seconds;

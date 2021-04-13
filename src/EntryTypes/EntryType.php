@@ -167,10 +167,7 @@ abstract class EntryType implements EntryTypeContract
     {
         $this->gate->authorize('list', $this->model());
 
-        $query = ($queryFilter ?? new QueryFilter)
-            ->addOrder('created_at')
-            ->addOrder('id')
-            ->pipeThrough($this->queryBuilder());
+        $query = ($queryFilter ?? new QueryFilter)->pipeThrough($this->queryBuilder());
 
         $this->queryItemsForRelationField($query);
 
@@ -180,14 +177,9 @@ abstract class EntryType implements EntryTypeContract
     public function getItems(?QueryFilterContract $queryFilter = null): LengthAwarePaginator
     {
         $this->gate->authorize('list', $this->model());
-
         $this->prepareQueryFilter($queryFilter ?? new QueryFilter);
 
-        $query = $queryFilter
-            ->addOrder('created_at')
-            ->addOrder('id')
-            ->pipeThrough($this->queryBuilder());
-
+        $query = $queryFilter->pipeThrough($this->queryBuilder());
         $this->queryItems($query);
 
         return $query->paginate($this->getItemsPerPage());

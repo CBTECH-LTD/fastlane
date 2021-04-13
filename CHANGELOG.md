@@ -6,6 +6,16 @@ All notable changes to `fastlane` will be documented in this file
 
 ---
 
+## [0.13.0] - 2021-04-13
+
+### Added
+- File Manager page.
+
+### Changed
+- Admin CSS to improve scrolling on navigation and main area.
+
+---
+
 ## [0.12.7] - 2021-03-26
 
 ### Changed
