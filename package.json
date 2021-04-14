@@ -45,7 +45,7 @@
         "@uppy/image-editor": "^0.1.5",
         "@uppy/xhr-upload": "^1.6.3",
         "ajv": "^6.12.2",
-        "axios": "^0.19",
+        "axios": "^0.21",
         "flatpickr": "^4.6.3",
         "fuse.js": "^6.4.1",
         "inputmask": "^5.0.5",
