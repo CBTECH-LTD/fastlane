@@ -15,6 +15,7 @@ class File extends BaseModel
         'extension',
         'size',
         'mimetype',
+        'parent_id',
     ];
 
     public function getRouteKeyName()
@@ -46,6 +47,7 @@ class File extends BaseModel
             'extension' => $this->extension,
             'size'      => $this->size,
             'mimetype'  => $this->mimetype,
+            'parent_id' => $this->parent_id,
         ];
     }
 }

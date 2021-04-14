@@ -71,7 +71,10 @@ class QueryBuilder
     public function key($value): self
     {
         $this->builder->whereKey($value);
-        return $this->addCacheKey("key[{$value}]");
+
+        $cacheKey = is_array($value) ? implode(':', $value) : $value;
+
+        return $this->addCacheKey("key[{$cacheKey}]");
     }
 
     public function slug(string $value): self

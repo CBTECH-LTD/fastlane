@@ -66,7 +66,8 @@ Route::middleware(['fastlane.auth:fastlane-cp', 'verified'])->group(function ($r
 
     $router->middleware('fastlane.resolve:' . app()->make(FileManagerEntryType::class)->identifier())->group(function () use ($router) {
         $router->get('file-manager/files', [FileManagerController::class, 'index'])->name('file-manager.index');
-        $router->post('file-manager/files', [FileManagerController::class, 'store'])->name('file-manager.store');
+        $router->post('file-manager/files/store', [FileManagerController::class, 'store'])->name('file-manager.store');
+        $router->post('file-manager/files/move', [FileManagerController::class, 'moveToDirectory'])->name('file-manager.moveToDirectory');
     });
 
     // Register Entry Types routes

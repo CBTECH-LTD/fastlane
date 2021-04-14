@@ -26,7 +26,8 @@ import FSpinner from './Components/Spinner'
 import FTableCard from './Components/TableCard'
 import FTheAppLayout from './Components/TheAppLayout'
 import FTrix from './Components/Trix'
-import FFileManager from './Components/FileManager'
+import FFileManager from './Components/FileManager/FileManager'
+import FFileManagerDraggableFileList from './Components/FileManager/DraggableFileList'
 import UmamiWidget from './Components/Widgets/Umami'
 
 export default {
@@ -47,6 +48,7 @@ export default {
         Vue.component('f-the-app-layout', FTheAppLayout)
         Vue.component('f-trix', FTrix)
         Vue.component('f-file-manager', FFileManager)
+        Vue.component('f-file-manager-draggable-file-list', FFileManagerDraggableFileList)
 
         // Menu specific..)
         Vue.component('f-menu-group', FMenuGroup)
