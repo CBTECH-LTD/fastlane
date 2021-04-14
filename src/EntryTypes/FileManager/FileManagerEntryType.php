@@ -148,6 +148,24 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
         return $this->storeFile($request, $entryInstance);
     }
 
+    public function moveFiles(array $fileIds, ?string $targetId): void
+    {
+        // Check whether the authenticated user can move files.
+        if ($this->policy()) {
+            $this->gate->authorize('update', $this->model());
+        }
+
+        // Retrieve the target and the given files from the database.
+        $target = !is_null($targetId) ? $this->queryBuilder()->key($targetId)->firstOrFail()->model() : null;
+        $files = $this->queryBuilder()->key($fileIds)->get();
+
+
+        $this->queryBuilder()
+            ->getBuilder()
+            ->whereKey($files->map(fn ($e) => $e->model()->getKey())->all())
+            ->update(['parent_id' => optional($target)->getKey()]);
+    }
+
     protected function queryItems(QueryBuilder $query): void
     {
         $query
