@@ -6,6 +6,13 @@ All notable changes to `fastlane` will be documented in this file
 
 ---
 
+## [0.14.0] - 2021-04-14
+
+### Added
+- Folder creation and management on file manager.
+
+---
+
 ## [0.13.0] - 2021-04-13
 
 ### Added
