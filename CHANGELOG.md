@@ -6,6 +6,13 @@ All notable changes to `fastlane` will be documented in this file
 
 ---
 
+## [X.X.X] - 2021-04-15
+
+### Added
+- Handlers to move blocks up and down in the Block Editor.
+
+---
+
 ## [0.14.0] - 2021-04-14
 
 ### Added
