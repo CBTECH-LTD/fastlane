@@ -43,10 +43,11 @@ class FileManagerController extends Controller
             ->pipeThrough($this->entryType()->queryBuilder())
             ->get()
             ->mapToGroups(function (EntryInstance $e) {
-                $type = $e->model()->mimetype ? 'directories' : 'files';
+                $type = $e->model()->isDirectory() ? 'directories' : 'files';
 
                 return [ $type => $e ];
             })
+            ->sortKeys()
             ->flatMap
             ->map(
                 fn(EntryInstance $entry) => (new EntryResource($entry))->toIndex()

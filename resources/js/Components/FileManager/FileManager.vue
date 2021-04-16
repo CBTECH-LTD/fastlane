@@ -372,12 +372,18 @@ export default {
                 responsive: true,
             }
         }).use(XHRUpload, {
-            endpoint: this.endpoint,
+            endpoint: `${this.endpoint}/store`,
             withCredentials: true,
             bundle: false,
             headers: {
-                'X-CSRF-TOKEN': this.csrfToken
-            }
+                'X-CSRF-TOKEN': this.csrfToken,
+            },
+        })
+
+        this.uppy.on('file-added', (file) => {
+            this.uppy.setFileMeta(file.id, {
+                parent: this.parentId ? this.parentId : '',
+            })
         })
 
         this.uppy.on('complete', async ({ successful }) => {

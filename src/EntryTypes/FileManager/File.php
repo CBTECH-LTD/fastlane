@@ -48,6 +48,7 @@ class File extends BaseModel
             'size'      => $this->size,
             'mimetype'  => $this->mimetype,
             'parent_id' => $this->parent_id,
+            'is_directory' => $this->isDirectory(),
         ];
     }
 }

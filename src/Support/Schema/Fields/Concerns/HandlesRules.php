@@ -130,9 +130,9 @@ trait HandlesRules
     /**
      * Construct the base rules used on all operations.
      *
-     * @return string
+     * @return array
      */
-    protected function getBaseRules(): string
+    protected function getBaseRules(): array
     {
         $rules = $this->required
             ? ['required']
@@ -144,7 +144,7 @@ trait HandlesRules
                 : new Unique($this->entryInstance->model()->getTable(), $this->getName());
         }
 
-        return implode('|', $rules);
+        return $rules;
     }
 
     /**
@@ -155,13 +155,13 @@ trait HandlesRules
     protected function buildCreateRules(): array
     {
         $rules = array_merge(
-            [$this->getBaseRules()],
+            $this->getBaseRules(),
             [Arr::get($this->getTypeRules(), $this->getName(), '')],
-            [$this->createRules]
+            Arr::wrap($this->createRules)
         );
 
         return array_merge(Arr::except($this->getTypeRules(), $this->getName()), [
-            $this->getName() => Collection::make($rules)->filter(fn($r) => ! empty($r))->implode('|'),
+            $this->getName() => Collection::make($rules)->filter(fn($r) => ! empty($r))->all(),
         ]);
     }
 
@@ -173,9 +173,10 @@ trait HandlesRules
     protected function buildUpdateRules(): array
     {
         $rules = array_merge(
-            ['sometimes', $this->getBaseRules()],
+            ['sometimes'],
+            $this->getBaseRules(),
             [Arr::get($this->getTypeRules(), $this->getName(), '')],
-            [$this->updateRules]
+            Arr::wrap($this->updateRules),
         );
 
         return array_merge(Arr::except($this->getTypeRules(), $this->getName()), [

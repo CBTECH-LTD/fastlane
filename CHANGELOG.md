@@ -6,6 +6,14 @@ All notable changes to `fastlane` will be documented in this file
 
 ---
 
+## [0.15.1] - 2021-04-16
+
+### Fixed
+- Media upload not working in the file manager.
+- Mistake on Mimetype query that had been fetching all records independent of the folder being viewed. 
+
+---
+
 ## [0.15.0] - 2021-04-15
 
 ### Added

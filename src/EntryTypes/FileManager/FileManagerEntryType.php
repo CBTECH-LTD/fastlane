@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File as FileFacade;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class FileManagerEntryType extends EntryType implements WithCustomViews, WithCollectionLinks, WithCustomController, RenderableOnMenu
 {
@@ -67,37 +68,21 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
     public function fields(): array
     {
         return [
-            StringField::make('name', 'Name')
-                ->required()
-                ->showOnIndex()
-                ->sortable(),
-
-            StringField::make('extension', 'Extension')
-                ->maxLength(10)
-                ->showOnIndex()
-                ->hideOnForm()
-                ->sortable(),
-
-            HiddenField::make('size', 'Size')->showOnIndex(),
-
-            HiddenField::make('mimetype', 'Mime Type')->showOnIndex(),
-
+            StringField::make('name', 'Name')->required()->showOnIndex(),
+            StringField::make('file', 'File')->required()->showOnIndex(),
+            StringField::make('extension', 'Extension')->maxLength(10)->hideOnForm()->showOnIndex(),
+            ToggleField::make('is_active', 'Active')->required()->hideOnForm()->showOnIndex(),
+            HiddenField::make('size', 'Size')->hideOnForm()->showOnIndex(),
+            HiddenField::make('mimetype', 'Mime Type')->hideOnForm()->showOnIndex(),
+            HiddenField::make('parent_id', 'Parent Directory')->showOnIndex()->withRules([
+                Rule::exists('fastlane_files', 'id')->where('mimetype', 'fastlane/directory'),
+            ]),
             HiddenField::make('url', 'URL')
+                ->hideOnForm()
                 ->showOnIndex()
                 ->readValueUsing(function (EntryInstanceContract $entryInstance) {
                     return new FieldValue('url', $entryInstance->model()->url());
                 }),
-
-            StringField::make('file', 'File')
-                ->showOnIndex()
-                ->required(),
-
-            FieldPanel::make('Settings')->withIcon('tools')
-                ->withFields([
-                    ToggleField::make('is_active', 'Active')
-                        ->required()
-                        ->showOnIndex(),
-                ]),
         ];
     }
 
@@ -141,7 +126,7 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
 
         // If the request is trying to create a directory...
         if ($request->has('directory')) {
-            return $this->makeDirectory($entryInstance, $request->get('directory'), $request->get('parent'));
+            return $this->makeDirectory($entryInstance, $request->input('directory'), $request->input('parent'));
         }
 
         // Otherwise the request is storing an uploaded file.
@@ -202,7 +187,8 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
             'extension' => FileFacade::extension($filePath),
             'mimetype' => $uploadedFile->getMimeType(),
             'size' => (string)$uploadedFile->getSize(),
-            'active' => true,
+            'parent_id' => $request->input('parent'),
+            'is_active' => true,
         ]);
 
         // Validate the request data against the create fields
@@ -219,13 +205,21 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
         // Pass the validated date through all fields, call hooks before saving,
         // then call more hooks after model has been saved.
         $this->hydrateFields($entryInstance, $fields, $data);
-
         $entryInstance->saveModel();
+
         return $entryInstance;
     }
 
     protected function makeDirectory(EntryInstanceContract $entryInstance, string $directory, ?string $parent = null)
     {
+        Validator::make([
+            'directory' => $directory,
+            'parent_id' => $parent
+        ], [
+            'directory' => 'required|string',
+            'parent_id' => ['nullable', Rule::exists('fastlane_files', 'id')->where('mimetype', 'fastlane/directory')],
+        ])->validate();
+
         $data = [
             'file' => "{$parent}/{$directory}",
             'name' => $directory,
@@ -233,6 +227,7 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
             'extension' => 'DIR',
             'size' => 0,
             'is_active' => true,
+            'parent_id' => $parent,
         ];
 
         // Validate the request data against the create fields
@@ -240,7 +235,6 @@ class FileManagerEntryType extends EntryType implements WithCustomViews, WithCol
         $fields = $entryInstance->schema()->getFields();
 
         $this->hydrateFields($entryInstance, $fields, $data);
-
         $entryInstance->saveModel();
 
         return $entryInstance;
