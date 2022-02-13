@@ -44,7 +44,7 @@
         "@uppy/dashboard": "^1.12.5",
         "@uppy/image-editor": "^0.1.5",
         "@uppy/xhr-upload": "^1.6.3",
-        "ajv": "^6.12.2",
+        "ajv": "^6.12.3",
         "axios": "^0.19",
         "flatpickr": "^4.6.3",
         "fuse.js": "^6.4.1",
