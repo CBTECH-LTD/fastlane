@@ -50,7 +50,7 @@
         "fuse.js": "^6.4.1",
         "inputmask": "^5.0.5",
         "lodash": "^4.17.19",
-        "moment": "^2.27.0",
+        "moment": "^2.29.2",
         "popper.js": "^1.12",
         "portal-vue": "^2.1.7",
         "tailwindcss": "^1.4.6",
